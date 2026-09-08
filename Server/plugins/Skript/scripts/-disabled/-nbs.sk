@@ -1,0 +1,119 @@
+import:
+    com.xxmicloxx.NoteBlockAPI.model.Song
+    com.xxmicloxx.NoteBlockAPI.songplayer.EntitySongPlayer
+    com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder
+    com.xxmicloxx.NoteBlockAPI.model.RepeatMode
+    java.io.File
+
+
+on tab complete of "/playsong":
+    set {_songsFolder} to new File("songs")
+    {_songsFolder}.exists() is true:
+        set {_files::*} to ...{_songsFolder}.listFiles()
+        loop {_files::*}:
+            loop-value.getName() contains ".nbs":
+                set {_name} to loop-value.getName()
+                
+                replace all ".nbs" with "" in {_name}
+                add {_name} to tab completions
+
+command /playsong [<text>]:
+    permission: music.play
+    trigger:
+        
+        set {_songName} to arg
+        
+        {_songName} is not set:
+            send "&cUsage: /playsong <song name>"
+            stop
+        
+        
+        {music::%player's uuid%} is set:
+            send "&cYou already have a song playing! Use /stopsong first."
+            stop
+        
+        
+        {_songName} doesn't contain ".nbs":
+            set {_songName} to "%{_songName}%.nbs"
+        set {_file} to new File("songs/%{_songName}%")
+        
+        {_file}.exists() is false:
+            send "&cSong '%{_songName}%' not found!"
+            stop
+        
+        
+        set {_song} to NBSDecoder.parse({_file})
+        
+        
+        set {music::%player's uuid%} to new EntitySongPlayer({_song})
+        
+        
+        {music::%player's uuid%}.setEntity(player)
+        
+        
+        {music::%player's uuid%}.addPlayer(player)
+        
+        
+        {music::%player's uuid%}.setAutoDestroy(true)
+        {music::%player's uuid%}.setRepeatMode(RepeatMode.NO)
+        
+        
+        {music::%player's uuid%}.setPlaying(true)
+        
+        send "&aPlaying: &f%{_song}.getTitle()%"
+        send "&7The song will follow you as you move!"
+
+command /stopsong:
+    permission: music.stop
+    trigger:
+        
+        {music::%player's uuid%} is not set:
+            send "&cYou don't have any song playing!"
+            stop
+        
+        
+        {music::%player's uuid%}.setPlaying(false)
+        {music::%player's uuid%}.destroy()
+        delete {music::%player's uuid%}
+        
+        send "&cStopped your song"
+
+command /pausesong:
+    permission: music.pause
+    trigger:
+        {music::%player's uuid%} is not set:
+            send "&cYou don't have any song playing!"
+            stop
+        
+        {music::%player's uuid%}.setPlaying(false)
+        send "&ePaused your song"
+
+command /resumesong:
+    permission: music.resume
+    trigger:
+        {music::%player's uuid%} is not set:
+            send "&cYou don't have any song playing!"
+            stop
+        
+        {music::%player's uuid%}.setPlaying(true)
+        send "&aResumed your song"
+
+command /volume <integer>:
+    permission: music.volume
+    trigger:
+        {music::%player's uuid%} is not set:
+            send "&cYou don't have any song playing!"
+            stop
+        
+        arg-1 is between 0 and 100:
+            {music::%player's uuid%}.setVolume(arg-1)
+            send "&aVolume set to %arg-1%%%"
+        else:
+            send "&cVolume must be between 0 and 100!"
+
+
+on quit:
+    {music::%player's uuid%} is set:
+        {music::%player's uuid%}.setPlaying(false)
+        {music::%player's uuid%}.destroy()
+        delete {music::%player's uuid%}

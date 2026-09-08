@@ -1,0 +1,29 @@
+command nbts:
+    prefix: core
+    executable by: players
+    trigger:
+        player has permission "nbt.NO":
+            stop
+        create a gui with virtual chest inventory with 6 rows named "NBTS":
+            loop {nbts::*}:
+                set {_item} to loop-value
+                set {_item} to player's skull if {_item} is a player head
+                make gui slot (loop-counter - 1) with {_item}
+                set {_n} to loop-counter
+            set lock status of last gui to false
+        open the last gui for player
+
+command editnbts:
+	permission: admin.nbteditor
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		create a gui with virtual chest inventory with 6 rows named "NBT Editor":
+			loop {nbts::*}:
+				make gui slot (loop-counter - 1) with loop-value
+			set lock status of last gui to false
+		open the last gui for player
+
+on inventory close:
+	event-inventory's name is "NBT Editor"
+	set {nbts::*} to all items in event-inventory

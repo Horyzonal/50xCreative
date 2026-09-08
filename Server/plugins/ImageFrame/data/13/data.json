@@ -1,0 +1,164 @@
+{
+  "type": "imageframe:url_static",
+  "index": 13,
+  "name": "50xNews1",
+  "url": "https://cdn.discordapp.com/attachments/1100845111723708529/1260634172502835312/White_and_Black_Professional_Magazine_Cover_2-1.png?ex\u003d6a317a10\u0026is\u003d6a302890\u0026hm\u003dc6cfed2ed1e528555cbb2805382345a0038da485bcd41497c595273a39e1a3c3\u0026",
+  "width": 5,
+  "height": 6,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "hasAccess": {},
+  "creationTime": 1781547665046,
+  "mapdata": [
+    {
+      "mapid": 486,
+      "image": "0.png",
+      "markers": []
+    },
+    {
+      "mapid": 487,
+      "image": "1.png",
+      "markers": []
+    },
+    {
+      "mapid": 488,
+      "image": "2.png",
+      "markers": []
+    },
+    {
+      "mapid": 489,
+      "image": "3.png",
+      "markers": []
+    },
+    {
+      "mapid": 490,
+      "image": "4.png",
+      "markers": []
+    },
+    {
+      "mapid": 491,
+      "image": "5.png",
+      "markers": []
+    },
+    {
+      "mapid": 492,
+      "image": "6.png",
+      "markers": []
+    },
+    {
+      "mapid": 493,
+      "image": "7.png",
+      "markers": []
+    },
+    {
+      "mapid": 494,
+      "image": "8.png",
+      "markers": []
+    },
+    {
+      "mapid": 495,
+      "image": "9.png",
+      "markers": []
+    },
+    {
+      "mapid": 496,
+      "image": "10.png",
+      "markers": []
+    },
+    {
+      "mapid": 497,
+      "image": "11.png",
+      "markers": []
+    },
+    {
+      "mapid": 498,
+      "image": "12.png",
+      "markers": []
+    },
+    {
+      "mapid": 499,
+      "image": "13.png",
+      "markers": []
+    },
+    {
+      "mapid": 500,
+      "image": "14.png",
+      "markers": []
+    },
+    {
+      "mapid": 501,
+      "image": "15.png",
+      "markers": []
+    },
+    {
+      "mapid": 502,
+      "image": "16.png",
+      "markers": []
+    },
+    {
+      "mapid": 503,
+      "image": "17.png",
+      "markers": []
+    },
+    {
+      "mapid": 504,
+      "image": "18.png",
+      "markers": []
+    },
+    {
+      "mapid": 505,
+      "image": "19.png",
+      "markers": []
+    },
+    {
+      "mapid": 506,
+      "image": "20.png",
+      "markers": []
+    },
+    {
+      "mapid": 507,
+      "image": "21.png",
+      "markers": []
+    },
+    {
+      "mapid": 508,
+      "image": "22.png",
+      "markers": []
+    },
+    {
+      "mapid": 509,
+      "image": "23.png",
+      "markers": []
+    },
+    {
+      "mapid": 510,
+      "image": "24.png",
+      "markers": []
+    },
+    {
+      "mapid": 511,
+      "image": "25.png",
+      "markers": []
+    },
+    {
+      "mapid": 512,
+      "image": "26.png",
+      "markers": []
+    },
+    {
+      "mapid": 513,
+      "image": "27.png",
+      "markers": []
+    },
+    {
+      "mapid": 514,
+      "image": "28.png",
+      "markers": []
+    },
+    {
+      "mapid": 515,
+      "image": "29.png",
+      "markers": []
+    }
+  ]
+}

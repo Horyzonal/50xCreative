@@ -1,0 +1,9 @@
+every tick:
+    set {_p} to player("Kundaliel")
+    set {_e} to {_p}'s eye
+    set {_e} to location 0.25 meters in front of {_e}
+    add location 0.1 meters to the left of {_e} to {_e::*}
+    add location 0.1 meters to the right of {_e} to {_e::*}
+    loop all players:
+        loop-player's world is {_p}'s world
+        make 1 of electric spark at {_e::*} with extra 0 for {_p}

@@ -1,0 +1,59 @@
+{
+  "type": "imageframe:url_static",
+  "index": 4,
+  "name": "whoisthat",
+  "url": "https://media.discordapp.net/attachments/1344310558995906570/1515020258157658323/image.png?ex\u003d6a2d7c11\u0026is\u003d6a2c2a91\u0026hm\u003df91bf0912cf4fd1a7e556da11a2aba0e94b078cc472da802e92770a3dabb27c8\u0026\u003d\u0026format\u003dwebp\u0026quality\u003dlossless",
+  "width": 3,
+  "height": 3,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "hasAccess": {},
+  "creationTime": 1781304258434,
+  "mapdata": [
+    {
+      "mapid": 362,
+      "image": "0.png",
+      "markers": []
+    },
+    {
+      "mapid": 363,
+      "image": "1.png",
+      "markers": []
+    },
+    {
+      "mapid": 364,
+      "image": "2.png",
+      "markers": []
+    },
+    {
+      "mapid": 365,
+      "image": "3.png",
+      "markers": []
+    },
+    {
+      "mapid": 366,
+      "image": "4.png",
+      "markers": []
+    },
+    {
+      "mapid": 367,
+      "image": "5.png",
+      "markers": []
+    },
+    {
+      "mapid": 368,
+      "image": "6.png",
+      "markers": []
+    },
+    {
+      "mapid": 369,
+      "image": "7.png",
+      "markers": []
+    },
+    {
+      "mapid": 370,
+      "image": "8.png",
+      "markers": []
+    }
+  ]
+}

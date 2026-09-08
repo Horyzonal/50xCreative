@@ -1,0 +1,368 @@
+# Don't Delete!!!
+
+import:
+	java.lang.String
+
+options:
+	err: &8(&4&l❗&8)&c
+	info: &8(<##FC00FF>&l❗&8)&f
+	usage: &8(&4&l❗&8) &cCorrect command usage &7»&f
+	notyou: &8(&4&l❗&8) &cConsole may not use this command.
+	noperm: &8(&4&l❗&8) &cYou do not have permission for this command.
+	notthis: &8(&4&l❗&8) &cYou may not use this feature of the command.
+	nothere: &8(&4&l❗&8) &cYou may not use this command in this region.
+	nothigh: &8(&4&l❗&8) &cThat person has a higher authority than you.
+	notnow: &8(&4&l❗&8) &cYou may use this command after %remaining time%.
+	notplayed: &8(&4&l❗&8) &cPlayer hasn't played before
+
+command banana <player>:
+	usage: {@err} &cCorrect command usage &7»&f /banana <player>
+	permission: op
+	permission message: {@noperm}
+	trigger:
+		give arg carrot named "&eBanana"
+		send title "&e&lYou've been Bananaed" to arg
+		broadcast "&e&lThis is bananas! %arg% got bananaed"
+		send "&8[&2&l✔&8]&e You've bananaed %arg%"
+
+command editnbts:
+	permission: admin.nbteditor
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		create a gui with virtual chest inventory with 6 rows named "NBT Editor":
+			loop {nbts::*}:
+				make gui slot (loop-counter - 1) with loop-value with lore "&c&lClick To Delete":
+					delPrompt(event-item, index of event-slot, player)
+			set lock status of last gui to true
+		open the last gui for player
+
+function delPrompt(i: item, s: integer, p: player):
+	create a gui with virtual chest inventory with 3 rows named "NBT Editor":
+		make gui slot (all integers between 0 and 26) with gray stained glass pane
+		make gui slot 12 to green stained glass pane:
+			clear {nbts::%{_s}+1%}
+			close inventory to {_p}
+			make player execute "editnbts"
+		make gui slot 14 to red stained glass pane:
+			close inventory to {_p}
+			make player execute "editnbts"
+		make gui slot 13 to {_i}
+	open the last gui for {_p}
+
+on place of barriers:
+	priority(player) < 8
+	remove all barriers from player's inventory
+	cancel event
+
+command entityfix:
+	trigger:
+		if priority(sender) < 10:
+			send "{@noperm} &cSorry you don't have permission to run this. If you believe there is a glitched entity please contact staff"
+			stop
+		set {_recievers::*} to console and all players where [priority(input) >= 10]
+		stafflog("{@info} &f%player% has started a &aEntityfix")
+		send formatted "%minimessage from "<bold><gradient:#ABCDEF:#FEDCBA>ENTITYLOG"% &8→&f <#ABCDEF>Looping Entities..." to {_recievers::*}
+		loop all entities in world "creative" where [input isn't a player]:
+			clear nbt of loop-entity
+			kill loop-entity
+			add 1 to {_count::%loop-entity's name%}
+		if amount of {_count::*} is 0:
+			send "%minimessage from "<bold><gradient:#ABCDEF:#FEDCBA>ENTITYLOG"% &8→&f <#ABCDEF>No Entities..." to {_recievers::*}
+			stop
+		loop indices of {_count::*}:
+			add "%loop-value in proper case% (%{_count::%loop-value%}%)" to {_list::*}
+		set {_temp} to join {_list::*} with "&f,<#ABCDEF> "
+		send formatted "%minimessage from "<bold><gradient:#ABCDEF:#FEDCBA>ENTITYLOG"% &8→&f <#ABCDEF>%{_temp}%" to {_recievers::*}
+		send formatted "%minimessage from "<bold><gradient:#ABCDEF:#FEDCBA>ENTITYLOG"% &8→&f <#ABCDEF>Cleared %sum({_count::*})% Entities" to {_recievers::*}
+
+
+command blockfix:
+	trigger:
+		if priority(sender) < 10:
+			send "{@noperm} &cSorry, you don't have permission to run this. If you believe there is a glitched block, please contact staff." to sender
+			stop
+		stafflog("{@info} &f%sender% has started a &aBlockfix")
+		stafflog("{@info} &fStarting &eStage 1&f...")
+		loop (blocks within location(100, 317, -100, world "creative") and location(-100, -64, 100, world "creative")) where [input isn't air]:
+			nbt of loop-value isn't nbt from "{}":
+				add loop-value to {_end::*}
+			mod(loop-counter, 50000) = 0:
+				wait 1 tick
+				send actionbar "&eProcessing Blocks: &f%loop-counter%" to sender
+		stafflog("{@info} &fFound &e%amount of {_end::*}% &fblock(s) with NBT.")
+		stafflog("{@info} &fStage 1 complete. Moving on to &eStage 2&f in &e5 seconds&f...")
+		wait 5 seconds
+		stafflog("{@info} &fStarting &eStage 2&f...")
+		loop {_end::*}:
+			clear nbt of loop-value
+			mod(loop-counter, 5) = 0:
+				wait 1 tick
+				send actionbar "&eClearing Blocks: &f%loop-counter%"
+		stafflog("{@info} &aBlockfix complete! &fAll nbt of blocks have been cleared.")
+
+on shoot:
+	event-projectile is thrown potion
+	reset nbt of event-projectile
+
+on right click with debug stick:
+	priority(event-player) < 13
+	event-block is piston or sticky piston
+	player's world is "plots"
+	send "&l%smallcaps(name of player's world)% &7»&f You can't debug a &e%parseItemName(event-block)%&f here!" to player
+	cancel event
+
+on portal enter:
+	set block at event-location to air
+
+on join:
+	set {cash::%player's uuid%} to 0 if {cash::%player's uuid%} isn't set
+
+command reversebal [<player>]:
+	permission: op
+	trigger:
+		set {_p} to arg-1 ? player
+		set {cash::%{_p}'s uuid%} to {cash::%{_p}'s uuid%}*-1
+
+###
+function getCorners(l: location) :: locations:
+	set {_x} to x-coord of {_l} - 0.5
+	set {_y} to y-coord of {_l} - 0.5
+	set {_z} to z-coord of {_l} - 0.5
+	add location({_x}, {_y}, {_z}) to {_corners::*}
+	add location(({_x} + 1), {_y}, {_z}) to {_corners::*}
+	add location({_x}, {_y}, ({_z} + 1)) to {_corners::*}
+	add location(({_x} + 1), {_y}, ({_z} + 1)) to {_corners::*}
+	add location({_x}, ({_y} + 1), {_z}) to {_corners::*}
+	add location(({_x} + 1), ({_y} + 1), {_z}) to {_corners::*}
+	add location({_x}, ({_y} + 1), ({_z} + 1)) to {_corners::*}
+	add location(({_x} + 1), ({_y} + 1), ({_z} + 1)) to {_corners::*}
+	return {_corners::*}
+
+function getOffset(loc1: location, loc2: location) :: numbers:
+	set {_x} to (x-coord of {_loc2}) - (x-coord of {_loc1})
+	set {_y} to (y-coord of {_loc2}) - (y-coord of {_loc1})
+	set {_z} to (z-coord of {_loc2}) - (z-coord of {_loc1})
+	return {_x}, {_y}, {_z}
+
+
+on load:
+	set {tools::1} to stick named "&eTeleportation Creator"
+	set {tools::2} to stick named "&aHeight Creator"
+
+every tick:
+	loop all players:
+		loop-player's tool is {tools::1}:
+			set {_pos1} to loop-player's metadata "loc_1"
+			set {_pos2} to loop-player's metadata "loc_2"
+			draw 1 dust using dustOption(red, 1) at getCorners({_pos1}) with extra 0 with force for loop-player
+			draw 1 dust using dustOption(green, 1) at getCorners({_pos2}) with extra 0 with force for loop-player
+
+on left click:
+	player's tool is {tools::1}
+	set player's metadata "loc_1" to location of event-block
+	cancel event
+
+on right click:
+	player's tool is {tools::1}
+	player is sneaking:
+		set player's metadata "type" to raw name of event-block
+		send "{@info} You've set your block to %type of event-block%" to player
+		stop
+	set player's metadata "loc_2" to location of event-block
+	cancel event
+
+command generate [<integer=2>]:
+	permission: op
+	trigger:
+		if any:
+			player's metadata "loc_1" isn't set
+			player's metadata "loc_2" isn't set
+			player's metadata "type" isn't set
+		then:
+			send "{@err} Please set positions!"
+			give {tools::1} to player
+			stop
+		set {_pos1} to player's metadata "loc_1"
+		set {_pos2} to player's metadata "loc_2"
+		set {_loc::*} to getOffset({_pos1}, {_pos2})
+		set {_item} to repeating command block with nbt from "{""minecraft:block_entity_data"":{Command:""execute as @a[distance=..200] at @s if block ~ ~-%arg% ~ %player's metadata "type"% run teleport @s ~%{_loc::1}% ~%{_loc::2}% ~%{_loc::3}%"",SuccessCount:0,TrackOutput:1b,UpdateLastExecution:1b,auto:0b,conditionMet:0b,id:""minecraft:command_block"",powered:0b,auto:1b}}"
+		give {_item} to player
+###
+
+on command:
+	command is "rules":
+		set {_args::*} to args
+		if {_args::1} is "92.5":
+			cancel event
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "&e92.5. Snitch%nl%&fYou have to chug an entire liter of sprite before you snitch.%nl%"
+			send formatted "<ttp:&aClick &fto go to the next page!><run command:/rules 92.5>&7Next page »<reset>%nl%"	
+
+
+command chatgametop:
+	aliases: cgtop
+	trigger:
+		add "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &d&lTOP 10 CHAT GAME WINNERS%nl%" to {_s::*}
+		loop sorted indices of {ChatGameWins::*} in descending order:
+			add "<#ff5cfa>%loop-counter%.&f %loop-value parsed as offlineplayer's name% &7- <#ff5cfa>%numFormat({ChatGameWins::%loop-value%}) ? 0% Wins" to {_s::*}
+			exit loop if loop-counter > 9
+
+		set {_s::*} to "None Recorded" if size of {_s::*} = 1
+		send {_s::*} to sender
+
+
+command sendnames:
+	permission: op
+	trigger:
+		loop all offline players where [priority(input) >= 10]:
+			add loop-value to {_send::*}
+			if mod(loop-counter, 100) = 0:
+				wait 1 tick
+		wait 5 seconds
+		broadcast "All current staff members"
+		broadcast {_send::*}
+		
+
+every tick:
+	loop all players where [input's world is "creative"]:
+		set {_p} to loop-player
+		if any:
+			abs({_p}'s x-coord) > 101
+			abs({_p}'s z-coord) > 101
+		then:
+			priority({_p}) < 12
+			teleport {_p} to location(0, {_p}'s y-coord, 0, world "creative")
+
+on click:
+	raw name of event-item contains "spawn_egg"
+	if nbt of player's tool isn't nbt from "{}":
+		reset nbt of player's tool
+		cancel event
+
+###
+function true_damage(p: player):
+	set boolean tag "true_damage" of custom nbt of {_p}'s tool to true
+
+
+on damage:
+	if boolean tag "true_damage" of custom nbt of attacker's tool is true:
+		add damage to {non.recover::%victim's uuid%}
+		send action bar "%damage% | %{non.recover::%victim's uuid%}%" to attacker
+		set victim's health to victim's health - damage
+
+
+on heal:
+	set entity's health to min(entity's health, entity's max health - {non.recover::%player's uuid%}) - 0.5
+
+on death:
+	clear {non.recover::%victim's uuid%}
+###
+
+on dispense:
+	if any:
+		event-item stack is tagged with tag "paper:shulker_boxes"
+		event-block is tagged with tag "paper:shulker_boxes"
+		event-item stack is tagged with tag "paper:spawn_eggs"
+	then:
+		cancel event
+
+on skript load:
+	delete {supermutechat}
+
+command supermutechat:
+	prefix: staff
+	usage: {@usage} /<mc | supermutechat | chatmute>
+	aliases: mc, chatmute
+	permission: op
+	permission message: {@noperm}
+	trigger:
+		{supermutechat} = on:
+			clear {supermutechat}
+		else:
+			set {supermutechat} to on
+		broadcast "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8→ &6%sender% &fhas %"&9super muted" if {supermutechat} is true else "&aunmuted"% &fthe &eserver chat&f.%nl%"
+
+
+on right click:
+	player's name is "Kundaliel"
+	raw name of event-block contains "iron":
+		toggle block at event-block
+		make player swing their hand
+	event-block is a redstone lamp:
+		set event-block to redstone lamp[lit=true]
+		make player swing their hand
+
+on command:
+	args contain "kundaliel"
+	send "&cundefined"
+	cancel event
+###
+on death:
+	{tofix::*} contains victim:
+		broadcast "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8→ &eDeath bug for world &6%victim's world% &efixed for &6%victim%%nl%"
+		cancel event
+
+command fixplayer <player>:
+	permission: op
+	permission message: {@noperm}
+	trigger:
+		add arg to {tofix::*}
+		set {_origin} to arg's location
+		send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8→ &eTesting worlds for &6%arg%&e..." to sender and arg
+		loop all worlds:
+			teleport arg to spawn location of loop-value
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8→ &6%loop-value% &eTested &7(&f%loop-counter%&8/&f%amount of all worlds%&7)%nl%" to sender and arg
+			wait 1 second
+		send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8→ &eFinished testing worlds for &6%arg%&e." to sender and arg
+		teleport arg to {_origin}
+###
+command /voidworld <text>:
+    permission: op
+    prefix: admin
+    trigger:
+        set {_w} to world creator named arg-1
+        set world type of {_w} to flat
+        set generator settings of {_w} to "{""biome"": ""minecraft:the_void"",""layers"": []}}"
+        set should generate structures of {_w} to false
+        load world from {_w}
+
+
+function getScriptPath(script: string) :: strings:
+	set {_pass::*} to all scripts where [input contains {_script}]
+	return {_pass::*} where [input doesn't start with "-"]
+
+function getBareScriptNames() :: strings:
+	loop all scripts:
+		set {_return::*} to loop-value split at "/"
+		add last element of {_return::*} to {_names::*}
+	return {_names::*} where [input doesn't start with "-"]
+
+
+on tab complete:
+	if event-string is "reload":
+		set tab completions for position 1 to getBareScriptNames()
+		
+
+command reload <string="">:
+	permission: op
+	permission message: {@noperm}
+	trigger:
+		set {_paths::*} to getScriptPath(arg)
+		loop (size of {_paths::*}) times:
+			send "&8→ &eReloading &6%arg% &8(&e%{_paths::%loop-counter%}%&8)%nl%" to all players where [input has permission "op"] and sender
+		reload script {_paths::*}
+
+import:
+    java.util.UUID
+    litebans.api.Database
+
+function testing(p: offlineplayer):
+    create section with {_p} stored in {_isMuted}:
+        set {_uuidString} to {_p}'s uuid
+        if Database.get().isPlayerMuted({_uuidString}, name of {_p}) = true:
+            return true
+        return false
+    
+    run section {_isMuted} async with {_p} and store result in {_hmm} and wait
+    broadcast {_hmm}

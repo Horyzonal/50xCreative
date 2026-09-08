@@ -1,0 +1,254 @@
+import:
+    java.lang.Class
+    java.lang.Boolean
+    java.lang.Float
+
+function apply_velocity_slowdown(entity: entity, amount: number):
+    if double list tag "originalVelocity" of custom nbt of {_entity} isn't set:
+        set {_v} to velocity of {_entity}
+        add x of {_v} to {_v::*}
+        add y of {_v} to {_v::*}
+        add z of {_v} to {_v::*}
+        set double list tag "originalVelocity" of custom nbt of {_entity} to {_v::*}
+    set {_v::*} to double list tag "originalVelocity" of custom nbt of {_entity}
+    set {_nv} to vector {_v::1}, {_v::2}, {_v::3}
+    set velocity of {_entity} to ({_nv} * {_amount})
+
+function setPlayerTickRate(p: player, tickrate: number, frozen: boolean):
+    set {_handleMethod} to {_p}.getClass().getMethod("getHandle")
+    set {_serverPlayer} to {_handleMethod}.invoke({_p})
+    set {_tickrateFloat} to Float.valueOf("%{_tickrate}%")
+    set {_frozenBoolean} to Boolean.valueOf({_frozen})
+    set {_connection} to {_serverPlayer}.getClass().getField("connection").get({_serverPlayer})
+    set {_packetClass} to Class.forName("net.minecraft.network.protocol.game.ClientboundTickingStatePacket")
+    set {_packet} to {_packetClass}.getConstructor(Float.TYPE, Boolean.TYPE).newInstance({_tickrateFloat}, {_frozenBoolean})
+    set {_sendMethod} to {_connection}.getClass().getMethod("send", Class.forName("net.minecraft.network.protocol.Packet"))
+    {_sendMethod}.invoke({_connection}, {_packet})
+
+function lockPlayerCamera(p: player):
+    if {timeclock.locked::%{_p}'s uuid%} is true:
+        stop
+    
+    set {_id} to random integer from 1 to 99999
+    set {_uuid} to "%random uuid%"
+    
+    set {timeclock.locked.id::%{_p}'s uuid%} to {_id}
+    set {timeclock.locked.uuid::%{_p}'s uuid%} to {_uuid}
+    set {timeclock.locked::%{_p}'s uuid%} to true
+    
+    set {_yaw} to yaw of {_p}
+    set {_pitch} to pitch of {_p}
+    set {_loc} to location of {_p}
+    
+    
+    set {timeclock.locked.location::%{_p}'s uuid%} to {_loc}
+    
+    # spawn fake player named "timeclock_freeze" with skin named ({_p}'s name) with name hidden true on tablist false at {_p} with yaw {_yaw} and pitch {_pitch} for {_p} with id {_id} and uuid {_uuid}
+    
+    # set camera of {_p} to entity with id {_id}
+
+function unlockPlayerCamera(p: player):
+    if {timeclock.locked::%{_p}'s uuid%} is not true:
+        stop
+    
+    set camera of {_p} to entity with id (entity id of {_p})
+    remove fake entity with id {timeclock.locked.id::%{_p}'s uuid%} for {_p}
+    
+    delete {timeclock.locked::%{_p}'s uuid%}
+    delete {timeclock.locked.id::%{_p}'s uuid%}
+    delete {timeclock.locked.uuid::%{_p}'s uuid%}
+    delete {timeclock.locked.location::%{_p}'s uuid%}
+
+function createClockDisplay(p: player):
+    
+    removeClockDisplay({_p})
+    
+    
+    set {_loc} to location of {_p}
+    spawn text display at {_loc}:
+        set {_display} to event-entity
+        make {_display} invulnerable
+        set billboard of {_display} to vertical
+        set transformation translation of {_display} to vector(0, 0.75, 0)
+        set text of {_display} to "🕐"
+        set text opacity of {_display} to 255
+        set sky light override of {_display} to 15
+        set block light override of {_display} to 15
+        
+        make {_display} ride {_p}
+        
+        
+        set {timeclock.display::%{_p}'s uuid%} to {_display}
+
+function removeClockDisplay(p: player):
+    if {timeclock.display::%{_p}'s uuid%} is set:
+        set {_display} to {timeclock.display::%{_p}'s uuid%}
+        if {_display} is alive:
+            kill {_display}
+        delete {timeclock.display::%{_p}'s uuid%}
+
+function updateClockDisplay(p: player, progress: number, mode: text):
+    set {_display} to {timeclock.display::%{_p}'s uuid%}
+    
+    if {_display} is not set:
+        createClockDisplay({_p})
+        set {_display} to {timeclock.display::%{_p}'s uuid%}
+    
+    if {_display} is not alive:
+        createClockDisplay({_p})
+        set {_display} to {timeclock.display::%{_p}'s uuid%}
+    
+    set {_timeScale} to 1.0 - {_progress}
+    
+    set text of {_display} to minimessage from "<transition:#00FF00:#FF0000:%{_progress}%>x%{_timeScale}%"
+
+function applySlowdownToPlayers(players: players, tickRate: number, shouldLock: boolean, casterUUID: text):
+    loop {_players::*}:
+        setPlayerTickRate(loop-value, {_tickRate}, false)
+        
+        if {_shouldLock} is true:
+            lockPlayerCamera(loop-value)
+        else:
+            unlockPlayerCamera(loop-value)
+        
+        set string tag "affectedByTimeClock" of custom nbt of loop-value to {_casterUUID}
+
+function applySlowdownToEntities(entities: entities, slowdown: number, casterUUID: text):
+    loop {_entities::*}:
+        apply_velocity_slowdown(loop-value, {_slowdown})
+        set string tag "affectedByTimeClock" of custom nbt of loop-value to {_casterUUID}
+
+function executeTimeSlow(caster: player, radius: number, revolutionTime: number):
+    set {timeclock.active::%{_caster}'s uuid%} to true
+    
+    
+    set {_affectedPlayers::*} to all players in radius {_radius} of {_caster} where [input isn't {_caster}]
+    set {_affectedEntities::*} to all entities in radius {_radius} of {_caster} where [input isn't a player]
+    set {_affectedPlayers::*} to {_affectedPlayers::*} where [input isn't "Kundaliel" or "LeopardGamer"]
+    
+    
+    play sound "entity.warden.heartbeat" with volume 1 and pitch 0.8 at {_caster}
+    play sound "block.sculk_shrieker.shriek" with volume 0.6 and pitch 0.7 at {_caster}
+    
+    
+    loop {_affectedPlayers::*}:
+        play sound "entity.elder_guardian.curse" with volume 0.4 and pitch 1.2 at loop-value
+        play sound "block.portal.ambient" with volume 0.3 and pitch 0.5 at loop-value
+        draw 30 portal particle at loop-value
+    
+    set {_steps} to {_revolutionTime}
+    
+    
+    loop {_steps} times:
+        if {timeclock.active::%{_caster}'s uuid%} is not true:
+            stop
+        
+        set {_progress} to (loop-number - 1) / {_steps}
+        set {_tickRate} to 20 - (20 * {_progress})
+        set {_shouldLock} to false
+        if {_tickRate} <= 0.1:
+            set {_shouldLock} to true
+        
+        loop {_affectedPlayers::*}:
+            updateClockDisplay(loop-value-2, {_progress}, "slow")
+            
+            
+            if mod(loop-counter-2, floor({_steps}/32)) is 0:
+                set {_tickPitch} to 2.0 - (1.5 * {_progress})
+                play sound "block.note_block.basedrum" with volume 0.2 and pitch {_tickPitch} at loop-value-2
+                
+            
+            if mod(loop-counter-2, floor({_steps}/16)) is 0:
+                play sound "block.sculk_sensor.clicking" with volume 0.15 and pitch 1 - {_progress} at loop-value-2
+        
+        applySlowdownToPlayers({_affectedPlayers::*}, {_tickRate}, {_shouldLock}, "%{_caster}'s uuid%")
+        
+        set {_entitySlowdown} to 1.0 - {_progress}
+        applySlowdownToEntities({_affectedEntities::*}, {_entitySlowdown}, "%{_caster}'s uuid%")
+        
+        wait timespan(1, tick)
+    
+    
+    loop {_affectedPlayers::*}:
+        play sound "entity.warden.sonic_boom" with volume 0.3 and pitch 0.5 at loop-value
+        play sound "block.anvil.land" with volume 0.4 and pitch 0.1 at loop-value
+        play sound "block.respawn_anchor.deplete" with volume 0.5 and pitch 0.5 at loop-value
+        draw 50 rgb(20, 0, 40) dust particle at loop-value
+    
+    wait timespan(100, ticks)
+    
+    
+    loop {_affectedPlayers::*}:
+        play sound "entity.warden.emerge" with volume 0.4 and pitch 1.5 at loop-value
+        play sound "block.beacon.activate" with volume 0.3 and pitch 0.8 at loop-value
+        draw 30 reverse portal particle at loop-value
+    
+    loop {_steps} times:
+        if {timeclock.active::%{_caster}'s uuid%} is not true:
+            stop
+        
+        set {_progress} to 1.0 - ((loop-number - 1) / {_steps})
+        set {_tickRate} to 20 - (20 * {_progress})
+        set {_shouldLock} to false
+        if {_tickRate} <= 0.1:
+            set {_shouldLock} to true
+        
+        loop {_affectedPlayers::*}:
+            updateClockDisplay(loop-value-2, {_progress}, "speed")
+            
+            
+            if mod(loop-counter-2, floor({_steps}/32)) is 0:
+                set {_tickPitch} to 0.5 + (1.5 * (1 - {_progress}))
+                play sound "block.note_block.basedrum" with volume 0.2 and pitch {_tickPitch} at loop-value-2
+                
+            
+            if mod(loop-counter-2, floor({_steps}/16)) is 0:
+                play sound "block.note_block.bell" with volume 0.2 and pitch 0.5 + (1.5 * (1 - {_progress})) at loop-value-2
+        
+        applySlowdownToPlayers({_affectedPlayers::*}, {_tickRate}, {_shouldLock}, "%{_caster}'s uuid%")
+        
+        set {_entitySlowdown} to 1.0 - {_progress}
+        applySlowdownToEntities({_affectedEntities::*}, {_entitySlowdown}, "%{_caster}'s uuid%")
+        
+        wait timespan(1, tick)
+    
+    
+    loop {_affectedPlayers::*}:
+        setPlayerTickRate(loop-value, 20, false)
+        unlockPlayerCamera(loop-value)
+        removeClockDisplay(loop-value)
+        delete string tag "affectedByTimeClock" of custom nbt of loop-value
+        play sound "entity.lightning_bolt.thunder" with volume 0.4 and pitch 1.5 at loop-value
+        play sound "entity.player.levelup" with volume 0.3 and pitch 1.2 at loop-value
+        draw 50 glow particle at loop-value
+        draw 30 end rod particle at loop-value
+    
+    loop {_affectedEntities::*}:
+        if double list tag "originalVelocity" of custom nbt of loop-value is set:
+            set {_v::*} to double list tag "originalVelocity" of custom nbt of loop-value
+            set velocity of loop-value to vector {_v::1}, {_v::2}, {_v::3}
+        delete custom nbt of loop-value
+    
+    delete {timeclock.active::%{_caster}'s uuid%}
+
+command create-time-clock [<number=5>] [<number=200>]:
+    permission: timeclock.create
+    trigger:
+        set {_item} to 1 clock
+        set string tag "time-clock" of custom nbt of {_item} to "true"
+        set float tag "radius" of custom nbt of {_item} to arg 1
+        set float tag "revolutionTime" of custom nbt of {_item} to arg 2
+        set name of {_item} to "&5&lTime Slow Clock"
+        set lore of {_item} to "&7Radius: &f%arg 1% blocks", "&7Revolution Time: &f%arg 2% ticks", "", "&eRight-click to activate", "&fClock appears above affected players' heads", "&7Centered on caster's position", "&7Does not affect the caster", "&fWhite &7→ &cRed clock slows time (20→0 TPS)", "&aGreen &7→ &cRed clock speeds time (0→20 TPS)", "", "&cThe slower the clock moves,", "&cthe slower time becomes", "&4Complete freeze at full rotation!", "&4&lCamera locks when frozen!"
+        give {_item} to player
+        send "&aCreated Time Slow Clock!" to player
+
+command /cancel-timeclock:
+    permission: timeclock.use
+    trigger:
+        if {timeclock.active::%player's uuid%} is not true:
+            send "&cYou don't have an active time clock!"
+            stop
+        
+        delete {timeclock.active::%player's uuid%}
+        send "&aTime clock cancelled!"

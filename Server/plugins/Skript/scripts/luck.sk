@@ -1,0 +1,683 @@
+###
+import:
+    org.bukkit.event.block.BlockFertilizeEvent
+    org.bukkit.Material
+    java.awt.Color
+    org.bukkit.block.Block
+    java.lang.String
+
+
+function getRandomFlower(b: text) :: material:
+    if {_b} is "plains" or "sunflower plains":
+        set {_rand} to random integer between 1 and 100
+        if {_rand} <= 20:
+            return dandelion
+        else if {_rand} <= 40:
+            return poppy
+        else if {_rand} <= 52:
+            return azure bluet
+        else if {_rand} <= 64:
+            return red tulip
+        else if {_rand} <= 76:
+            return orange tulip
+        else if {_rand} <= 88:
+            return white tulip
+        else if {_rand} <= 94:
+            return pink tulip
+        else if {_rand} <= 97:
+            return oxeye daisy
+        else:
+            return cornflower
+            
+    else if {_b} is "dripstone caves":
+        set {_rand} to random integer between 1 and 3
+        if {_rand} is 1:
+            return dandelion
+        else if {_rand} is 2:
+            return poppy
+        else:
+            return wildflowers
+            
+    else if {_b} is "deep dark":
+        set {_rand} to random integer between 1 and 2
+        if {_rand} is 1:
+            return dandelion
+        else:
+            return poppy
+            
+    else if {_b} is "forest" or "dark forest":
+        set {_rand} to random integer between 1 and 100
+        if {_rand} <= 45:
+            return dandelion
+        else if {_rand} <= 90:
+            return poppy
+        else:
+            return lily of the valley
+            
+    else if {_b} is "birch forest" or "old growth birch forest":
+        set {_rand} to random integer between 1 and 100
+        if {_rand} <= 45:
+            return dandelion
+        else if {_rand} <= 90:
+            return poppy
+        else:
+            return lily of the valley
+            
+    else if {_b} is "flower forest":
+        set {_rand} to random integer between 1 and 100
+        if {_rand} <= 12:
+            return dandelion
+        else if {_rand} <= 24:
+            return poppy
+        else if {_rand} <= 34:
+            return allium
+        else if {_rand} <= 44:
+            return azure bluet
+        else if {_rand} <= 52:
+            return red tulip
+        else if {_rand} <= 60:
+            return orange tulip
+        else if {_rand} <= 68:
+            return white tulip
+        else if {_rand} <= 76:
+            return pink tulip
+        else if {_rand} <= 84:
+            return oxeye daisy
+        else if {_rand} <= 92:
+            return cornflower
+        else:
+            return lily of the valley
+            
+    else if {_b} is "meadow":
+        set {_rand} to random integer between 1 and 100
+        if {_rand} <= 18:
+            return dandelion
+        else if {_rand} <= 36:
+            return poppy
+        else if {_rand} <= 50:
+            return allium
+        else if {_rand} <= 64:
+            return azure_bluet
+        else if {_rand} <= 78:
+            return oxeye daisy
+        else if {_rand} <= 92:
+            return cornflower
+        else:
+            return wildflowers
+            
+    else if {_b} is "swamp":
+        return blue orchid
+        
+    else if {_b} is "pale garden":
+        return closed eyeblossom
+
+    else if {_b} is "cherry grove":
+        return pink petals
+        
+        
+    else:
+        set {_rand} to random integer between 1 and 2
+        if {_rand} is 1:
+            return dandelion
+        else:
+            return poppy
+
+on BlockFertilizeEvent:
+    loop ...event.getBlocks():
+        set {_location} to loop-value.getLocation()
+        player("6fde7365-ca36-46a8-8d7c-f88e777b282d")'s world is world of {_location}
+        if distance between player("6fde7365-ca36-46a8-8d7c-f88e777b282d") and {_location} is smaller than 5:
+            cancel event
+        set {_b} to biome of block at {_location}
+        loop-value.getType() != Material.TALL_GRASS
+        set block at {_location} to getRandomFlower({_b})
+###
+on death with priority highest:
+    victim is Invulnerable
+    cancel event
+
+on spawn:
+    if event-spawn reason is beehive:
+        cancel event
+    set {_check} to string tag "CustomName" of nbt of entity
+    length of {_check} > 100
+    set string tag "CustomName" of nbt of entity to "Bleh"
+
+
+on tab complete:
+    set {_command} to event-string
+    replace all "/" with "" in {_command}
+    ((aliases of command "toggle-ff") and "toggle-ff") contains {_command}
+
+    if player has permission "op":
+        set tab completions for position 1 to "both", "players", "entities", "projectile"
+
+command toggle-ff [<text>]:
+    permission: op
+    trigger:
+        set {_arg} to arg 1 ? "both"
+        if {_arg} is not "both", "players", "entities", or "projectile":
+            send "&cUsage: /toggle-ff [both|players|entities|projectile]"
+            stop
+
+        if {Kundaliel::FF} is set:
+            toggle {Kundaliel::FF}
+            if {Kundaliel::FF} is true:
+                set {Kundaliel::FF::mode} to {_arg}
+                send "&aForce field enabled &7(&f%{_arg}%&7)"
+            else:
+                send "&cForce field disabled"
+        else:
+            set {Kundaliel::FF} to false
+            set {Kundaliel::FF::mode} to {_arg}
+            send "&cForce field disabled"
+
+every tick:
+    set {_radius} to 10
+    set {_p} to player("Kundaliel")
+
+    set {_p::*} to (all entities in world of {_p}) where [input isn't {_p}]
+    loop {_p::*}:
+        set {_l} to loop-value
+        if {Kundaliel::FF} is true:
+            set {_d} to distance between location of {_l} and location of {_p}
+            if {_d} <= {_radius}:
+                set {_mode} to {Kundaliel::FF::mode} ? "both"
+                if {_mode} is "players":
+                    {_l} is not a player
+                    continue
+                else if {_mode} is "entities":
+                    {_l} is a player
+                    continue
+                else if {_mode} is "projectile":
+                    {_l} is not a projectile
+                    continue
+
+                set {isAffected::%{_l}'s uuid%} to true
+                set {_rate} to {_d} * (20 / {_radius})
+
+                set {_t} to {_d} / {_radius}
+                set {_r} to floor(255 * (1 - {_t}))
+                set {_b} to floor(255 * {_t})
+                set {_step} to (1 / max({_d}, 0.5)) * (180 / 3.14159)
+                set {_y} to {_l}'s y - {_p}'s y
+
+                set {_dx} to {_l}'s x - {_p}'s x
+                set {_dz} to {_l}'s z - {_p}'s z
+                set {_hd} to sqrt({_dx}^2 + {_dz}^2)
+                if {_l} is a player:
+                    setPlayerTickRate({_l}, {_rate}, false)
+                    force draw 1 rgb({_r}, 0, {_b}) dust particle of size 0.5 with extra value 0 at circle({_p} ~ vector(0, {_y}, 0), {_hd}, {_step}) for ({_l} and {_p})
+                else:
+                    set {_v} to 1 / (1 + (2.718281828 ^ (-3 * ({_d} - 4))))
+                    set velocity of {_l} to velocity of {_l} * {_v}
+                    force draw 1 rgb({_r}, 0, {_b}) dust particle of size 2 with extra value 0 at {_l}
+                    {_d} <= 3:
+                        push {_l} (vector between {_p} ~ vector(0, 1, 0) and {_l}) with speed 0.05
+                    delete {isAffected::%{_l}'s uuid%}
+
+        else if {isAffected::%{_l}'s uuid%} is set:
+            setPlayerTickRate({_l}, 20, false)
+            delete {isAffected::%{_l}'s uuid%}
+###
+import:
+    org.bukkit.block.BlockFace
+    java.util.LinkedHashSet
+
+function dedupe(vals: objects) :: objects:
+    set {_set} to new LinkedHashSet()
+    loop {_vals::*}:
+        {_set}.add(loop-value)
+    return ...{_set}
+
+function isExposed(b: block) :: boolean:
+    if {_b}.getRelative(BlockFace.UP).isEmpty():
+        return true
+    if {_b}.getRelative(BlockFace.NORTH).isEmpty():
+        return true
+    if {_b}.getRelative(BlockFace.SOUTH).isEmpty():
+        return true
+    if {_b}.getRelative(BlockFace.EAST).isEmpty():
+        return true
+    if {_b}.getRelative(BlockFace.WEST).isEmpty():
+        return true
+    if {_b}.getRelative(BlockFace.DOWN).isEmpty():
+        return true
+    return false
+
+function blockBounds(b: block) :: locations:
+    set {_o} to location of {_b} ~ vector(-0.5, -0.5, -0.5)
+    loop ...{_b}.getCollisionShape().getBoundingBoxes():
+        add {_o} ~ vector(loop-value.getMinX(), loop-value.getMinY(), loop-value.getMinZ()) to {_r::*}
+        add {_o} ~ vector(loop-value.getMaxX(), loop-value.getMinY(), loop-value.getMinZ()) to {_r::*}
+        add {_o} ~ vector(loop-value.getMinX(), loop-value.getMinY(), loop-value.getMaxZ()) to {_r::*}
+        add {_o} ~ vector(loop-value.getMaxX(), loop-value.getMinY(), loop-value.getMaxZ()) to {_r::*}
+        add {_o} ~ vector(loop-value.getMinX(), loop-value.getMaxY(), loop-value.getMinZ()) to {_r::*}
+        add {_o} ~ vector(loop-value.getMaxX(), loop-value.getMaxY(), loop-value.getMinZ()) to {_r::*}
+        add {_o} ~ vector(loop-value.getMinX(), loop-value.getMaxY(), loop-value.getMaxZ()) to {_r::*}
+        add {_o} ~ vector(loop-value.getMaxX(), loop-value.getMaxY(), loop-value.getMaxZ()) to {_r::*}
+    return {_r::*}
+
+function entityBounds(e: entity) :: locations:
+    set {_bb} to {_e}.getBoundingBox()
+    set {_w} to world of location of {_e}
+    set {_minX} to {_bb}.getMinX()
+    set {_minY} to {_bb}.getMinY()
+    set {_minZ} to {_bb}.getMinZ()
+    set {_maxX} to {_bb}.getMaxX()
+    set {_maxY} to {_bb}.getMaxY()
+    set {_maxZ} to {_bb}.getMaxZ()
+    add location({_minX}, {_minY}, {_minZ}, {_w}) to {_r::*}
+    add location({_maxX}, {_minY}, {_minZ}, {_w}) to {_r::*}
+    add location({_minX}, {_minY}, {_maxZ}, {_w}) to {_r::*}
+    add location({_maxX}, {_minY}, {_maxZ}, {_w}) to {_r::*}
+    add location({_minX}, {_maxY}, {_minZ}, {_w}) to {_r::*}
+    add location({_maxX}, {_maxY}, {_minZ}, {_w}) to {_r::*}
+    add location({_minX}, {_maxY}, {_maxZ}, {_w}) to {_r::*}
+    add location({_maxX}, {_maxY}, {_maxZ}, {_w}) to {_r::*}
+    return {_r::*}
+
+function doBounds(l: location, r: number):
+    loop all blocks in radius {_r} of {_l} where [isExposed(input) is true]:
+        add blockBounds(loop-block) to {_points::*}
+    set {_points::*} to dedupe({_points::*})
+    force draw 1 rgb(255, 0, 0) dust particle of size 0.5 with extra value 0 at {_points::*}
+
+every tick:
+    set {_p} to player("6fde7365-ca36-46a8-8d7c-f88e777b282d")
+    doBounds({_p}'s location, 5)
+###
+
+function kundalielRitual(p: player):
+    set {_carpets::*} to all blocks in radius 5 of {_p} where [input is orange carpet]
+    loop {_carpets::*}:
+        block at loop-value ~ vector(1, 0, 0) is orange candle
+        block at loop-value ~ vector(-1, 0, 0) is orange candle
+        block at loop-value ~ vector(0, 0, 1) is orange candle
+        block at loop-value ~ vector(0, 0, -1) is orange candle
+        add loop-value to {_valid::*}
+    if {_valid::*} is not set:
+        send "[ERROR] No valid ritual" to {_p} and player("6fde7365-ca36-46a8-8d7c-f88e777b282d")
+        stop
+    set {_target} to random element of {_valid::*}
+    force draw 50 poof particles with extra value 0.05 at {_target}
+    teleport player("6fde7365-ca36-46a8-8d7c-f88e777b282d") to {_target} ~ vector(0, -0.5, 0)
+
+
+command ftp <player>:
+    permission: op
+    trigger:
+        kundalielRitual(arg)
+
+
+on teleport with priority lowest:
+    player's name is "Kundaliel"
+    teleport cause is ender pearl
+    cancel event
+    spawn armor stand at event-location:
+        set name of entity to "Kundaliel"
+        set entity's helmet to skull of offlineplayer("6fde7365-ca36-46a8-8d7c-f88e777b282d")
+        run 1 second later:
+            force draw 50 poof particles with extra value 0.05 at entity ~ vector(0, 1, 0)
+            delete entity
+
+on connect:
+    set {_p::*} to all players' names
+    if {_p::*} contains player's name:
+        kick player due to "&cYou're already connected to this proxy."
+        
+
+function mahoragaWheel(center: location, radius: number, rotation: number) :: locations:
+	# radius     = distance from center to outer rim (blue line)
+	# red line   = radius / 2
+	# ballSize   = red / 2 = radius / 4  (diameter of sphere = red line)
+	# spoke tip  = radius + red = radius * 1.5
+ 
+	set {_ballSize} to {_radius} / 4
+	set {_tipDist}  to {_radius} * 1.5
+ 
+	# Outer rim circle
+	add circle({_center}, {_radius}, 10) to {_locs::*}
+ 
+	# Center hub sphere
+	add fibonacciSphere({_center}, {_ballSize}, 50) to {_locs::*}
+ 
+	# 8 spokes + tip balls
+	loop 8 times:
+		set {_angle} to {_rotation} + (loop-number - 1) * 45
+ 
+		set {_v} to spherical vector radius {_tipDist}, yaw {_angle}, pitch 0
+		set {_tip} to {_center} ~ {_v}
+ 
+		add line({_center}, {_tip}, 0.1) to {_locs::*}
+		add fibonacciSphere({_tip}, {_ballSize}, 50) to {_locs::*}
+ 
+	return {_locs::*}
+
+
+
+command test-wheel:
+    permission: op
+    trigger:
+        loop 360 times:
+            force draw orange dust particle of size 0.3 at mahoragaWheel(player's head ~ vector(0, 0.4, 0), 0.5, loop-counter-1)
+            wait 2 ticks
+
+function lerpColor(c1: color, c2: color, t: number) :: color:
+    set {_r1} to red component of {_c1}
+    set {_g1} to green component of {_c1}
+    set {_b1} to blue component of {_c1}
+    set {_r2} to red component of {_c2}
+    set {_g2} to green component of {_c2}
+    set {_b2} to blue component of {_c2}
+    set {_r} to round({_r1} + ({_r2} - {_r1}) * {_t})
+    set {_g} to round({_g1} + ({_g2} - {_g1}) * {_t})
+    set {_b} to round({_b1} + ({_b2} - {_b1}) * {_t})
+    return rgb({_r}, {_g}, {_b})
+
+
+function adaptEntity(e: entity, fail: boolean = false):
+    set {_p} to orange dust particle of size 0.3
+    play sound "entity.creaking.twitch" with volume 2 and pitch 1 at {_e}'s head
+    loop 4 times:
+        set {_swing} to 15
+        if mod(loop-counter, 2) is 0:
+            set {_swing} to -15
+        loop 10 times:
+            force draw {_p} at mahoragaWheel({_e}'s head ~ vector(0, 0.4, 0), 0.5, {_swing})
+            wait 1 tick
+
+
+    if {_fail} is true:
+        loop 15 times:
+            set {_spin} to loop-counter
+            set {_degPerTick} to 6 + {_spin} * 1
+            set {_ticksThisRot} to round((360 / {_degPerTick}))
+
+            set {_t} to {_spin} / 14.0
+            set {_col} to lerpColor(rgb(255, 125, 0), rgb(255, 0, 0), {_t})
+            set {_p2} to {_col} dust particle of size 0.3
+
+            play sound "entity.breeze.wind_burst" with volume 0.3 and pitch (0.4 + {_spin} * 0.08) at {_e}'s head
+
+            loop {_ticksThisRot} times:
+                force draw {_p2} at mahoragaWheel({_e}'s head ~ vector(0, 0.4, 0), 0.5, {_rotation})
+                add {_degPerTick} to {_rotation}
+                wait 1 tick
+
+        play sound "entity.wither.death" with volume 1 and pitch 0.5 at {_e}'s location
+        create an explosion of force 0 at {_e}
+        clearMeta({_e})
+        {_e}.remove()
+        kill {_e}
+    else:
+        # --- Phase 2: full spin (80 ticks = 4 seconds, 4.5 deg/tick) ---
+        # Impressive heavy impact as wheel commits to spinning
+        play sound "entity.wither.break_block" with volume 0.3 and pitch 0.6 at {_e}'s head
+        set {_rotation} to 0
+        loop 80 times:
+            # Whoosh every 20 ticks as the wheel sweeps through the air
+            if mod(loop-counter, 20) is 1:
+                play sound "entity.breeze.wind_burst" with volume 0.3 and pitch 0.4 at {_e}'s head
+            force draw {_p} at mahoragaWheel({_e}'s head ~ vector(0, 0.4, 0), 0.5, {_rotation})
+            add 4.5 to {_rotation}
+            wait 1 tick
+
+        # Eerie cursed energy pulse on adaptation completion
+        play sound "entity.wither.break_block" with volume 0.5 and pitch 0.3 at {_e}'s head
+
+
+command /adapt:
+    permission: op
+    trigger:
+        adaptEntity(player)
+
+import:
+    org.bukkit.event.player.PlayerInteractAtEntityEvent
+    org.bukkit.inventory.EquipmentSlot
+
+on PlayerInteractAtEntityEvent:
+    event.getRightClicked() is a player
+
+    set {_clicker} to event.getPlayer()
+    set {_item} to {_clicker}.getInventory().getItem(event.getHand())
+    {_item} is set
+    delete compound tag "minecraft:equippable" of nbt of {_item}
+    {_clicker}.getInventory().setItem(event.getHand(), {_item})
+
+on right click:
+    set {_hand} to event.getHand()
+    set {_item} to player.getInventory().getItem({_hand})
+
+    if {_item} is not tagged with tag "paper:spawn_eggs":
+        set {_hand} to EquipmentSlot.OFF_HAND
+        set {_item} to player.getInventory().getItem({_hand})
+
+    {_item} is tagged with tag "paper:spawn_eggs"
+    delete compound tag "minecraft:entity_data" of nbt of {_item}
+    player.getInventory().setItem({_hand}, {_item})
+
+function showDeadToAll(target: entity):
+    set {_viewers::*} to all players where [input is not {_target}]
+    fake death packet of entity with id (entity id of {_target}) for {_viewers::*}
+
+function showAliveToAll(target: entity):
+    set {_viewers::*} to all players where [input is not {_target}]
+    add entity id of {_target} to {_ids::*}
+    set {_destroy} to new play_server_entity_destroy packet
+    set field 0 of {_destroy} to {_ids::*}
+    delete {_ids::*}
+    send packet {_destroy} to {_viewers::*} without calling event
+    wait 1 tick
+    packet update {_target} for {_viewers::*}
+
+function clearMeta(e: entity):
+    clear metadata "move;NO" of {_e}
+    clear metadata "death;NO" of {_e}
+    clear metadata "death;adapt" of {_e}
+    clear metadata "death;Kunda" of {_e}
+
+
+on entity move:
+    metadata "move;NO" of entity is true
+    cancel event
+
+# Tier thresholds:
+# 0  - normal
+# 1  - half damage
+# 2  - quarter damage
+# 3  - fire immunity (combust cancel)
+# 4  - potion immunity
+# 5  - drowning immunity
+# 6  - fall damage immunity
+# 7+ - near invincible (damage /128)
+
+on damage:
+    if metadata "move;NO" of victim is true:
+        cancel event
+        stop
+    metadata "death;NO" of victim is true
+    set {_a} to (metadata "death;adapt" of victim)
+    set damage to damage / (2^{_a})
+
+    if {_a} >= 5:
+        if damage cause is drowning, suffocation, fire, or lava:
+            cancel event
+            stop
+
+    if {_a} >= 6:
+        if damage cause is fall:
+            cancel event
+            stop
+
+on death:
+    metadata "death;NO" of victim is true
+    if metadata "move;NO" of victim is true:
+        cancel event
+        stop
+    set metadata "death;adapt" of victim to (metadata "death;adapt" of victim) + 1
+    set {_a} to (metadata "death;adapt" of victim)
+    cancel event
+    showDeadToAll(victim)
+    set metadata "move;NO" of victim to true
+    if metadata "death;Kunda" of victim is true:
+        adaptEntity(victim, true)
+        stop
+    else:
+        adaptEntity(victim)
+
+    run 6 seconds later:
+        extinguish victim
+        clear victim's potion effects
+        set metadata "move;NO" of victim to false
+        showAliveToAll(victim)
+
+on entity potion effect modification:
+    set {_a} to (metadata "death;adapt" of entity)
+    if {_a} >= 4:
+        cancel event
+
+import:
+    org.bukkit.event.entity.EntityCombustEvent
+
+on combust:
+    set {_a} to (metadata "death;adapt" of entity)
+    if {_a} >= 3:
+        cancel event
+
+on entity knockback:
+    set {_v} to knockback victim
+    metadata "death;NO" of {_v} is true
+    set {_a} to (metadata "death;adapt" of {_v})
+    set velocity of {_v} to (velocity of {_v}) / {_a}
+
+import:
+    litebans.api.Database
+    org.bukkit.Bukkit
+    java.lang.System
+    de.myzelyam.api.vanish.VanishAPI
+
+function formatNames(p: objects) :: text:
+    loop {_p::*}:
+        set {_name} to "%loop-value%"
+        replace all "_" with "\_" in {_name}
+        add {_name} to {_names::*}
+    return join {_names::*} with ", "
+
+on message receive:
+    set {_mp::*} to split event-message at " "
+    if 1st element of {_mp::*} is "!getBan":
+        event-member has discord role with id "1130063796090712146"
+        set {_name} to 2nd element of {_mp::*}
+
+        set {_uuid} to Bukkit.getOfflinePlayer({_name}).getUniqueId()
+
+        create section with {_uuid} stored in {_LiteBansDB}:
+            return Database.get().getBan({_uuid}, null, Database.ANY_SERVER_SCOPE)
+        run section {_LiteBansDB} async with {_uuid} and store result in {_ban} and wait
+
+        if {_ban} is not set:
+            reply with hidden ":x: No active ban found for **%{_name}%**."
+            stop
+
+        set {_bannedOn} to floor({_ban}.getDateStart() / 1000)
+        set {_expiresOn} to floor({_ban}.getDateEnd() / 1000)
+
+        if {_ban}.isPermanent() is true:
+            set {_expires} to "Never — Permanent"
+        else:
+            set {_expires} to "<t:%{_expiresOn}%:D> (<t:%{_expiresOn}%:R>)"
+
+        create a new message and store it in {_msg}:
+            make embed:
+                set embed color of embed to hex "00A9FF"
+                set author of embed to "%{_name}%"
+                set author icon of embed to "https://mc-heads.net/avatar/%{_name}%"
+                set description of embed to "**Reason** — %{_ban}.getReason()%"
+                add inline field named "Banned By" with value "%{_ban}.getExecutorName()%" to embed
+                add inline field named "Banned On" with value "<t:%{_bannedOn}%:D>" to embed
+                add inline field named "Duration" with value "%{_ban}.getDurationString()%" to embed
+                add inline field named "Expires" with value "%{_expires}%" to embed
+                set footer of embed to "50xCreative Moderation • Requested by %discord name of event-member%"
+            add last embed to the embeds of the message
+        reply with {_msg}
+
+    else if 1st element of {_mp::*} is "!playerList":
+
+        loop all players:
+            if VanishAPI.getInvisiblePlayers().contains(loop-player's uuid):
+                continue
+            if loop-player has permission "staff.tag":
+                add loop-player to {_staff::*}
+            else:
+                add loop-player to {_regular::*}
+
+        set {_staffTotal} to size of {_staff::*}
+        set {_regularCount} to size of {_regular::*}
+        set {_totalCount} to {_staffTotal} + {_regularCount}
+
+        if {_totalCount} is 0:
+            reply with hidden "There are no players currently online."
+            stop
+
+        sort {_staff::*} in descending order by priority(input)
+
+        loop {_staff::*}:
+            add "%formatNames(loop-value)% (%{loop-value}'s group%)" to {_staffEntries::*}
+
+        set {_staffList} to join {_staffEntries::*} with ", "
+        set {_playerList} to formatNames({_regular::*})
+
+        create a new message and store it in {_msg}:
+            make embed:
+                set embed color of embed to hex "00A9FF"
+                set title of embed to "Online Players (%{_totalCount}%)"
+                if {_staffTotal} > 0:
+                    add inline field named "Staff (%{_staffTotal}%)" with value "%{_staffList}%" to embed
+                if {_regularCount} > 0:
+                    add inline field named "Players (%{_regularCount}%)" with value "%{_playerList}%" to embed
+                set footer of embed to "50xCreative"
+            add last embed to the embeds of the message
+        reply with {_msg}
+
+
+
+command fix-attribute <player>:
+    permission: op
+    trigger:
+        loop all attribute types:
+            delete loop-value attribute modifier of arg
+            send "Deleted %loop-value% of %arg%" to player
+
+
+command beezooka:
+    permission: kunda.beezooka
+    trigger:
+        spawn bee at player's head
+        set {_bee} to last spawned entity 
+        {_bee}.setVelocity(player.getEyeLocation().getDirection().multiply(2))
+
+        run 1 second later:
+            set {_loc} to {_bee}'s location
+            create an explosion of force 0 at {_loc}
+            {_bee}.remove()
+
+on sign edit:
+    loop 4 times:
+        set line loop-value to formatted line loop-value
+
+on kick:
+    player's name is "itzvalemc"
+    cancel event
+
+import:
+    com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent
+    org.bukkit.entity.EntityType
+
+on PreCreatureSpawnEvent:
+    if event.getType().equals(EntityType.TEXT_DISPLAY) is true:
+        event.setCancelled(true)
+
+command me <string>:
+    trigger:
+        make sender say arg

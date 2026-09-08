@@ -1,0 +1,54 @@
+on load:
+	set {Special.Items::1} to paper named "&6Gamemode Toggle" with lore "&7Right-click to toggle gamemode"
+
+on right click:
+    if 1 of player's tool is {Special.Items::1}:
+        if player's gamemode is creative:
+            set player's gamemode to survival
+            send "&aGamemode changed to Survival" to player
+            play sound "entity.player.levelup" with volume 0.2 to player
+        else if player's gamemode is survival:
+            set player's gamemode to creative
+            send "&aGamemode changed to Creative" to player
+            play sound "entity.player.levelup" with volume 0.2 to player
+        else:
+            send "&cYou must be in Creative or Survival mode!" to player
+
+command /gmpaper [<player=%player%>]:
+    permission: gamemode.toggle
+    trigger:
+        give arg {Special.Items::1}
+        send "&aYou received the Gamemode Toggle paper!" to arg
+
+on command "/gmc":
+    if player has 1 {Special.Items::1}:
+        cancel event
+        set player's gamemode to creative
+        send "&6&lGamemode Toggle Paper &7» &aUsing your paper to bypass cooldown!" to player
+        send "&aGamemode changed to Creative" to player
+        play sound "entity.player.levelup" with volume 0.2 to player
+
+on command "/gms":
+    if player has {Special.Items::1}:
+        cancel event
+        set player's gamemode to survival
+        send "&6&lGamemode Toggle Paper &7» &aUsing your paper to bypass cooldown!" to player
+        send "&aGamemode changed to Survival" to player
+        play sound "entity.player.levelup" with volume 0.2 to player
+
+on command "/gamemode":
+    if arg-1 is set:
+        if arg-1 is "creative" or "1" or "c":
+            if player has paper named "&6Gamemode Toggle":
+                cancel event
+                set player's gamemode to creative
+                send "&6&lGamemode Toggle Paper &7» &aUsing your paper to bypass cooldown!" to player
+                send "&aGamemode changed to Creative" to player
+                play sound "entity.player.levelup" with volume 0.2 to player
+        else if arg-1 is "survival" or "0" or "s":
+            if player has paper named "&6Gamemode Toggle":
+                cancel event
+                set player's gamemode to survival
+                send "&6&lGamemode Toggle Paper &7» &aUsing your paper to bypass cooldown!" to player
+                send "&aGamemode changed to Survival" to player
+                play sound "entity.player.levelup" with volume 0.2 to player

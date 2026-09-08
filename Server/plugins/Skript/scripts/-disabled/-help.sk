@@ -1,0 +1,41 @@
+#==========================================================================#
+
+options:
+	err: &8(&4&l❗&8)&c
+	info: &8(<##FC00FF>&l❗&8)&f
+
+	usage: &8(&4&l❗&8) &cCorrect command usage &7»&f
+	notyou: &8(&4&l❗&8) &cConsole may not use this command.
+	noperm: &8(&4&l❗&8) &cYou do not have permission for this command.
+	notthis: &8(&4&l❗&8) &cYou may not use this feature of the command.
+	nothere: &8(&4&l❗&8) &cYou may not use this command in this region.
+	nothigh: &8(&4&l❗&8) &cThat person has a higher authority than you.
+	notnow: &8(&4&l❗&8) &cYou may use this command after %remaining time%.
+
+#==========================================================================#
+
+command help [<text>] [<int>]:
+	prefix: core
+	aliases: commands
+	permission: op
+	trigger:
+		arg-1 = "admin":
+			arg-2 = 1:
+				send "%nl%<#FC00FF>Help Menu &8| &4Admin%nl%"
+				send " &8» &4/adminchat &7- &fChat with other admins."
+				send " &8» &4/broadcast &7- &fAnnounce important messages to everyone."
+				send " &8» &4/clearchat &7- &fClears the server's chat (e.g. inapporpriate texsts.)"
+				send ""
+		arg-1 = "staff":
+			arg-2 = 1:
+				send "%nl%<#FC00FF>Help Menu &8| &cStaff%nl%"
+				send " &8» &c/staffchat &7- &fChat with other staff members."
+				send " &8» &c/broadcast &7- &fAnnounce important messages to everyone."
+				send " &8» &c/clearchat &7- &fClears the server's chat (e.g. inapporpriate texsts.)"
+				send ""
+		else:
+			send "%nl%<#FC00FF>Help Menu%nl%"
+			send " &8» &d/help admin"
+			send " &8» &d/help staff"
+			send " &8» &d/help donor"
+			send ""

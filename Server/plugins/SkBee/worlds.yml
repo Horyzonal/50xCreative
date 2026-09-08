@@ -1,0 +1,41 @@
+worlds:
+  honey:
+    key: minecraft:honey
+    type: FLAT
+    environment: NORMAL
+    seed: -944997318148817722
+    generator-settings: '{"biome": "minecraft:the_void","layers": []}}'
+    structures: false
+    hardcore: false
+  tag:
+    key: minecraft:tag
+    type: FLAT
+    environment: NORMAL
+    seed: -3191290622532091588
+    generator-settings: '{"biome": "minecraft:the_void","layers": []}}'
+    structures: false
+    hardcore: false
+  chaos:
+    key: minecraft:chaos
+    type: FLAT
+    environment: NORMAL
+    seed: 8907435260334237913
+    generator-settings: '{"biome": "minecraft:the_void","layers": []}}'
+    structures: false
+    hardcore: false
+  ffa:
+    key: minecraft:ffa
+    type: FLAT
+    environment: NORMAL
+    seed: 6556994161602803823
+    generator-settings: '{"biome": "minecraft:the_void","layers": []}}'
+    structures: false
+    hardcore: false
+  Empty:
+    key: minecraft:empty
+    type: FLAT
+    environment: NORMAL
+    seed: 5067626417186849895
+    generator-settings: '{"biome": "minecraft:the_void","layers": []}}'
+    structures: false
+    hardcore: false

@@ -1,0 +1,700 @@
+#==========================================================================#
+
+options:
+	err: &8(&4&l❗&8)&c
+	info: &8(<##FC00FF>&l❗&8)&f
+
+	usage: &8(&4&l❗&8) &cCorrect command usage &7»&f
+	notyou: &8(&4&l❗&8) &cConsole may not use this command.
+	noperm: &8(&4&l❗&8) &cYou do not have permission for this command.
+	notthis: &8(&4&l❗&8) &cYou may not use this feature of the command.
+	nothere: &8(&4&l❗&8) &cYou may not use this command in this region.
+	nothigh: &8(&4&l❗&8) &cThat person has a higher authority than you.
+	notnow: &8(&4&l❗&8) &cYou may use this command after %remaining time%.
+
+#==========================================================================#
+
+# ========= #
+# BROADCAST #
+# ========= #
+ 
+command broadcast <text>:
+	prefix: staff
+	aliases: bc, announce
+	usage: {@usage} /broadcast &f<text>
+	permission: staff.broadcast
+	permission message: {@noperm}
+	trigger:
+		play sound "block.note_block.pling" at pitch 2 for all players
+		broadcast "%nl%%minimessage from "<gradient:#fb7100:#f0fd00><b>[❗] ANNOUNCEMENT [❗]"%%nl%%formatted arg-1%%nl%"
+
+# ========= #
+# CLEARCHAT #
+# ========= #
+
+on load:
+	{-ChatClear::*} isn't set
+	loop 2000 times:
+		add random integer between 0 and 69420 to {-ChatClear::*}
+
+on tab complete of "cc", "clearchat" and "chatclear":
+	sender has permission "staff.clearchat"
+	set tab completions for position 1 to all players
+
+command clearchat [<player>]:
+	prefix: staff
+	aliases: cc, chatclear
+	usage: {@usage} /<cc | clearchat | chatclear> &7[player]
+	permission: staff.clearchat
+	permission message: {@noperm}
+	trigger:
+		arg-1 is set:
+			priority(sender) < priority(arg-1):
+				send "{@nothigh}"
+			else:
+				send nl repeated 1000 times to arg-1
+				send "%nl%{@info} Your chat has been &acleared &fby &e%"you" if arg-1 = sender else sender%&f.%nl%" to arg-1
+				stafflog("%sender% &fhas cleared <#B247FF>%arg-1 if sender != arg-1 else "&ftheir own"% chat.") if arg-1 != sender
+		else:
+			set {_p::*} to all players where [priority(input) < 10]
+			send {-ChatClear::*} to {_p::*}
+			send nl repeated 200 times to {_p::*}
+			broadcast "%nl%%minimessage from "<b><gradient:#FF6700:#FFFB6A>50xCreative"% &8→ &6%sender% &fhas &acleared &fthe &eserver's chat&f.%nl%"
+
+# ==== #
+# FAKE #
+# ==== #
+
+command fakewarn <text> <text> <text>:
+	prefix: staff
+	usage: {@usage} /fakewarn <executor> <victim> <reason>
+	permission: staff.fake.warn
+	permission message: {@noperm}
+	trigger:
+		set {_random} to random integer between 1000 and 9999
+		broadcast ""
+		broadcast " <#A7D9FF>&lᴡᴀʀɴ ᴀʟᴇʀᴛ"
+		broadcast " "
+		broadcast " <#b6d9d8>ℹ <#A7D9FF>&lɪᴅ <#b6d9d8>%{_random}%"
+		broadcast "    <#ff5348>☄ <#A7D9FF>ᴏꜰꜰᴇɴᴅᴇʀ <#ff5348>%arg-2%  "
+		broadcast "    <#a9c8ff>🪓 <#A7D9FF>ᴘᴜɴɪꜱʜᴇʀ <#a9c8ff>%arg-1%"
+		broadcast "    <#c19a6b>✎ <#A7D9FF>ʀᴇᴀꜱᴏɴ <#c19a6b>%arg-3%"
+		broadcast " "
+		stafflog("<#C26EFF>The warn made by &e%sender% <#C26EFF>was fake &f:)")
+
+command faketempban <text> <text> <timespan> <text>:
+	prefix: staff
+	usage: {@usage} /faketempban <executor> <victim> <duration> <reason>
+	permission: staff.fake.tempban
+	permission message: {@noperm}
+	trigger:
+		set {_random} to random integer between 1000 and 9999
+		broadcast ""
+		broadcast " <#A7D9FF>&lᴛᴇᴍᴘᴏʀᴀʀʏ ʙᴀɴ ᴀʟᴇʀᴛ"
+		broadcast " "
+		broadcast " <#b6d9d8>ℹ <#A7D9FF>&lɪᴅ <#b6d9d8>%{_random}%"
+		broadcast "    <#ff5348>☄ <#A7D9FF>ᴏꜰꜰᴇɴᴅᴇʀ <#ff5348>%arg-2%  "
+		broadcast "    <#a9c8ff>🪓 <#A7D9FF>ʙᴀɴɴᴇᴅ ʙʏ <#a9c8ff>%arg-1%"
+		broadcast "    <#c19a6b>✎ <#A7D9FF>ʀᴇᴀꜱᴏɴ <#c19a6b>%arg-4%"
+		broadcast "    <#fc54fc>⌛ <#A7D9FF>ᴅᴜʀᴀᴛɪᴏɴ <#fc54fc>%arg-3%"
+		broadcast " "
+		stafflog("<#C26EFF>The tempban made by &e%sender% <#C26EFF>was fake &f:)")
+
+command fakeban <text> <text> <text>:
+	prefix: staff
+	usage: {@usage} /fakeban <executor> <victim> <reason>
+	permission: staff.fake.ban
+	permission message: {@noperm}
+	trigger:
+		set {_random} to random integer between 1000 and 9999
+		broadcast ""
+		broadcast " <#A7D9FF>&lᴘᴇʀᴍᴀɴᴇɴᴛ ʙᴀɴ ᴀʟᴇʀᴛ"
+		broadcast " "
+		broadcast " <#b6d9d8>ℹ <#A7D9FF>&lɪᴅ <#b6d9d8>%{_random}%"
+		broadcast "    <#ff5348>☄ <#A7D9FF>ᴏꜰꜰᴇɴᴅᴇʀ <#ff5348>%arg-2%  "
+		broadcast "    <#a9c8ff>🪓 <#A7D9FF>ʙᴀɴɴᴇᴅ ʙʏ <#a9c8ff>%arg-1%"
+		broadcast "    <#c19a6b>✎ <#A7D9FF>ʀᴇᴀꜱᴏɴ <#c19a6b>%arg-3%"
+		broadcast " "
+		stafflog("<#C26EFF>The ban made by &e%sender% <#C26EFF>was fake &f:)")
+
+command faketempmute <text> <text> <timespan> <text>:
+	prefix: staff
+	usage: {@usage} /faketempmute <executor> <victim> <duration> <reason>
+	permission: staff.fake.tempmute
+	permission message: {@noperm}
+	trigger:
+		set {_random} to random integer between 1000 and 9999
+		broadcast ""
+		broadcast " <#A7D9FF>&lᴛᴇᴍᴘᴏʀᴀʀʏ ᴍᴜᴛᴇ ᴀʟᴇʀᴛ"
+		broadcast " "
+		broadcast " <#b6d9d8>ℹ <#A7D9FF>&lɪᴅ <#b6d9d8>%{_random}%"
+		broadcast "    <#ff5348>☄ <#A7D9FF>ᴏꜰꜰᴇɴᴅᴇʀ <#ff5348>%arg-2%  "
+		broadcast "    <#a9c8ff>🪓 <#A7D9FF>ᴍᴜᴛᴇᴅ ʙʏ <#a9c8ff>%arg-1%"
+		broadcast "    <#c19a6b>✎ <#A7D9FF>ʀᴇᴀꜱᴏɴ <#c19a6b>%arg-4%"
+		broadcast "    <#fc54fc>⌛ <#A7D9FF>ᴅᴜʀᴀᴛɪᴏɴ <#fc54fc>%arg-3%"
+		broadcast " "
+		stafflog("<#C26EFF>The tempmute made by &e%sender% <#C26EFF>was fake &f:)")
+
+command fakemute <text> <text> <text>:
+	prefix: staff
+	usage: {@usage} /fakemute <executor> <victim> <reason>
+	permission: staff.fake.mute
+	permission message: {@noperm}
+	trigger:
+		set {_random} to random integer between 1000 and 9999
+		broadcast ""
+		broadcast " <#A7D9FF>&lᴘᴇʀᴍᴀɴᴇɴᴛ ᴍᴜᴛᴇ ᴀʟᴇʀᴛ"
+		broadcast " "
+		broadcast " <#b6d9d8>ℹ <#A7D9FF>&lɪᴅ <#b6d9d8>%{_random}%"
+		broadcast "    <#ff5348>☄ <#A7D9FF>ᴏꜰꜰᴇɴᴅᴇʀ <#ff5348>%arg-2%  "
+		broadcast "    <#a9c8ff>🪓 <#A7D9FF>ᴘᴜɴɪꜱʜᴇʀ <#a9c8ff>%arg-1%"
+		broadcast "    <#c19a6b>✎ <#A7D9FF>ʀᴇᴀꜱᴏɴ <#c19a6b>%arg-3%"
+		broadcast " "
+		stafflog("<#C26EFF>The mute made by &e%sender% <#C26EFF>was fake &f:)")
+
+command fakekick <text> <text> <text>:
+	prefix: staff
+	usage: {@usage} /fakekick <executor> <victim> <reason>
+	permission: staff.fake.kick
+	permission message: {@noperm}
+	trigger:
+		set {_random} to random integer between 1000 and 9999
+		broadcast ""
+		broadcast " <#A7D9FF>&lᴋɪᴄᴋ ᴀʟᴇʀᴛ"
+		broadcast " "
+		broadcast " <#b6d9d8>ℹ <#A7D9FF>&lɪᴅ <#b6d9d8>%{_random}%"
+		broadcast "    <#ff5348>☄ <#A7D9FF>ᴏꜰꜰᴇɴᴅᴇʀ <#ff5348>%arg-2%  "
+		broadcast "    <#a9c8ff>🪓 <#A7D9FF>ᴋɪᴄᴋᴇᴅ ʙʏ <#a9c8ff>%arg-1%"
+		broadcast "    <#c19a6b>✎ <#A7D9FF>ʀᴇᴀꜱᴏɴ <#c19a6b>%arg-3%"
+		broadcast " "
+		stafflog("<#C26EFF>The kick made by &e%sender% <#C26EFF>was fake &f:)")
+
+command fakejoin [<text>]:
+	prefix: staff
+	usage: {@usage} /fakejoin [<player>]
+	permission: staff.fake.join
+	permission message: {@noperm}
+	trigger:
+		set {_p} to arg
+		set {_m} to random element out of ("&7<#4BFFA0>%{_p}%&7 joined the server.", "&7Welcome back, <#4BFFA0>%{_p}%&7.", "<#4BFFA0>%{_p}%&7 has returned.", "<#4BFFA0>%{_p}%&7 has entered.", "&7Here comes <#4BFFA0>%{_p}%&7.", "&7Guess who's back? <#4BFFA0>%{_p}%&7!", "&7<#4BFFA0>%{_p}%&7 rejoined.", "&7<#4BFFA0>%{_p}%&7 just logged in.", "&7<#4BFFA0>%{_p}%&7 has reconnected.")
+		broadcast "&8[<#00D263>➕&8] <#49FF9F>%{_m}%"
+		stafflog("The join made by %arg-1% &e%sender% <#C26EFF>was fake &f:)")
+
+command fakeleave [<text>]:
+	prefix: staff
+	usage: {@usage} /fakeleave [<player>]
+	permission: staff.fake.leave
+	permission message: {@noperm}
+	trigger:
+		set {_p} to arg
+		set {_m} to random element out of ("&7<#FF5050>%{_p}%&7 has left.", "&7Farewell, <#FF5050>%{_p}%&7.", "&7<#FF5050>%{_p}%&7 disconnected.", "&7Goodbye, <#FF5050>%{_p}%&7.", "&7<#FF5050>%{_p}%&7 logged out.", "&7Safe travels, <#FF5050>%{_p}%&7.", "&7See you next time, <#FF5050>%{_p}%&7.")
+		broadcast "&8[<#D20000>➖&8] <#FF5050>%{_m}%"
+		stafflog("The leave made by %arg-1% &e%sender% <#C26EFF>was fake &f:)")
+
+# ====== #
+# FREEZE #
+# ====== #
+
+on command:
+	player's metadata "freeze" is set
+	set {_x::*} to split full command at " "
+	"%{_x::1}%" != "freeze"
+	cancel event
+	send "{@err} You are currently frozen."
+
+on player move:
+	player's metadata "freeze" is set
+	cancel event
+	send "{@err} You are currently frozen."
+
+on click:
+	player's metadata "freeze" is set
+	cancel event
+	send "{@err} You are currently frozen." to player
+
+on place:
+	player's metadata "freeze" is set
+	cancel event
+	send "{@err} You are currently frozen." to player
+
+on break:
+	player's metadata "freeze" is set
+	cancel event
+	send "{@err} You are currently frozen."  to player
+
+on tab complete of "freeze":
+	sender has permission "staff.freeze"
+	set tab completions for position 1 to all players
+
+function freeze(s: sender, p: player):
+	priority({_p}) > priority({_s}):
+		send "{@nothigh}" to {_s}
+	else:
+		{_p}'s metadata "freeze" isn't set:
+			set {_p}'s metadata "freeze" to on
+		else:
+			clear {_p}'s metadata "freeze"
+		stafflog("%{_s}% &f%"froze" if {_p}'s metadata "freeze" is on else "thawed"% <#C26EFF>%"&fthemselves" if {_s} = {_p} else {_p}%&f.")
+
+command freeze <player> [<text>]:
+	prefix: staff
+	usage: {@usage} /freeze <player>
+	permission: staff.freeze
+	permission message: {@noperm}
+	trigger:
+		arg-2 is set:
+			send usage
+			stop
+		freeze(sender, arg-1)
+
+# ========= #
+# LAST SEEN #
+# ========= #
+
+on quit:
+	set {find::%player's uuid%} to now
+	
+on join:
+	delete {find::%player's uuid%}
+
+# ========= #
+# MAP RESET #
+# ========= #
+
+command mapreset:
+	prefix: staff
+	aliases: mr
+	permission: staff.mapreset
+	permission message: {@noperm}
+	trigger:
+		create a gui with virtual chest inventory with 3 row named "MAP RESET ┊ World":
+			make gui slot (integers from 0 to 26) with black stained glass pane named ""
+			make gui slot 11 with ender eye named "&a&lCREATIVE" with lore "&8ᴡᴏʀʟᴅ" and "" and "&aClick &7to &fselect this world&7!":
+				mapresetGUI(player, world "creative")
+			make gui slot 15 with diamond named "&d&lCANVAS" with lore "&8ᴡᴏʀʟᴅ" and "" and "&aClick &7to &fselect this world&7!":
+				mapreset(sender, world "canvas")
+		open the last gui for player
+		invsfx(player)
+
+function mapresetGUI(p: player, w: world):
+	create a gui with virtual chest inventory with 3 row named "MAP RESET ┊ Biome":
+		make gui slot (integers from 0 to 26) with black stained glass pane named ""
+		make gui slot 10 with grass block named "&6Normal" with lore "&8ʙɪᴏᴍᴇ" and "" and "&aClick &7to &fselect this biome&7!":
+			mapreset(sender, {_w})
+			close {_p}'s inventory
+			invsfx({_p}, 3)
+		make gui slot 11 with green concrete powder named "&6Realistic" with lore "&8ʙɪᴏᴍᴇ" and "" and "&aClick &7to &fselect this biome&7!":
+			mapreset(sender, {_w}, "REALISTIC")
+			close {_p}'s inventory
+			invsfx({_p}, 3)
+		make gui slot 12 with suspicious sand named "&6Desert" with lore "&8ʙɪᴏᴍᴇ" and "" and "&aClick &7to &fselect this biome&7!":
+			mapreset(sender, {_w}, "SAHARAN")
+			close {_p}'s inventory
+			invsfx({_p}, 3)
+		make gui slot 13 with snow block named "&6Snowy" with lore "&8ʙɪᴏᴍᴇ" and "" and "&aClick &7to &fselect this biome&7!":
+			mapreset(sender, {_w}, "WINTER")
+			close {_p}'s inventory
+			invsfx({_p}, 3)
+		make gui slot 14 with white concrete named "&6Asylum" with lore "&8ʙɪᴏᴍᴇ" and "" and "&aClick &7to &fselect this biome&7!":
+			mapreset(sender, {_w}, "ASYLUM")
+			close {_p}'s inventory
+			invsfx({_p}, 3)
+		make gui slot 15 with netherrack named "&6Hell" with lore "&8ʙɪᴏᴍᴇ" and "" and "&aClick &7to &fselect this biome&7!":
+			mapreset(sender, {_w}, "HELL")
+			close {_p}'s inventory
+			invsfx({_p}, 3)
+		make gui slot 16 with end stone named "&6Moon" with lore "&8ʙɪᴏᴍᴇ" and "" and "&aClick &7to &fselect this biome&7!":
+			mapreset(sender, {_w}, "MOON")
+			close {_p}'s inventory
+			invsfx({_p}, 3)
+		make gui slot 18 with arrow named "&6Back" with lore "&8ᴀᴄᴛɪᴏɴ" and "" and "&aClick &7to &fgo back&7!":
+			{_p} command "mapreset"
+		make gui slot 26 with barrier named "&6Stop" with lore "&8ᴀᴄᴛɪᴏɴ" and "" and "&aClick &7to &fcancel Map Reset&7!":
+			mapreset(sender, {_w}, "-STOP")
+	open the last gui for {_p}
+	invsfx({_p})
+
+
+function mapreset(s: sender, w: world, t: text = "NORMAL"):
+	{_t} in uppercase = "-STOP":
+		{mapreset::%name of {_w}%} is set:
+			delete {mapreset::%name of {_w}%}
+			broadcast "", "<#ABFFAD>⚠ &lMAP RESET CANCELED", "%smallcaps(name of {_w})% &rmap reset &rhas been <#ABFFAD>cancelled &rby a staff.", "" in {_w}
+			stafflog("%{_s}% &rhas stopped a map reset in <#C26EFF>%smallcaps(name of {_w})%&f.")
+			stop
+		send "{@err} There are no pending map resets in %smallcaps(name of {_w})%&c." to {_s}
+		stop
+	set {mapreset::%name of {_w}%} to on
+	stafflog("%{_s}% &fhas initiated a <#C26EFF>%{_t} in uppercase% &fmap reset in <#C26EFF>%smallcaps(name of {_w})%&f.")
+	broadcast formatted "", "<#FF0000>⚠ &l%{_t} in uppercase% MAP RESET", "Commencing in <#FF0000>10 seconds&f!","" in {_w} if {mapreset::%{_w}%} is set
+	wait 5 rl second if {mapreset::%{_w}%} is set
+	broadcast formatted "", "<#FF0000>⚠ &l%{_t} in uppercase% MAP RESET", "Commencing in <#FF0000>5 seconds&f!","" in {_w} if {mapreset::%{_w}%} is set
+	wait 1 rl second if {mapreset::%{_w}%} is set
+	broadcast formatted "", "<#FF0000>⚠ &l%{_t} in uppercase% MAP RESET", "Commencing in <#FF0000>4 seconds&f!","" in {_w} if {mapreset::%{_w}%} is set
+	wait 1 rl second if {mapreset::%{_w}%} is set
+	broadcast formatted "", "<#FF0000>⚠ &l%{_t} in uppercase% MAP RESET", "Commencing in <#FF0000>3 seconds&f!","" in {_w} if {mapreset::%{_w}%} is set
+	wait 1 rl second if {mapreset::%{_w}%} is set
+	broadcast formatted "", "<#FF0000>⚠ &l%{_t} in uppercase% MAP RESET", "Commencing in <#FF0000>2 seconds&f!","" in {_w} if {mapreset::%{_w}%} is set
+	wait 1 rl second if {mapreset::%{_w}%} is set
+	broadcast formatted "", "<#FF0000>⚠ &l%{_t} in uppercase% MAP RESET", "Commencing in <#FF0000>1 second&f!","" in {_w} if {mapreset::%{_w}%} is set
+	wait 1 rl second if {mapreset::%{_w}%} is set
+	broadcast formatted "", "<#FF0000>⚠ &l%{_t} in uppercase% MAP RESET", "Commencing <#FF0000>NOW&f!","" in {_w} if {mapreset::%{_w}%} is set
+	if {mapreset::%name of {_w}%} is set:
+		console command "//world %name of {_w} in lowercase%"
+		console command "//pos1 150,-64,-150", "//pos2 -150,400,150", "//set barrier"
+		broadcast "{@info} Setting barriers..."
+		wait 5 seconds
+		console command "//pos1 100,101,-100", "//pos2 -100,384,100", "//set air"
+		broadcast "{@info} Clearing space..."
+		wait 5 seconds
+		console command "//pos1 100,-64,-100", "//pos2 -100,-60,100", "//set bedrock"
+		broadcast "{@info} Setting bedrock..."
+		wait 2 seconds
+		broadcast "{@info} Setting up map..."
+		{_t} = "NORMAL":
+			console command "//pos1 100,100,-100", "//pos2 -100,100,100", "//set grass_block"
+			console command "//pos1 100,99,-100", "//pos2 -100,95,100", "//set dirt"
+			console command "//pos1 100,94,-100", "//pos2 -100,1,100", "//set stone"
+			console command "//pos1 100,0,-100", "//pos2 -100,-59,100", "//set deepslate"
+		{_t} = "REALISTIC":
+			console command "//pos1 100,100,-100", "//pos2 -100,100,100", "//set grass_block,green_wool,lime_terracotta,moss_block"
+			console command "//pos1 100,99,-100", "//pos2 -100,95,100", "//set dirt,coarse_dirt,rooted_dirt,packed_mud,granite"
+			console command "//pos1 100,94,-100", "//pos2 -100,1,100", "//set stone,andesite,light_gray_wool,cobblestone,dead_fire_coral_block"
+			console command "//pos1 100,0,-100", "//pos2 -100,-59,100", "//set deepslate,cobbled_deepslate,deepslate_coal_ore"
+		{_t} = "SAHARAN":
+			console command "//pos1 100,100,-100", "//pos2 -100,100,100", "//set sand,suspicious_sand"
+			console command "//pos1 100,95,-100", "//pos2 -100,99,100", "//set smooth_sandstone,chiseled_sandstone,sandstone"
+			console command "//pos1 100,94,-100", "//pos2 -100,1,100", "//set stone,andesite,light_gray_wool,cobblestone,dead_fire_coral_block"
+			console command "//pos1 100,0,-100", "//pos2 -100,-59,100", "//set deepslate,cobbled_deepslate,deepslate_coal_ore"
+		{_t} = "WINTER":
+			console command "//pos1 100,100,-100", "//pos2 -100,100,100", "//set snow_block,white_wool,white_concrete"
+			console command "//pos1 100,99,-100", "//pos2 -100,95,100", "//set dirt,coarse_dirt,rooted_dirt,packed_mud,granite"
+			console command "//pos1 100,94,-100", "//pos2 -100,1,100", "//set stone,andesite,light_gray_wool,cobblestone,dead_fire_coral_block"
+			console command "//pos1 100,0,-100", "//pos2 -100,-59,100", "//set deepslate,cobbled_deepslate,deepslate_coal_ore"
+		{_t} = "ASYLUM":
+			console command "//pos1 100,-59,-100", "//pos2 -100,100,100", "//set white_concrete"
+		{_t} = "HELL":
+			console command "//pos1 100,100,-100", "//pos2 -100,100,100", "//set crimson_nylium"
+			console command "//pos1 100,99,-100", "//pos2 -100,-59,100", "//set 35%%netherrack,10%%nether_gold_ore,10%%nether_quartz_ore,20%%mangrove_planks,25%%stripped_mangrove_wood"
+		{_t} = "MOON":
+			console command "//pos1 100,100,-100", "//pos2 -100,-59,100", "//set end_stone"
+		
+		console command "//pos1 0,0,0", "//pos2 0,0,0", "//world"
+		wait 1 second
+		kill all entities in world ({_w} in lowercase) where [input is not a player]
+		teleport all players in {_w} to {spawn::%name of {_w}%}
+		delete {mapreset::%name of {_w}%}
+		broadcast formatted "", "<#FFCF00>⭐ &lMAP RESET COMPLETE <#FFCF00>⭐", "%smallcaps(name of {_w})% &fmap reset has been <#FFCF00>complete&f!","" to {_w}
+###
+		create a new message and store it in {_message}:
+			set the content of the message to mention tag of role with id "1130796016581476443"
+			make embed and store it in {_embed}:
+				set title of embed to "Mapreset Complete!"
+				set embed color of embed to lime
+				set footer of embed to "%name of {_w} in proper case% Has Been Reset!"
+			add {_embed} to the embeds of the message
+			post {_message} to text channel with id "1129342867001847848"
+###
+		set {LastMapreset} to now
+
+# ======== #
+# MUTECHAT #
+# ======== #
+
+on skript load:
+	delete {mutechat}
+
+command mutechat:
+	prefix: staff
+	usage: {@usage} /<mc | mutechat | chatmute>
+	aliases: mc, chatmute
+	permission: staff.mutechat
+	permission message: {@noperm}
+	trigger:
+		{mutechat} = on:
+			clear {mutechat}
+		else:
+			set {mutechat} to on
+		broadcast "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8→ &6%sender% &fhas %"&cmuted" if {mutechat} is true else "&aunmuted"% &fthe &eserver chat&f.%nl%"
+
+# ====== #
+# REBOOT #
+# ====== #
+
+on tab complete of "reboot":
+	sender has permission "staff.reboot"
+	set tab completions for position 1 to "1h", "15m", "5m", "1m" and "stop"
+
+command reboot <text="30s">:
+	prefix: staff
+	usage: {@usage} /reboot &7[1h | 15m | 5m | 1m | stop]
+	permission: staff.reboot
+	permission message: {@noperm}
+	trigger:
+		arg-1 != "1h" or "15m" or "5m" or "1m" or "stop":
+			send usage
+			stop
+		arg-1 = "stop":
+			{50x::reboot} = true:
+				delete {50x::reboot}
+				stafflog("<#AA7EFF>%sender% &fhas terminated the pending server reboot.")
+				broadcast formatted "%nl%&c&l⛔ REBOOT TERMINATED%nl%<#F66400>Server reboot &fhas been terminated.%nl%"
+			else:
+				send "{@err} There are no pending server reboots."
+		set {50x::reboot} to true
+		arg-1 = "1h":
+			{50x::reboot} = true
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>1 HOUR%nl%"
+			wait 45 rl minute
+		arg-1 = "15m":
+			{50x::reboot} = true
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>15 MINUTES%nl%"
+			wait 10 rl minute
+		arg-1 = "5m":
+			{50x::reboot} = true
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>5 MINUTES%nl%"
+			wait 4 rl minute
+		arg-1 = "1m":
+			{50x::reboot} = true
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>1 MINUTE%nl%"
+			wait 30 rl second
+		{50x::reboot} = true:
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>30 SECONDS%nl%"
+			wait 20 rl second
+		{50x::reboot} = true:
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>10 SECONDS%nl%"
+			wait 5 rl second
+		{50x::reboot} = true:
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>5 SECONDS%nl%"
+			wait 1 rl second
+		{50x::reboot} = true:
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>4 SECONDS%nl%"
+			wait 1 rl second
+		{50x::reboot} = true:
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>3 SECONDS%nl%"
+			wait 1 rl second
+		{50x::reboot} = true:
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>2 SECONDS%nl%"
+			wait 1 rl second
+		{50x::reboot} = true:
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot in <#FF9350>1 SECOND%nl%"
+			wait 1 rl second
+		{50x::reboot} = true:
+			broadcast formatted "%nl%<#F66400>⚠ &lSERVER REBOOT ⚠%nl%&fServer will reboot <#FF9350>NOW%nl%"
+			console command "restart"
+
+# ===== #
+# SMITE #
+# ===== #
+
+command smite [<player=%player%>]:
+	prefix: staff
+	aliases: strike
+	permission: staff.smite
+	permission message: {@noperm}
+	trigger:
+		if arg is online:
+			strike lightning above arg
+			send "{@info} Thou has been smitten!" to arg
+			stafflog("%sender% has smitten <#C26EFF>%arg%&f.")
+		else:
+			send "{@err} That person is not online."
+
+# ========= #
+# STAFFCHAT #
+# ========= #
+
+function staffchat(p: sender, m: text):
+	send "&8[%minimessage from "<b><gradient:#FF009B:#B73FFF>STAFFCHAT"%&8] %"&8(&aVANISHED&8) " if {_p}'s metadata "vanished" is set else ""%&f%{_p}%&7: &f%{_m}%" to console and all players where [priority(input) >= 10]
+
+on tab complete of "staffchat", "schat", and "sfc":
+	sender has permission "staff.chat"
+	set tab completions for position 1 to "<message>"
+
+command staffchat [<text>]:
+	prefix: staff
+	aliases: schat, sfc
+	usage: {@usage} /<schat | staffchat> &7[message]
+	permission: staff.chat
+	permission message: {@noperm}
+	trigger:
+		arg-1 is set:
+			staffchat(sender, arg-1)
+		else:
+			sender = console:
+				send "{@usage} /<schat | staffchat> <message>"
+			else:
+				player's metadata "staffchat" is set:
+					clear player's metadata "adminchat"
+					clear player's metadata "staffchat"
+					clear player's metadata "donorchat"
+				else:
+					set player's metadata "staffchat" to true
+				send "{@info} You have toggled staff chat to %"&aon" if player's metadata "staffchat" is set else "&coff"%&f."
+				
+# TO BE FIXED
+
+# ====== #
+# PUNSIH #
+# ====== #
+
+on tab complete of "punish":
+	set tab completions for position 1 to all players
+
+command punish <text>:
+	prefix: staff
+	usage: {@usage} /punish &f<offline player / player's uuid>
+	permission: staff.punish
+	permission message: {@noperm}
+	trigger:
+		banUI(player, arg-1)
+
+function banUI(p: player, t: string):
+	play sound "entity.bat.takeoff" at volume 1 with pitch 0.7 for {_p}
+	set {punishtarget::%{_p}'s uuid%} to {_t}
+	set metadata tag "50xPunishUI" of {_p} to chest inventory with 6 rows named "<#fb9700>&lP<#fb8b18>&lu<#fc7e2f>&ln<#fc7247>&li<#fc655f>&ls<#fc5977>&lh <#fd4c8e>&lU<#fd40a6>&lI &8(%{punishtarget::%{_p}'s uuid%}%)"
+	wait 1 tick
+	set {spunish::%{_p}'s uuid%} to ""
+	set {rb::%{_p}'s uuid%} to true
+	set slot (integers from 0 to 53) of metadata tag "50xPunishUI" of {_p} to black stained glass pane named ""
+	set slot (integers from 9 to 44) of metadata tag "50xPunishUI" of {_p} to gray stained glass pane named ""
+	set slot 13 of metadata tag "50xPunishUI" of {_p} to skull of {punishtarget::%{_p}'s uuid%} parsed as offline player named "&c%{punishtarget::%{_p}'s uuid%}%"
+	set slot 19 of metadata tag "50xPunishUI" of {_p} to netherite pickaxe named "&6&lGriefing" with lore "&7When a player interferes", "&7other player's creations", "&7without consent.", "", "&ePunishment: &dBan", "&eDuration: &d7 Days", "" and "&fClick to punish."  
+	set slot 20 of metadata tag "50xPunishUI" of {_p} to iron chain named "&6&lNSFW" with lore ("&7When a player makes", "&7inappropriate builds.", "", "&ePunishment: &dBan", "&eDuration: &d1 Day", "" and "&fClick to punish.")
+	set slot 21 of metadata tag "50xPunishUI" of {_p} to barrier named "&6&lUser Inappropriateness" with lore "&7When a player has explicit", "&7names or skins.", "", "&ePunishment: &dBan", "&eDuration: &d2 Days", "" and "&fClick to punish." 
+	set slot 22 of metadata tag "50xPunishUI" of {_p} to redstone named "&6&lLag Machine" with lore "&7When a player deliberately tries", "&7to make a restone contraption", "&7that lags the server.", "", "&ePunishment: &dPerm-Ban", "&eDuration: &dForever", "" and "&fClick to punish." 
+	set slot 29 of metadata tag "50xPunishUI" of {_p} to damaged anvil named "&6&lMinor Grief" with lore "&7When a player griefs", "&7less than 7 blocks.", "", "&ePunishment: &dWarn", "&eDuration: &d30 Days", "" and "&fClick to punish." 
+	set slot 30 of metadata tag "50xPunishUI" of {_p} to coarse dirt named "&6&lMap Trashing" with lore "&7When a player places", "&7or breaks alot of", "&7blocks in the 50xCreative", "&7map.", "", "&ePunishment: &dWarn", "&eDuration: &d30 Days", "" and "&fClick to punish." 
+	set slot 23 of metadata tag "50xPunishUI" of {_p} to structure void named "&6&lUnfair Advantage" with lore "&7When a player uses a hacked client or", "&7exploits to gain unfair advantages.", "", "&ePunishment: &dTempban", "&eDuration: &d7 Days", "" and "&fClick to punish." 
+	set slot 24 of metadata tag "50xPunishUI" of {_p} to spruce sign named "&6&lAdvertising" with lore "&7When a player advertises their servers", "&7or content without permission.", "", "&ePunishment: &dTempmute", "&eDuration: &d2 Days", "" and "&fClick to punish." 
+	set slot 25 of metadata tag "50xPunishUI" of {_p} to skeleton skull named "&6&lBan Evasion (Alting)" with lore "&7When a player uses another minecraft", "&7account with the same IP-Address", "&7typically to evade a ban.", "", "&ePunishment: &dPerm IP-Ban", "&eDuration: &dForever", "" and "&fClick to punish." 
+	set slot 28 of metadata tag "50xPunishUI" of {_p} to jukebox named "&6&lSound Spam" with lore "&7When a player uses redstone or observer", "&7clocks connected to blocks that typically", "&7make noises, or places many jukeboxes", "&7with same or different music discs", "&7played simultaneously, or random noteblocks", "&7that doesn't provide a tune or melody.", "", "&ePunishment: &dWarning", "&eDuration: &d30 Days", "" and "&fClick to punish." 
+	set slot 31 of metadata tag "50xPunishUI" of {_p} to tnt named "&6&lMass Grief" with lore "&7When a player breaks the map", "&7or uses griefer to grief", "&7more than 200 blocks.", "", "&ePunishment: &dTBan", "&eDuration: &d30 Days", "" and "&fClick to punish." 
+	set slot 48 of metadata tag "50xPunishUI" of {_p} to lime stained glass pane named "&eRollback &8[&aON&8]" with lore "&7Used for Ggriefing, NSFW and Sound Spam.", "" and "&fClick to turn off &erollback&7!" 
+	set slot 50 of metadata tag "50xPunishUI" of {_p} to red stained glass pane named "&dSilent Mode &8[&cOFF&8]" with lore "&7Make the punishment hidden", "&7for normal players.", "" and "&fClick to turn on &dsilent mode&7!" 
+	set slot 53 of metadata tag "50xPunishUI" of {_p} to barrier named "&c&lClose" with lore "" and "&fClick to &cclose &fthe Punishment UI!"
+	open (metadata tag "50xPunishUI" of {_p}) to {_p}
+
+on quit:
+	delete {punishtarget::%player's uuid%}
+
+on inventory click:
+	event-inventory = (metadata tag "50xPunishUI" of player):
+		cancel event
+		set {_t} to "1w"
+		if index of event-slot = 50:
+			if {spunish::%player's uuid%} is "":
+				set {spunish::%player's uuid%} to "-s"
+				set event-slot to lime stained glass pane named "&dSilent Mode &8[&aON&8]" with lore "&7Make the punishment hidden" and "&7for normal players." and "" and "&fClick to turn off &dsilent mode&7!" 
+			else:
+				set {spunish::%player's uuid%} to ""
+				set event-slot to red stained glass pane named "&dSilent Mode &8[&cOFF&8]" with lore "&7Make the punishment hidden" and "&7for normal players." and "" and "&fClick to turn on &dsilent mode&7!" 
+		else if index of event-slot = 48:
+			if {rb::%player's uuid%} is true:
+				set {rb::%player's uuid%} to false
+				set event-slot to red stained glass pane named "&eRollback &8[&cOFF&8]" with lore "&7Used for Griefing, NSFW and Sound Spam." and "" and "&fClick to turn on &erollback&7!" 
+			else:
+				set {rb::%player's uuid%} to true
+				set event-slot to lime stained glass pane named "&eRollback &8[&aON&8]" with lore "&7Used for Ggriefing, NSFW and Sound Spam." and "" and "&fClick to turn off &erollback&7!"
+		else if index of event-slot = 19:
+			close player's inventory
+			add 1 to {grief::%{punishtarget::%player's uuid%}%}
+			if {grief::%{punishtarget::%player's uuid%}%} = 1:
+				player command "tempban %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% 7d Griefing"
+				if {rb::%player's uuid%} is true:
+					console command "co rb u:%{punishtarget::%player's uuid%}% t:1w r:#global"
+			if {grief::%{punishtarget::%player's uuid%}%} = 2:
+				player command "tempban %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% 14d Second Offence Griefing"
+				if {rb::%player's uuid%} is true:
+					console command "co rb u:%{punishtarget::%player's uuid%}% t:1w r:#global"
+			if {grief::%{punishtarget::%player's uuid%}%} = 3:
+				player command "tempban %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% 30d Third Offence Griefing"
+				if {rb::%player's uuid%} is true:
+					console command "co rb u:%{punishtarget::%player's uuid%}% t:1w r:#global"
+			if {grief::%{punishtarget::%player's uuid%}%} = 4:
+				player command "ban %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% Last Offence Griefing"
+				if {rb::%player's uuid%} is true:
+					console command "co rb u:%{punishtarget::%player's uuid%}% t:1w r:#global"
+		else if index of event-slot = 20:
+			close player's inventory
+			player command "tempban %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% 1d NSFW"
+			if {rb::%player's uuid%} is true:
+				console command "co rb u:%{punishtarget::%player's uuid%}% t:1w r:#global"	
+		else if index of event-slot = 21:
+			close player's inventory
+			player command "tempban %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% 2d Inappropriate Skin / Name"
+		else if index of event-slot = 22:
+			close player's inventory
+			player command "ban %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% Lag Machine"
+			if {rb::%player's uuid%} is true:
+				console command "co rb u:%{punishtarget::%player's uuid%}% t:1w r:#global"
+		else if index of event-slot = 23:
+			close player's inventory
+			player command "tempban %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% 7d Unfair Advantage"
+		else if index of event-slot = 24:
+			close player's inventory
+			player command "tempmute %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% 2d Advertising"
+		else if index of event-slot = 25:
+			close player's inventory
+			player command "ipban %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% Ban Evasion"
+		else if index of event-slot = 28:
+			close player's inventory
+			player command "warn %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% Sound Spam 30d"
+		else if index of event-slot = 29:
+			close player's inventory
+			player command "warn %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% Minor Grief 30d"
+			if {rb::%player's uuid%} is true:
+				console command "co rb u:%{punishtarget::%player's uuid%}% t:1w r:#global"
+		else if index of event-slot = 30:
+			close player's inventory
+			player command "warn %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% Map trashing 30d"
+			if {rb::%player's uuid%} is true:
+				console command "co rb u:%{punishtarget::%player's uuid%}% t:1w r:#global"
+		else if index of event-slot = 31:
+			close player's inventory
+			player command "tempban %{spunish::%player's uuid%}% %{punishtarget::%player's uuid%}% 30d Mass Griefing"
+			if {rb::%player's uuid%} is true:
+				console command "co rb u:%{punishtarget::%player's uuid%}% t:1w r:#global"
+		else if index of event-slot = 53:
+			close player's inventory
+
+
+command /removestrikes <offline player>:
+	prefix: staff
+	usage: {@usage} /removestikes &f<offline player / player's uuid>
+	permission: staff.punish
+	permission message: {@noperm}
+	trigger:
+		if {grief::%arg-1%} = 1:
+			remove 1 from {grief::%arg-1%}
+			send "{@info} &aAll &rstrikes from %arg-1% are removed!"
+			stop
+		if {grief::%arg-1%} = 2:
+			remove 1 from {grief::%arg-1%}
+			send "{@info} &cSecond &rstrike from %arg-1% has been removed!"
+			stop
+		if {grief::%arg-1%} = 3:
+			remove 1 from {grief::%arg-1%}
+			send "{@info} &cThird &rstrike from %arg-1% has been removed!"
+			stop
+		if {grief::%arg-1%} = 4:
+			remove 1 from {grief::%arg-1%}
+			send "{@info} &cFourth &Rstrike from %arg-1% has been removed!"
+			stop
+		else:
+			send "{@err} Targeted player doesn't have any strikes or doesn't exist!"
+
+command openvault <offlineplayer> <id:int=1> [<text>]:
+	prefix: srmod
+	usage: {@usage} /<openvault | vaultopen> &f<offline player> &7[1-7]
+	aliases: vaultopen
+	permission: srmod.vault
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		set {_uuid} to arg-1's uuid
+		{vaults::%{_uuid}%::%{_id}%} is not set:
+			send "{@err} %arg-1% does not have vault #%{_id}%."
+			stop
+		openVault(arg-1, {_id}, player)
+		adminlog("%sender% &fhas opened <#FF2323>%arg-1%&f's <#FF2323>vault #%{_id}%&f.")

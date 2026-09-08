@@ -1,0 +1,1367 @@
+# ================================================================================================================================================================= #
+
+options:
+	name: %minimessage from "<b><gradient:#1685FF:#16E3FF>50xCreative</gradient></b>"%
+	info: &8[<##167BFF>&l❗&8]&f
+	warn: &8[<##FF0000>&l❗&8]&c
+	
+	primary: <#0079FF>
+	secondary: <#16AFFF>
+	tertiary: <#16E3FF>
+	
+	usage: &8[<##FF0000>&l❗&8]&c Correct command usage &7»&f
+	notyou: &8[<##FF0000>&l❗&8]&c Console may not use this command.
+	noperm: &8[<##FF0000>&l❗&8]&c You do not have permission for this command.
+	notthis: &8[<##FF0000>&l❗&8]&c You may not use this feature of the command.
+	nothere: &8[<##FF0000>&l❗&8]&c You may not use this command in this region.
+	nothigh: &8[<##FF0000>&l❗&8]&c That person has a higher authority than you.
+	notnow: &8[<##FF0000>&l❗&8]&c You may use this command after %remaining time%.
+	supported_worlds: "donor", "creative", or "plots"
+
+# ================================================================================================================================================================= #
+                          
+# AFK
+on load:
+	clear {afklist::*}, {afkc::*}
+
+on region enter:
+	event-region = "afk":
+		afk(player, player)
+
+###
+on player world change:
+	event-world = "afk":
+		set {afkc::%player's uuid%} to 0
+	else:
+		afk(player, player) if player's metadata "afk" is set
+		clear {afkc::%player's uuid%}
+
+every 1 second:
+	loop all players where [input's world = "afk"]:
+		send action bar "{@info} AFK Rewards in: &8[&e%{afkc::%loop-player's uuid%}% seconds&8/&a900 seconds&8]" to loop-player
+		{afkc::%loop-player's uuid%} < 900:
+			add 1 to {afkc::%loop-player's uuid%}
+		else:
+			set {afkc::%loop-player's uuid%} to 0
+			console command "eco add %loop-value% 10"
+###
+
+function afk(s: sender, p: player):
+	if priority({_s}) < 10:
+		{_s} isn't {_p}
+		send "{@notthis}" to {_s}
+		stop
+	{_p}'s metadata "afk" is set:
+		clear {_p}'s metadata "afk" 
+		send action bar "&7[!] %{_p}% is no longer AFK." to all players
+		stafflog("%{_s}% &fhas sent <#C26EFF>%{_p}% &fout of AFK.") if {_s} != {_p}
+		spawn({_s} if {_s} doesn't have permission "50x.afk.others" else {_p}, "lobby")
+	else:
+		set {_p}'s metadata "afk" to true 
+		send action bar "&7[!] %{_p}% is now AFK." to all players
+		stafflog("%{_s}% &fhas sent <#C26EFF>%{_p}% &fto AFK.") if {_s} != {_p}
+		spawn({_s} if {_s} doesn't have permission "50x.afk.others" else {_p}, "afk")
+
+on command:
+	player has metadata "afk"
+	afk(player, player)
+
+command afk <player=%player%>:
+	prefix: core
+	usage: {@usage} /afk &7[player]
+	trigger:
+		arg-1 isn't set:
+			send usage
+		else:
+			afk(sender, arg-1)
+
+on quit:
+	clear player's metadata "afk" 
+
+# ================ #
+# PARTICLE EFFECTS #
+# ================ #
+
+# Are these really needed?
+###
+every 1 tick:
+	loop all players where [{pe::%input's uuid%} is set]:
+		loop-player's gamemode != spectator
+		set {_fd} to vector(0.2, 0, 0.2)
+		set {_bd} to vector(0.5, 0.5, 0.5)
+		set {_ofs} to location 0.2 above loop-player
+		{pe::%loop-player's uuid%} = 1:
+			draw 2 gust at {_ofs} with delta {_fd} with extra 0 with force
+		{pe::%loop-player's uuid%} = 2:
+			draw 2 soul fire flame at {_ofs} with delta {_fd} with extra 0 with force
+		{pe::%loop-player's uuid%} = 3:
+			draw 5 {_lpt} at loop-player with delta {_fd} with extra 0 with force
+		{pe::%loop-player's uuid%} = 4:
+			draw 2 ominous spawning 1 above loop-player with delta {_bd} with extra 0 with force
+		{pe::%loop-player's uuid%} = 5:
+			draw 1 raid omen 1 above loop-player with delta {_bd} with extra 0 with force
+		{pe::%loop-player's uuid%} = 6:
+			draw 7 glow at {_ofs} with delta {_fd} with extra 0 with force
+		{pe::%loop-player's uuid%} = 7:
+			draw 5 infested at {_ofs} with delta {_bd} with extra 0 with force
+
+function pe(p: player):
+	create a gui with virtual chest inventory with 3 rows named minimessage from "        ♦ Particle Effects ♦":	
+		make gui slot (integers from 0 to 26) with black stained glass pane named "&f"
+		make gui slot 4 with blaze powder named "&6Particle Effects" with lore "&8ᴄᴏsᴍᴇᴛɪᴄ"
+		make gui slot 10 with red concrete named minimessage from "<gradient:#C8D7FF:#ADF3FD>Cloud" with lore "&8ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ" and "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇᴛ ᴛʜɪs ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ":
+			cs({_p}, 3, "<gradient:#C8D7FF:#ADF3FD>Cloud")
+		make gui slot 11 with orange concrete named minimessage from "<gradient:#084CFB:#00FFFF>Blue Flame" with lore "&8ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ" and "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇᴛ ᴛʜɪs ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ":
+			cs({_p}, 3, "<gradient:#084CFB:#00FFFF>Blue Flame")
+		make gui slot 12 with yellow concrete named minimessage from "<gradient:#084CFB:#7500FF>Blue Storm" with lore "&8ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ" and "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇᴛ ᴛʜɪs ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ":
+			cs({_p}, 3, "<gradient:#084CFB:#7500FF>Blue Storm")
+		make gui slot 13 with lime concrete named minimessage from "<gradient:#2E4C9B:#7FC5E7>Clear Storm" with lore "&8ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ" and "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇᴛ ᴛʜɪs ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ":
+			cs({_p}, 3, "<gradient:#2E4C9B:#7FC5E7>Clear Storm")
+		make gui slot 14 with green concrete named minimessage from "<gradient:#9B2E2E:#F30000>Red Death" with lore "&8ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ" and "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇᴛ ᴛʜɪs ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ":
+			cs({_p}, 3, "<gradient:#9B2E2E:#F30000>Red Death")
+		make gui slot 15 with light blue concrete named minimessage from "<gradient:#A2FFA1:#55730D>Celestial Stars" with lore "&8ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ" and "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇᴛ ᴛʜɪs ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ":
+			cs({_p}, 3, "<gradient:#A2FFA1:#55730D>Celestial Stars")
+		make gui slot 16 with cyan concrete named minimessage from "<gradient:#191F19:#777777>Mysterious Ashes" with lore "&8ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ" and "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇᴛ ᴛʜɪs ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ":
+			cs({_p}, 3, "<gradient:#191F19:#777777>Mysterious Ashes")
+		make gui slot 22 with smooth stone named "<#E0E0E0>Default" with lore "&8ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ" and "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇᴛ ᴛʜɪs ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ":
+			cs({_p}, 3)
+		make gui slot 18 with arrow named "&e&lBack" with lore "&8ᴀᴄᴛɪᴏɴ%nl%%nl%&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ɢᴏ ʙᴀᴄᴋ ᴛᴏ ᴛʜᴇ ᴘʀᴇᴠɪᴏᴜs ᴍᴇɴᴜ":
+			cosmetics({_p})
+		set lock status of gui to true
+	open last gui for {_p}
+	invsfx({_p})
+
+on tab complete of "particles":
+	set tab completion for position 1 to "CLOUD", "BLUE_FLAME", "BLUE_STORM", "CLEAR_STORM", "RED_DEATH", "CELESTIAL_STARS", "MYSTERIOUS_ASHES" and "DEFAULT" if sender has permission "cosmetic.particles"
+
+command particles [<text>] [<text>]:
+	prefix: cosmetic
+	usage: {@usage} /particles <particle effect>
+	executable by: players
+	permission: cosmetic.particles
+	permission message: {@noperm}
+	trigger:
+		arg-2 is set:
+			send usage
+			stop
+		arg-1 = "CLOUD":
+			cs(player, 3, "<gradient:#C8D7FF:#ADF3FD>Cloud")
+		else if arg-1 = "BLUE_FLAME":
+			cs(player, 3, "<gradient:#084CFB:#00FFFF>Blue Flame")
+		else if arg-1 = "BLUE_STORM":
+			cs(player, 3, "<gradient:#084CFB:#7500FF>Blue Storm")
+		else if arg-1 = "CLEAR_STORM":
+			cs(player, 3, "<gradient:#2E4C9B:#7FC5E7>Clear Storm")
+		else if arg-1 = "RED_DEATH":
+			cs(player, 3, "<gradient:#9B2E2E:#F30000>Red Death")
+		else if arg-1 = "CELESTIAL_STARS":
+			cs(player, 3, "<gradient:#A2FFA1:#55730D>Celestial Stars")
+		else if arg-1 = "MYSTERIOUS_ASHES":
+			cs(player, 3, "<gradient:#191F19:#777777>Mysterious Ashes")
+		else if arg-1 = "DEFAULT":
+			cs(player, 3)
+		else:
+			pe(player)
+###
+
+# CRATES
+
+options:
+	prize1: paper named "&fCash Voucher &8(&a&l$50&8)" with lore "&8ᴘʀɪᴢᴇ", "", " &fʀᴀʀɪᴛʏ: &7✰✰✰✰&6✰", " &fᴄʜᴀɴᴄᴇ: &a70%%"
+	prize2: paper named "&fCash Voucher &8(&a&l$100&8)" with lore "&8ᴘʀɪᴢᴇ", "", " &fʀᴀʀɪᴛʏ: &7✰✰✰✰&6✰", " &fᴄʜᴀɴᴄᴇ: &a30%%"
+	prize3: paper named "&fCash Voucher &8(&a&l$500&8)" with lore "&8ᴘʀɪᴢᴇ", "", " &fʀᴀʀɪᴛʏ: &7✰✰✰&6✰✰", " &fᴄʜᴀɴᴄᴇ: &a15%%"
+	prize4: tripwire hook named "&fVote Crate Key &8(&a&lx1&8)" with lore "&8ᴘʀɪᴢᴇ", "", " &fʀᴀʀɪᴛʏ: &7✰✰✰&6✰✰", " &fᴄʜᴀɴᴄᴇ: &a15%%"
+	prize5: tripwire hook named "&fVote Crate Key &8(&a&lx2&8)" with lore "&8ᴘʀɪᴢᴇ", "", " &fʀᴀʀɪᴛʏ: &7✰✰&6✰✰✰", " &fᴄʜᴀɴᴄᴇ: &a5%%"
+	prize6: name tag named "&fDesigner Rank &8(&6&lPERMANENT&8)" with lore "&8ᴘʀɪᴢᴇ", "", " &fʀᴀʀɪᴛʏ: &7✰&6✰✰✰✰", " &fᴄʜᴀɴᴄᴇ: &a1%%"
+	prize7: name tag named "&fArchitect Rank &8(&6&lPERMANENT&8)" with lore "&8ᴘʀɪᴢᴇ", "", " &fʀᴀʀɪᴛʏ: &6✰✰✰✰✰", " &fᴄʜᴀɴᴄᴇ: &a0.05%%"
+
+on leftclick:
+	event-block is block at location(54.5, 92.5, 61.5, world "lobby")
+	cancel event
+	create gui with virtual chest inventory with 3 row named "           &n♦ ᴠᴏᴛᴇ ᴄʀᴀᴛᴇ ♦":
+		make gui slot (integers from 0 to 26) with gray stained glass pane
+		make gui slot 10 with {@prize1}
+		make gui slot 11 with {@prize2}
+		make gui slot 12 with {@prize3}
+		make gui slot 13 with {@prize4}
+		make gui slot 14 with {@prize5}
+		make gui slot 15 with {@prize6}
+		make gui slot 16 with {@prize7}
+		invsfx(player)
+	open last gui for player
+
+on rightclick:
+	event-block is block at location(54.5, 92.5, 61.5, world "lobby")
+	cancel event
+	{vkey::%player's uuid%} < 1:
+		send "{@warn} You do not have any vote crate keys. &7(/vote)" to player
+	else:
+		set {_loops} to 1
+		if player is sneaking:
+			set {_loops} to {vkey::%player's uuid%}
+			set {vkey::%player's uuid%} to 0
+		if {_loops} = 1:
+			remove 1 from {vkey::%player's uuid%}
+		loop {_loops} times:
+			if mod(loop-counter, 1000) = 0:
+				wait 1 tick
+			chance of 30%:
+				console command "eco add %player% 100"
+				send "{@info} You have won &a$100&f!" to player
+				continue
+			else if chance of 15%:
+				console command "eco add %player% 500"
+				send "{@info} You have won &a$500&f!" to player
+				continue
+			else if chance of 15%:
+				add 1 to {vkey::%player's uuid%}
+				send "{@info} You have won &a1 vote key&f!" to player
+				continue
+			else if chance of 5%:
+				add 2 to {vkey::%player's uuid%}
+				send "{@info} You have won &a2 vote keys&f!" to player
+				continue
+			else if chance of 1%:
+				priority(player) > 1:
+					console command "eco add %player% 5000"
+					send "{@info} You have won &a$5000&f!" to player
+				else:
+					console command "lp user %player% parent add designer"
+					send "{@info} You have won &aDESIGNER RANK&f!" to player
+				continue
+			else if chance of 0.05%:
+				priority(player) > 2:
+					console command "eco add %player% 50000"
+					send "{@info} You have won &a$50000&f!" to player
+				else:
+					console command "lp user %player% parent add architect"
+					send "{@info} You have won &aARCHITECT RANK&f!" to player
+			else:
+				console command "eco add %player% 50"
+				send "{@info} You have won &a$50&f!" to player
+				continue
+
+command keys:
+	prefix: core
+	executable by: players
+	trigger:
+		send "{@info} You have &a%{vkey::%player's uuid%} ? 0% &fvote keys left. &7(/vote to get more)"
+
+# ECONOMY
+
+on tab complete of "pay":
+	set tab completions for position 1 to all players where [input != sender]
+
+command pay <offlineplayer> <number>:
+	prefix: core
+	aliases: transfer
+	usage: {@usage} /pay <offline player> <amount>
+	trigger:
+		arg-1 = sender:
+			send "{@warn} What is the point of paying yourself?"
+			stop
+		sender = console:
+			console command "eco add %arg-1% %arg-2%"
+			stop
+		if isInRegion(player) is true:
+			set {_bal} to {fcash::%player's uuid%} ? 0
+		else:
+			set {_bal} to {cash::%player's uuid%} ? 0
+		arg-1's uuid isn't set:
+			send "{@warn} Player doesn't exist or has not joined the server before."
+			stop
+		if arg-2 < 0.01:
+			sender's name isn't "Kundaliel"
+			send "{@warn} You may not pay less than one cent."
+			stop
+		if {_bal} < arg-2:
+			sender's name isn't "Kundaliel"
+			send "{@warn} Insufficient balance."
+			stop
+		if ({_bal} + arg-2) > 10000000000:
+			send "{@warn} That player will become too rich, transaction cancelled."
+			stop
+		if {s::ptog::%arg-1's uuid%} is set:
+			send "{@warn} That person isn't accepting any payments."
+			stop
+
+		if isInRegion(player) isn't true:
+			remove arg-2 from {cash::%player's uuid%}
+			add arg-2 to {cash::%arg-1's uuid%}
+			send "{@info} &fSuccessfully sent &a$%arg-2% &fto <#FFCF4A>%arg-1%&f." to player
+			send "{@info} <#FFCF4A>%player% &fhas sent you &a$%arg-2%&f!" to arg-1 if arg-1 is online
+		else:
+			remove arg-2 from {fcash::%player's uuid%}
+			add arg-2 to {fcash::%arg-1's uuid%}
+			send "{@info} &fSuccessfully sent <#EEA215>%arg-2% ғᴀɪᴛʜ ᴛᴏᴋᴇɴs &fto <#FFCF4A>%arg-1%&f." to player
+			send "{@info} <#FFCF4A>%player% &fhas sent you <#EEA215>%arg-2% ғᴀɪᴛʜ ᴛᴏᴋᴇɴs&f!" to arg-1 if arg-1 is online
+
+on tab complete of "bal", "balance" and "bank":
+	set tab completions for position 1 to all players
+
+command bal <p:offlineplayer=%player%>:
+	prefix: core
+	aliases: balance, bank
+	usage: {@usage} /bal &7[offline player]
+	trigger:
+		if isInRegion(player) isn't true:
+			send "{@info} Balance of <#FFCF4A>%{_p}%: &a$%numFormat({cash::%{_p}'s uuid%} ? 0)%"
+		else:
+			send "{@info} Balance of <#FFCF4A>%{_p}%: <#EEA215>%numFormat({fcash::%{_p}'s uuid%} ? 0)% ғᴀɪᴛʜ ᴛᴏᴋᴇɴs"
+
+every 15 minutes:
+	baltop()
+	run section {-playtimetop} async
+
+function baltop():
+	delete {baltop::*}
+	add "%nl%<#5CFF9C>&lTOP 10 BALANCES%nl%" to {baltop::*}
+	loop sorted indices of {cash::*} in descending order:
+		set {_name} to loop-value parsed as offlineplayer's name ? "Unknown"
+		if {_name} is "Unknown":
+			delete {cash::%loop-value parsed as offlineplayer%}, {cash::%loop-value parsed as offlineplayer's uuid%}
+		loop-counter = 1:
+			console command "npc sel !baltop", "npc skin %{_name}%"
+		add "<#5CFF9C>%loop-counter%. &f%{_name}% &7- <#5CFF9C>💲%numFormat({cash::%loop-value%}) ? 0%" to {baltop::*}
+		console command "holo edit baltop setline %loop-counter + 2% &#5CFF9C%loop-counter%. &f%{_name}% &7- &#5CFF9C💲%numFormat({cash::%loop-value%}) ? 0%"
+		exit loop if loop-counter > 9
+	add "" to {baltop::*}
+
+on load:
+	create section stored in {-playtimetop}:
+		delete {playtimetop::*}
+		add "%nl%<#FF49DD>&lTOP 10 PLAYTIME%nl%" to {playtimetop::*}
+		loop all offline players:
+			set {-time::%loop-offlineplayer's uuid%} to time played of loop-offlineplayer
+
+function playtimetop():
+	run section {-playtimetop} async and wait
+	loop sorted indices of {-time::*} in descending order:
+		loop-counter = 1:
+			console command "npc sel !playtimetop", "npc skin %loop-value parsed as offlineplayer's name ? "Unknown"%"
+		add "<#FF49DD>%loop-counter%. &f%loop-value parsed as offlineplayer's name ? "Unknown"% &7- <#FF49DD>⏳%timeFormat2(time played of loop-value parsed as offlineplayer)%" to {playtimetop::*}
+		console command "holo edit playtimetop setline %loop-counter + 2% <#FF49DD>%loop-counter%. &f%loop-value parsed as offlineplayer's name ? "Unknown"% &7- <#FF49DD>⏳%timeFormat2(time played of loop-value parsed as offlineplayer)%"
+		exit loop if loop-counter > 9
+	add "" to {playtimetop::*}
+	clear {-time::*}
+
+on tab complete of "baltop" and "balancetop":
+	priority(player) >= 10
+	set tab completions for position 1 to "refresh" and "r"
+
+command baltop [<text>]:
+	prefix: core
+	aliases: balancetop
+	trigger:
+		arg-1 is set:
+			priority(player) >= 10
+			baltop()
+			stop
+		send {baltop::*}
+
+command playtimetop [<text>]:
+	prefix: core
+	aliases: timetop
+	trigger:
+		arg-1 is set:
+			priority(player) >= 10
+			playtimetop()
+			stop
+		send {playtimetop::*}
+
+# admin
+
+on tab complete of "eco":
+	set tab completions for position 1 to "set", "add", and "remove" if sender has permission "admin.economy"
+	set tab completions for position 2 to "**", "*" and all players if sender has permission "admin.economy"
+
+command eco <text> <offlineplayer> <number>:
+	prefix: admin
+	permission: admin.economy
+	permission message: {@noperm}
+	usage: {@usage} /eco <set|add|remove> <player> &7<amount>
+	executable by: console
+	trigger:
+		arg-1 = "set":
+			arg-2 has played before:
+				set {cash::%arg-2's uuid%} to arg-3
+				send "{@info} Your balance has been mysteriously set to <#86FF5C>$%arg-3%&f." to arg-2 if arg-2 is online
+				send "{@info} You have set &fthe balance of &d%arg-2 if arg-2 isn't player else "yours"%&f to <#86FF5C>$%arg-3%&f."
+			else:
+				send "{@warn} ""%arg-2%"" doesn't exist or didn't join the server before."
+		else if arg-1 = "add":
+			arg-2 has played before:
+				add arg-3 to {cash::%arg-2's uuid%}
+				send "{@info} <#86FF5C>$%arg-3% &fhas been mysteriously added to your balance." to arg-2 if arg-2 is online
+				send "{@info} You have added <#86FF5C>$%arg-3% &fto the balance of &d%arg-2 if arg-2 isn't player else "yours"%&f."
+			else:
+				send "{@warn} ""%arg-2%"" doesn't exist or didn't join the server before."
+		else if arg-1 = "remove":
+			arg-2 has played before:
+				remove arg-3 from {cash::%arg-2's uuid%}
+				send "{@info} <#86FF5C>$%arg-3% &fhas been mysteriously removed to your balance." to arg-2 if arg-2 is online
+				send "{@info} You have removed <#86FF5C>$%arg-3% &ffrom the balance of &d%arg-2 if arg-2 isn't player else "yours"%&f."
+			else:
+				send "{@warn} ""%arg-2%"" doesn't exist or didn't join the server before."
+		else:
+			send ""
+			send "{@info} Economy Commands"
+			send ""
+			send "<#FFCF4A>/eco add (player) (amount)"
+			send "<#FFCF4A>/eco set (player) (amount)"
+			send "<#FFCF4A>/eco remove (player) (amount)"
+			send ""
+
+# === #
+# FUN #
+# === #
+
+command diceroll <int=1> <int=10>:
+	prefix: fun
+	trigger:
+		send "{@info} Your lucky number is: &a%random integer between arg 1 and arg 2%"
+
+# ======== #
+# GAMEMODE # FIX
+# ======== #
+
+function gamemode(s: sender, t: text, g: gamemode, w: world):
+	set {_} to minimessage from "<gradient:#44FF41:#49FFCB>creative" if {_g} = creative
+	set {_} to minimessage from "<gradient:#FF3D3D:#FF0067>survival" if {_g} = survival
+	set {_} to minimessage from "<gradient:#FF8600:#FFBA00>adventure" if {_g} = adventure
+	set {_} to minimessage from "<gradient:#C6C6C6:#A09F9F>spectator" if {_g} = spectator (gamemode)
+
+	{_s} = console: # CONSOLE
+		{_t} = "*":
+			player count < 1:
+				send "{@warn} There are no players on the server! :<" to {_s}
+				stop
+			set all players' gamemode to {_g}
+			send "{@info} Your &egamemode &fhas been set to %{_}% &fby &6the server&f." to all players
+			send "{@info} You have set &eeveryone&f's &egamemode &fto &6%{_g}%&f." to {_s}
+			stop
+		{_t} = "**":
+			number of all players in {_w} < 1:
+				send "{@warn} There are no players in the world %{_w}%! :<" to {_s}
+				stop				
+			set all players in {_w}' gamemode to {_g}
+			send "{@info} Your &egamemode &fhas been set to %{_}% &fby &6the server&f." to all players in {_w}
+			send "{@info} You have set &e(%all players in {_w}%)&f &fin world &e%{_w}%&f's &egamemode &fto &6%{_g}%&f." to {_s}
+			stop
+		{_t} parsed as player is online:
+			set {_t} parsed as player' gamemode to {_g}
+			send "{@info} Your &egamemode &fhas been set to %{_}% &fby &6the server&f." to {_t} parsed as player
+			send "{@info} You have set &e%{_t}%&f's &egamemode &fto &6%{_g}%&f." to {_s}
+			stop
+		send "{@warn} ""%{_t}%"" %"doesn't exist or didn't join the server before" if {name::%{_t} parsed as player's uuid%} isn't set else "is currently offline"%." to {_s}
+		stop
+	
+	{_s} has permission "admin.chat": # ADMIN
+		{_t} = "*":
+			set all players' gamemode to {_g}
+			player count < 2:
+				send "{@info} Your &egamemode &fhas been set to %{_}%&f." to {_s}
+				stop
+			send "{@info} Your &egamemode &fhas been set to %{_}% &fby &6%{_s}%&f." to all players where [input != {_s}]
+			send "{@info} You have set &eeveryone's &egamemode &fto %{_}%&f." to {_s}
+			stop
+		{_t} = "**":
+			set all players in {_w}' gamemode to {_g}
+			number of all players in {_w} < 2:
+				send "{@info} Your &egamemode &fhas been set to %{_}%&f." to {_s}
+				stop
+			send "{@info} Your &egamemode &fhas been set to %{_}% &fby &6%{_s}%&f." to all players in {_w} where [input != {_s}]
+			send "{@info} You have set &e(%all players in {_w}%)&f's &egamemode &fin world &e%{_w}% &fto %{_}%&f." to {_s}
+			stop
+		{_t} parsed as player = {_s}:
+			set {_s}' gamemode to {_g}
+			send "{@info} Your &egamemode &fhas been set to %{_}%&f." to {_s}
+			stop
+		{_t} parsed as player is online:
+			set {_t} parsed as player' gamemode to {_g}
+			send "{@info} Your &egamemode &fhas been set to %{_}% &fby &6%{_s}%&f." to {_t} parsed as player
+			send "{@info} You have set &e%{_t}%&f's &egamemode &fto %{_}%&f." to {_s}
+			stop
+		send "{@warn} ""%{_t}%"" %"doesn't exist or didn't join the server before" if {name::%{_t} parsed as player's uuid%} isn't set else "is currently offline"%." to {_s}
+		stop
+	
+	{_t} = "*": # NO ONE ELSE OTHER THAN ADMIN CAN SET EVERYONE'S GAMEMODE
+		send "{@notthis}" to {_s}
+		stop
+	{_t} = "**": # ONLY MOD AND SR MOD CAN SET ALL PLAYER IN PLAYER'S WORLD'S GAMEMODES THAT IS LOWER THAN THEIR RANK ONLY!
+		priority({_s}) < 7:
+			send "{@notthis}" to {_s}
+			stop
+		{_s}' world != {@supported_worlds}:
+			send "{@nothere}" to {_s}
+			stop
+		set all players in {_w} where [priority(input) < priority({_s})]' gamemode to {_g}
+		number of all players in {_w} < 2:
+			send "{@info} Your &egamemode &fhas been set to %{_}%&f." to {_s}
+			stop
+		send "{@info} Your &egamemode &fhas been set to %{_}% &fby &6%{_s}%&f." to all players in {_w} where [priority(input) < priority({_s})]
+		send "{@info} You have set &e(%all players in {_w}%)&f's &egamemode &fin world &e%{_w}% &fto %{_}%&f." to {_s}
+		stop
+	{_t} parsed as player = {_s}:
+		{_s}' world = {@supported_worlds}:
+###
+			priority({_s}) = 1:
+				{_s}' gamemode = {_g}:
+					send "{@warn} Your gamemode is already %{_g}%!" to {_s}
+					stop
+				metadata "gm" of {_s} isn't set:
+					set metadata "gm" of {_s} to now
+					set {_s}' gamemode to {_g}
+					send "{@info} Your &egamemode &fhas been set to %{_}%&f." to {_s}
+					stop
+				difference between metadata "gm" of {_s} and now >= 1 rl minute:
+					set metadata "gm" of {_s} to now
+					set {_s}' gamemode to {_g}
+					send "{@info} Your &egamemode &fhas been set to %{_}%&f." to {_s}
+					stop
+				send "{@warn} Please wait for %1 rl minute - difference between metadata "gm" of {_s} and now% before changing gamemodes!" to {_s}
+				stop
+				set {_s}' gamemode to {_g}
+				send "{@info} Your &egamemode &fhas been set to %{_}%&f." to {_s}
+				stop
+###
+			set {_s}' gamemode to {_g}
+			send "{@info} Your &egamemode &fhas been set to %{_}%&f." to {_s}
+			stop
+		send "{@nothere}" to {_s}
+		stop
+	{_t} parsed as player is online:
+		priority({_s}) < 5:
+			send "{@notthis}" to {_s}
+			stop
+		priority({_s}) <= priority({_t} parsed as player):
+			send "{@warn} %{_t}% has a higher or the same rank to you." to {_s}
+			stop
+		{_t}' gamemode = {_g}:
+			send "{@warn} %{_t}%'s gamemode is already %{_g}%!" to {_s}
+			stop
+		set {_t} parsed as player' gamemode to {_g}
+		send "{@info} Your &egamemode &fhas been set to %{_}% &fby &6%{_s}%&f." to {_t} parsed as player
+		send "{@info} You have set &e%{_t}%&f's &egamemode &fto %{_}%&f." to {_s}
+		stop
+	send "{@warn} ""%{_t}%"" %"doesn't exist or didn't join the server before" if {name::%{_t} parsed as player's uuid%} isn't set else "is currently offline"%." to {_s}
+	stop
+
+on tab complete of "gmc", "gma", "gms" or "gmsp":
+	if priority(player) > 9:
+		set tab completions for position 1 to "*", "**" and all players
+		set tab completions for position 2 to all worlds if tab arg-1 = "**"
+	else if priority(player) > 7:
+		set tab completions for position 1 to "**" and all players
+		set tab completions for position 2 to all worlds if tab arg-1 = "**"
+	else if priority(player) > 5:
+		set tab completions for position 1 to all players
+	else:
+		set tab completions for position 1 to ""
+ 
+on tab complete of "gamemode" or "gm":
+	set tab completions for position 1 to "0", "1", "2", "3", "s", "c", "a", "sp", "survival", "creative", "adventure", "spectator" if priority(player) < 6 else "0", "1", "2", "s", "c", "a", "survival", "creative", "adventure"
+	if priority(player) > 9:
+		set tab completions for position 2 to "*", "**" and all players
+		set tab completions for position 3 to all worlds if tab arg-2 = "**"
+	else if priority(player) > 7:
+		set tab completions for position 2 to "**" and all players
+		set tab completions for position 3 to all worlds if tab arg-2 = "**"
+	else if priority(player) > 5:
+		set tab completions for position 2 to all players
+	else:
+		set tab completions for position 2 to ""
+
+command gmc [<text>] [<world>]:
+	usage: {@usage} /gmc &7[player] [world]
+	prefix: core
+	trigger:
+		arg-1 = "**":
+			arg-2 isn't a world:
+				send "{@warn} Specify a valid world to set the gamemodes of players in that world!"
+				stop
+		sender = player:
+			gamemode(player, (arg-1 ? "%player%"), creative, (arg-2 ? player's world))
+			stop
+		arg-1 isn't set:
+			send "{@usage} /gmc <player | * | **> &7[world]"
+			stop
+		gamemode(sender, arg-1, creative, arg-2)
+		
+command gms [<text>] [<world>]:
+	usage: {@usage} /gms &7[player] [world]
+	prefix: core
+	trigger:
+		arg-1 = "**":
+			arg-2 isn't a world:
+				send "{@warn} Specify a valid world to set the gamemodes of players in that world!"
+				stop
+		sender = player:
+			gamemode(player, (arg-1 ? "%player%"), survival, (arg-2 ? player's world))
+			stop
+		arg-1 isn't set:
+			send "{@usage} /gms <player | * | **> &7[world]"
+			stop
+		gamemode(sender, arg-1, survival, arg-2)
+		
+command gma [<text>] [<world>]:
+	usage: {@usage} /gma &7[player] [world]
+	prefix: core
+	trigger:
+		arg-1 = "**":
+			arg-2 isn't a world:
+				send "{@warn} Specify a valid world to set the gamemodes of players in that world!"
+				stop
+		sender = player:
+			gamemode(player, (arg-1 ? "%player%"), adventure, (arg-2 ? player's world))
+			stop
+		arg-1 isn't set:
+			send "{@usage} /gma <player | * | **> &7[world]"
+			stop
+		gamemode(sender, arg-1, adventure, arg-2)
+		
+command gmsp [<text>] [<world>]:
+	usage: {@usage} /gmsp &7[player] [world]
+	prefix: core
+	permission: 50x.gamemode.spectator
+	permission message: {@noperm}
+	trigger:
+		arg-1 = "**":
+			arg-2 isn't a world:
+				send "{@warn} Specify a valid world to set the gamemodes of players in that world!"
+				stop
+		sender = player:
+			gamemode(player, (arg-1 ? "%player%"), spectator, (arg-2 ? player's world))
+			stop
+		arg-1 isn't set:
+			send "{@usage} /gma <player | * | **> &7[world]"
+			stop
+		gamemode(sender, arg-1, spectator, arg-2)
+		
+command gamemode <text> [<text>] [<world>]:
+	usage: {@usage} /gamemode <creative | survival | adventure | spectator> &7[player] [world]
+	prefix: core
+	aliases: gm
+	trigger:
+		arg-1 != "survival" or "s" or "0" or "creative" or "c" or "1" or "adventure" or "a" or "2" or "spectator" or "sp" or "3":
+			send usage
+			stop
+		arg-1 = "spectator" or "sp" or "3":
+			priority(sender) = 1
+			send "{@warn} You do not have access to this gamemode. Purchase a rank with /buy!"
+			stop
+		set {_} to survival if arg-1 = "survival" or "s" or "0"
+		set {_} to creative if arg-1 = "creative" or "c" or "1"
+		set {_} to adventure if arg-1 = "adventure" or "a" or "2"
+		set {_} to spectator (gamemode) if arg-1 = "spectator" or "sp" or "3"
+		arg-2 = "**":
+			arg-3 isn't a world:
+				send "{@warn} Specify a valid world to set the gamemodes of players in that world!"
+				stop
+		sender = player:
+			gamemode(player, (arg-2 ? "%player%"), {_}, (arg-3 ? player's world))
+			stop
+		else if arg-2 isn't set:
+			send "{@usage} /gamemode <creative | survival | adventure | spectator> <player | * | **> &7[world]"
+			stop
+		else:
+			gamemode(sender, arg-2, {_}, arg-3)
+
+# LINKS
+
+on rightclick on entity:
+	event-world = "lobby"
+	cancel event
+	name of event-entity = "!discord":
+		links(player, 1)
+	name of event-entity = "!store":
+		links(player, 2)
+	name of event-entity = "!website":
+		links(player, 3)
+	name of event-entity = "!vote":
+		links(player, 4)
+
+function links(p: sender, i: int):
+	send " &8┏&m                                                         " to {_p}
+	{_i} = 1: # DISCORD
+		send " <#5865F2>&lDISCORD" to {_p}
+		send " &fClick &a&n<ttp:&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴠɪsɪᴛ ᴏᴜʀ ᴅɪsᴄᴏʀᴅ sᴇʀᴠᴇʀ><url:https://discord.gg/2e9xuYGFUx>here&r to join" to {_p}
+	{_i} = 2: # STORE
+		send " <#FC39FF>&lSTORE" to {_p}
+		send " &fClick &a&n<ttp:&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴠɪsɪᴛ ᴏᴜʀ sᴛᴏʀᴇ><url:https://50xCreative.tebex.io/>here&r to visit" to {_p}
+	{_i} = 3: # WEBSITE
+		send " <#08D4FB>&lWEBSITE" to {_p}
+		send " &fClick &a&n<ttp:&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴠɪsɪᴛ ᴏᴜʀ ᴅɪsᴄᴏʀᴅ sᴇʀᴠᴇʀ><url:https://discord.gg/2e9xuYGFUx/>here&r to visit" to {_p}
+	{_i} = 4: # VOTE
+		send " <#00FF11>&lVOTING SITES" to {_p}
+		send " &7Temp Voting Site: &fClick &a&n<ttp:&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴠɪsɪᴛ ᴛʜɪs ᴠᴏᴛɪɴɢ sɪᴛᴇ><url:https://minecraftservers.org/server/679866>here&r to vote" to {_p}
+	###
+		send " &7Voting Site #1: &fClick &a&n<ttp:&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴠɪsɪᴛ ᴛʜɪs ᴠᴏᴛɪɴɢ sɪᴛᴇ><url:https://minecraft.buzz/vote/11173>here&r to vote" to {_p}
+		send " &7Voting Site #2: &fClick &a&n<ttp:&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴠɪsɪᴛ ᴛʜɪs ᴠᴏᴛɪɴɢ sɪᴛᴇ><url:https://minecraftservers.org/vote/663830>here&r to vote" to {_p}
+	###
+	{_i} = 5: # APPLY
+		send " &6&lAPPLICATIONS" to {_p}
+		send " &7Applications are closed until further notice." to {_p}
+	send " &8&m                                                          &8┛" to {_p}
+		
+command discord:
+	prefix: core
+	trigger:
+		links(sender, 1)
+
+command store:
+	prefix: core
+	trigger:
+		links(sender, 2)
+		
+command website:
+	prefix: core
+	trigger:
+		links(sender, 3)
+		
+command vote:
+	prefix: core
+	trigger:
+		links(sender, 4)
+
+command apply:
+	prefix: core
+	trigger:
+		links(sender, 5)
+# OPTIONS
+
+function options(p: player):
+	create gui with virtual chest inventory with 3 row named "            &n♦ ᴏᴘᴛɪᴏɴs ♦":
+		make gui slot 11 with flower banner pattern named ("<#0297FE>Scoreboard Visibility &8⋅ %"&2⬤" if fastboard of {_p} is on else "&4⬤"%") with lore ("&8sᴇᴛᴛɪɴɢ", "", "&7Toggles the visibility of the scoreboard.", "" and "&4&l￫ &ccʟɪᴄᴋ &fᴛᴏ ᴅɪsᴀʙʟᴇ ᴛʜɪs sᴇᴛᴛɪɴɢ" if fastboard of {_p} is on else "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴇɴᴀʙʟᴇ ᴛʜɪs sᴇᴛᴛɪɴɢ"):
+			toggle {_p}'s fastboard
+			options({_p})
+		make gui slot 12 with skull of {_p} named "<#0297FE>Chat Ping &8⋅ %"&2⬤" if {s::ping::%{_p}'s uuid%} isn't set else "&4⬤"%" with lore (("&8sᴇᴛᴛɪɴɢ", "", "&7Toggles whether to allow players to ping you.", "" and "&4&l￫ &ccʟɪᴄᴋ &fᴛᴏ ᴅɪsᴀʙʟᴇ ᴛʜɪs sᴇᴛᴛɪɴɢ") if {s::ping::%{_p}'s uuid%} isn't set else "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴇɴᴀʙʟᴇ ᴛʜɪs sᴇᴛᴛɪɴɢ"):
+			{s::ping::%{_p}'s uuid%} is set:
+				delete {s::ping::%{_p}'s uuid%}
+			else:
+				set {s::ping::%{_p}'s uuid%} to true
+			options({_p})
+		make gui slot 13 with diamond named "<#0297FE>Pay Toggle &8⋅ %"&2⬤" if {s::ptog::%{_p}'s uuid%} isn't set else "&4⬤"%" with lore (("&8sᴇᴛᴛɪɴɢ", "", "&7Toggles whether to receive payments.", "" and "&4&l￫ &ccʟɪᴄᴋ &fᴛᴏ ᴅɪsᴀʙʟᴇ ᴛʜɪs sᴇᴛᴛɪɴɢ") if {s::ptog::%{_p}'s uuid%} isn't set else "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴇɴᴀʙʟᴇ ᴛʜɪs sᴇᴛᴛɪɴɢ"):
+			{s::ptog::%{_p}'s uuid%} is set:
+				delete {s::ptog::%{_p}'s uuid%}
+			else:
+				set {s::ptog::%{_p}'s uuid%} to true
+			options({_p})
+		set lock status of last gui to true
+		make gui slot 14 with jukebox named "<#0297FE>Lobby Songs &8⋅ %"&2⬤" if {s::song::%{_p}'s uuid%} isn't set else "&4⬤"%" with lore (("&8sᴇᴛᴛɪɴɢ", "", "&7Toggles whether to hear lobby songs.", "" and "&4&l￫ &ccʟɪᴄᴋ &fᴛᴏ ᴅɪsᴀʙʟᴇ ᴛʜɪs sᴇᴛᴛɪɴɢ") if {s::song::%{_p}'s uuid%} isn't set else "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴇɴᴀʙʟᴇ ᴛʜɪs sᴇᴛᴛɪɴɢ"):
+			{s::song::%{_p}'s uuid%} is set:
+				delete {s::song::%{_p}'s uuid%}
+			else:
+				set {s::song::%{_p}'s uuid%} to true
+			options({_p})
+		make gui slot 15 with goat horn with item flag hide additional tooltip named "<#0297FE>Sound Effects &8⋅ %"&2⬤" if {s::invsfx::%{_p}'s uuid%} isn't set else "&4⬤"%" with lore (("&8sᴇᴛᴛɪɴɢ", "", "&7Toggles whether to hear sound effects.", "" and "&4&l￫ &ccʟɪᴄᴋ &fᴛᴏ ᴅɪsᴀʙʟᴇ ᴛʜɪs sᴇᴛᴛɪɴɢ") if {s::invsfx::%{_p}'s uuid%} isn't set else "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴇɴᴀʙʟᴇ ᴛʜɪs sᴇᴛᴛɪɴɢ"):
+			{s::invsfx::%{_p}'s uuid%} is set:
+				delete {s::invsfx::%{_p}'s uuid%}
+			else:
+				set {s::invsfx::%{_p}'s uuid%} to true
+			options({_p})
+		invsfx({_p})
+	open last gui to {_p}
+	
+command options:
+	prefix: core
+	executable by: players
+	trigger:
+		options(player)
+
+# ======== #
+# REALNAME #
+# ======== #
+on tab complete of "/realname":
+	loop all players:
+		add unformatted {nick::%loop-player's uuid%} to tab completions for position 1
+
+command realname <text>:
+	prefix: core
+	usage: {@usage} /realname &f<unformatted player nickname>
+	trigger:
+		if all:
+			player(arg 1) is online
+			uncolored {nick::*} doesn't contain arg-1
+		then:
+			send "{@warn} That player does not have any nickname, or that is already the player's name."
+		else if unformatted {nick::*} doesn't contain arg-1:
+			send "{@warn} No one has that nickname currently."
+		else:
+			loop {nick::*}:
+				unformatted loop-value = arg-1
+				if (loop-index parsed as player) isn't set:
+					delete {nick::%loop-index%}
+					send "{@warn} No one has that nickname currently."
+					stop loop
+				send "{@info} The real name of <#ffcf4a>%arg-1% &fis <#ffcf4a>%loop-index parsed as player%&f."
+				stop loop
+
+# ===== #
+# RULES #
+# ===== #
+
+command rules [<int>] [<text>]:
+	prefix: core
+	usage: {@usage} /rules &7[1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17]
+	trigger:
+		arg-2 is set:
+			send usage
+			stop
+		else if arg-1 isn't set:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO GRIEFING</gradient>"%%nl%&fDamaging, altering, or destroying another player's build without permission is strictly forbidden, regardless of personal feelings toward it. Staff can roll back any damage. Using hacks such as Nuker will result in a permanent ban. Repeat offenders will receive harsher penalties. This rule does not apply if you have explicit consent from the build's creator(s). Report any griefing immediately using /report.%nl%"
+			send formatted "<ttp:&aClick &fto go to the next page!><run command:/rules 2>&7Next page »<reset>%nl%"
+		else if arg-1 = 1:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO GRIEFING</gradient>"%%nl%&fDamaging, altering, or destroying another player's build without permission is strictly forbidden, regardless of personal feelings toward it. Staff can roll back any damage. Using hacks such as Nuker will result in a permanent ban. Repeat offenders will receive harsher penalties. This rule does not apply if you have explicit consent from the build's creator(s). Report any griefing immediately using /report.%nl%"
+			send formatted "<ttp:&aClick &fto go to the next page!><run command:/rules 2>&7Next page »<reset>%nl%"
+		else if arg-1 = 2:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO DISCRIMINATION</gradient>"%%nl%&fAny form of discrimination (e.g., gender, age, religion, race, nationality, orientation) is strictly prohibited. Treat all players with mutual respect. Punishments will depend on the severity of the offense and will be determined by staff.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 3>&7Next page »<reset>%nl%"
+		else if arg-1 = 3:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO ADVERTISING</gradient>"%%nl%&fPromoting or advertising other servers, businesses, or unrelated communities is not allowed. Indirect advertising (e.g., adding someone to promote to them later) is also prohibited. &7(Use /ad 50xCreative instead)%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 2>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 4>&7Next page »<reset>%nl%"
+		else if arg-1 = 4:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO EXPLICIT OR CONTROVERSIAL CONTENT</gradient>"%%nl%&fThis includes NSFW skins, names, conversations, and references to substances such as vapes, etc. Punishment will depend on the severity of the offense and may result in a warning or ban.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 3>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 5>&7Next page »<reset>%nl%"
+		else if arg-1 = 5:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO NBT/CUSTOM ITEMS</gradient>"%%nl%&fNBT/Custom items are items that are either unobtainable (e.g., Barrier Blocks, Command Blocks) or have custom properties such as unobtainable enchantment levels (e.g., Sharpness above 5).%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 4>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 6>&7Next page »<reset>%nl%"
+		else if arg-1 = 6:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO SOLICITING</gradient>"%%nl%&fDo not request or pressure others for goods or perks that cannot be normally obtained in-game, such as ranks or command access. Repeated pestering will result in warnings or further action.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 5>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 7>&7Next page »<reset>%nl%"
+		else if arg-1 = 7:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO REPEATED STANDALONE FLAG BUILDS</gradient>"%%nl%&fFlags such as LGBTQ+ flags or similar are prohibited from being built more than 3 times.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 6>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 8>&7Next page »<reset>%nl%"
+		else if arg-1 = 8:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO REVELATION OF PERSONAL INFORMATION</gradient>"%%nl%&fDo not share another player's personal or private information, such as their name, address, bank details, etc. This rule is ZERO TOLERANCE and heavily enforced.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 7>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 9>&7Next page »<reset>%nl%"
+		else if arg-1 = 9:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO INTERFERING WITH GAMEPLAY</gradient>"%%nl%&fDo not create contraptions, use exploits, or take actions that could crash or disrupt the server. All bugs should be reported to staff immediately. Failure to comply may result in a permanent ban or blacklist.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 8>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 10>&7Next page »<reset>%nl%"
+		else if arg-1 = 10:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO LAG GENERATING OBJECTS</gradient>"%%nl%&fThis includes lag machines, excessive entities, lag items, or anything else capable of crashing or lagging the server.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 9>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 11>&7Next page »<reset>%nl%"
+		else if arg-1 = 11:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>STAFF DISCRETION</gradient>"%%nl%&fStaff members may adjust, interpret, and enforce rules as necessary without prior notice. They may issue punishments they deem appropriate based on the situation.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 10>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 12>&7Next page »<reset>%nl%"
+		else if arg-1 = 12:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO ENTITY SPAM</gradient>"%%nl%&fDo not spawn excessive amounts of entities that cause lag, disrupt builds, or annoy other players. Abuse of entity spamming will result in potential bans.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 11>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 13>&7Next page »<reset>%nl%"
+		else if arg-1 = 13:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO FORMS OF ANNOYANCE</gradient>"%%nl%&fThis includes chat flooding, sound spam, obstructing other players' movement, and similar disruptive behavior.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 12>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 14>&7Next page »<reset>%nl%"
+		else if arg-1 = 14:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO LAND CLAIMS</gradient>"%%nl%&fClaiming land in the creative world is strictly forbidden. Build considerately and respect shared space.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 13>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 15>&7Next page »<reset>%nl%"
+		else if arg-1 = 15:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO AFK FLIGHT IN PLOT WORLD</gradient>"%%nl%&fFlying while AFK in Plot World is not allowed and is considered lag generation, which will result in a ban.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 14>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 16>&7Next page »<reset>%nl%"
+		else if arg-1 = 16:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO DISRESPECTFUL BEHAVIOUR OR CONTENT</gradient>"%%nl%&fThis includes calling players disrespectful names, mocking builds, or building over another player's work out of spite or disagreement.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 15>&7<< Previous Page<reset> &8| <ttp:&aClick &fto go to the next page!><run command:/rules 17>&7Next page »<reset>%nl%"
+		else if arg-1 = 17:
+			send "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &8&l┊ &6&lRules%nl%"
+			send "%minimessage from "<gradient:#FF0000:#FF8600>NO LOOPHOLES</gradient>"%%nl%&fAttempting to find loopholes in our rules will result in a longer punishment duration.%nl%"
+			send formatted "<ttp:&aClick &fto go to the previous page!><run command:/rules 16>&7<< Previous Page<reset>%nl%"
+		else:
+			send usage
+
+
+# ====================================================================================================== #
+
+# SPAWN
+
+options:
+	cosmetics: chest named "<#16E3FF>Cosmetics &8• &7ʀɪɢʜᴛ-ᴄʟɪᴄᴋ" with lore "&8ᴍᴇɴᴜ", "", "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Tweak your cosmetic configuration and", " <#78EFFF>| &7custom particle effects to your liking." with custom nbt from "{""type"":""cosmetics""}"
+	gamemenu: recovery compass named "<#16E3FF>Selector &8• &7ʀɪɢʜᴛ-ᴄʟɪᴄᴋ" with lore "&8ᴍᴇɴᴜ", "", "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Use this magical compass to travel" and " <#78EFFF>| &7across all available gamemodes."  with custom nbt from "{""type"":""game""}"
+	options: comparator named "<#16E3FF>Options &8• &7ʀɪɢʜᴛ-ᴄʟɪᴄᴋ" with lore "&8ᴍᴇɴᴜ", "", "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Tweak some settings of the server", " <#78EFFF>| &7tailored to your needs."  with custom nbt from "{""type"":""options""}"
+
+on leftclick:
+	event-world = "lobby":
+		event-item = {@cosmetics}:
+			cancel event
+			cosmetics(player)
+		event-item = {@gamemenu}:
+			cancel event
+			gamemenu(player)
+		event-item = {@options}:
+			cancel event
+			options(player)
+
+on rightclick:
+	event-world = "lobby":
+		event-item = {@cosmetics}:
+			cancel event
+			cosmetics(player)
+		event-item = {@gamemenu}:
+			cancel event
+			gamemenu(player)
+		event-item = {@options}:
+			cancel event
+			options(player)
+
+		"%event-entity%" = "!randomizer":
+			cancel event
+			spawn(player, "50xrngrush")
+		"%event-entity%" = "!creative":
+			cancel event
+			spawn(player, "creative")
+		"%event-entity%" = "!plots":
+			cancel event
+			spawn(player, "plots")
+		"%event-entity%" = "!tag":
+			cancel event
+			spawn(player, "tag")
+
+function wchange(p: player, t: text):
+	{_t} = {@supported_worlds} or "chaos":
+		priority({_p}) <= 12
+		set {_p}'s gamemode to creative
+	else if {_t} = "lobby":
+		clear {_p}'s inventory
+		set {_p}'s level to 1
+		set hotbar slot of {_p} to slot 4 of {_p}
+		set slot 2 of {_p}'s inventory to {@cosmetics}
+		set slot 4 of {_p}'s inventory to {@gamemenu}
+		set slot 6 of {_p}'s inventory to {@options}
+		set {_p}'s flight mode to true
+		priority({_p}) <= 12
+		set {_p}'s gamemode to adventure
+	else:
+		priority({_p}) <= 12
+		set {_p}'s gamemode to adventure
+
+on player world change:
+	player's gamemode != spectator
+	wait 2 tick
+	wchange(event-player, name of event-player's world)
+
+function spawn(p: player, w: text = "lobby"):
+	{lock::%{_w}%} is set:
+		play sound "block.anvil.land" at pitch 0.7 for {_p}
+		send "{@warn} This game is currently locked. Contact an administrator if you think this is an issue. We apologize for any inconvenience caused." to {_p}
+	else if {spawn::%{_w}%} isn't set:
+		play sound "block.anvil.land" at pitch 0.7 for {_p}
+		send "{@warn} The spawn of this game is currently unset. Contact an administrator about this issue. We apologize for any inconvenience caused." to {_p}
+	else:
+		clear passengers of {_p}
+		make {_p} dismount if {_p} is riding
+		teleport {_p} to {spawn::%{_w}%}
+		wait 1 tick
+		wchange({_p}, {_w})
+		play sound "entity.player.levelup" at pitch 0.7 for {_p}
+		send title "%logo({_w})% &l%{_w} in uppercase%&r %logo({_w})%" with subtitle "&fYou have been teleported." to {_p} for 1.5 seconds with fadein 0.3 second and fade out 0.3 second
+		send "{@info} ᴄᴏɴɴᴇᴄᴛᴇᴅ ʏᴏᴜ ᴛᴏ <#16E3FF>&l%smallcaps({_w})%&f." to {_p}
+		send "{@info} &fғʟɪɢʜᴛ ᴍᴏᴅᴇ ʜᴀs ʙᴇᴇɴ &aᴇɴᴀʙʟᴇᴅ&f." to {_p}
+		set block below {_p} to white stained glass if block below {_p} = air or light
+
+function gamemenu(p: player):
+	create gui with virtual chest inventory with 6 row named "        &n♦ ɢᴀᴍᴇ sᴇʟᴇᴄᴛᴏʀ ♦":
+		make gui slot (integers from 0 to 9, 17, 18, 26, 27, 35, 36, 44, integers from 45 to 53) with black stained glass pane without tooltip
+		make gui slot 11 with {head::plots} named "&6&lPLOTS" with lore "&8ɢᴀᴍᴇᴍᴏᴅᴇ", "", "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Display your artistic creations in a", " <#78EFFF>| &7200x200 plot world that never resets.", "", " &8⋅ <#E0E0E0>sᴛᴀᴛᴜs: <#76FF90>ᴏɴʟɪɴᴇ", " &8⋅ <#E0E0E0>ᴠᴇʀsɪᴏɴ: <#76FF90>1.20+", "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘʟᴀʏ ᴡɪᴛʜ &a%realPlayers("plots")% &fᴘʟᴀʏᴇʀs":
+			close {_p}'s inventory
+			spawn({_p}, "plots")	
+		make gui slot 13 with {head::creative} named "&a&lCREATIVE" with lore "&8ɢᴀᴍᴇᴍᴏᴅᴇ", "", "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Come and unleash your creativity", " <#78EFFF>| &7in this 125x125 creative world.", "", " &8⋅ <#E0E0E0>sᴛᴀᴛᴜs: <#76FF90>ᴏɴʟɪɴᴇ", " &8⋅ <#E0E0E0>ᴠᴇʀsɪᴏɴ: <#76FF90>1.20+", " &8⋅ <#E0E0E0>ʀᴇsᴇᴛs: <#76FF90>True", "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘʟᴀʏ ᴡɪᴛʜ &a%realPlayers("creative")% &fᴘʟᴀʏᴇʀs":
+			close {_p}'s inventory
+			spawn({_p}, "creative")
+		make gui slot 15 with {head::chaos} named "&c&lCHAOS" with lore "&8ɢᴀᴍᴇᴍᴏᴅᴇ", "", "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Let your intrusive thoughts", " <#78EFFF>| &7have some menacing fun.", "", " &8⋅ <#E0E0E0>sᴛᴀᴛᴜs: <#76FF90>ᴏɴʟɪɴᴇ", " &8⋅ <#E0E0E0>ᴠᴇʀsɪᴏɴ: <#76FF90>1.20+", " &8⋅ <#E0E0E0>ʀᴇsᴇᴛs: <#76FF90>True", "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘʟᴀʏ ᴡɪᴛʜ &a%realPlayers("chaos")% &fᴘʟᴀʏᴇʀs":
+			close {_p}'s inventory
+			spawn({_p}, "chaos")
+		{_p} has permission "donator.chat":
+			make gui slot 20 with {head::donor} named "&b&lDONATOR" with lore "&8ɢᴀᴍᴇᴍᴏᴅᴇ", "", "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Special creative world only", " <#78EFFF>| &7for donators and above.", "", " &8⋅ <#E0E0E0>sᴛᴀᴛᴜs: <#76FF90>ᴏɴʟɪɴᴇ", " &8⋅ <#E0E0E0>ᴠᴇʀsɪᴏɴ: <#76FF90>1.20+", "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘʟᴀʏ ᴡɪᴛʜ &a%realPlayers("donator")% &fᴘʟᴀʏᴇʀs":
+				close {_p}'s inventory
+				spawn({_p}, "donor")
+		{_p} has permission "staff.chat":
+			make gui slot 22 with {head::staff} named "&c&lSTAFF" with lore "&8ɢᴀᴍᴇᴍᴏᴅᴇ", "", "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Special creative world only", " <#78EFFF>| &7for staffs and above.", "", " &8⋅ <#E0E0E0>sᴛᴀᴛᴜs: <#76FF90>ᴏɴʟɪɴᴇ", " &8⋅ <#E0E0E0>ᴠᴇʀsɪᴏɴ: <#76FF90>1.20+", "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘʟᴀʏ ᴡɪᴛʜ &a%realPlayers("donator")% &fᴘʟᴀʏᴇʀs":
+				close {_p}'s inventory
+				spawn({_p}, "staff")
+		{_p} has permission "admin.chat":
+			make gui slot 24 with {head::admin} named "&d&lADMIN" with lore "&8ɢᴀᴍᴇᴍᴏᴅᴇ", "", "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Special creative world only", " <#78EFFF>| &7for admins and above.", "", " &8⋅ <#E0E0E0>sᴛᴀᴛᴜs: <#76FF90>ᴏɴʟɪɴᴇ", " &8⋅ <#E0E0E0>ᴠᴇʀsɪᴏɴ: <#76FF90>1.20+", "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘʟᴀʏ ᴡɪᴛʜ &a%realPlayers("donator")% &fᴘʟᴀʏᴇʀs":
+				close {_p}'s inventory
+				spawn({_p}, "admin")
+		make gui slot 29 with {head::event} named "&6&lEVENT" with lore "&8ɢᴀᴍᴇᴍᴏᴅᴇ", "" and "&cCOMING SOON":
+			close {_p}'s inventory
+		make gui slot 31 with {head::tag} named "&f&lTAG" with lore "&8ɢᴀᴍᴇᴍᴏᴅᴇ", "", "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Chase or escape in this", " <#78EFFF>| &7fast-paced game of tag!", "", " &8⋅ <#E0E0E0>sᴛᴀᴛᴜs: <#76FF90>ᴏɴʟɪɴᴇ", " &8⋅ <#E0E0E0>ᴠᴇʀsɪᴏɴ: <#76FF90>1.20+", " &8⋅ <#E0E0E0>ᴘʟᴀʏᴇʀs ɴᴇᴇᴅᴇᴅ: <#76FF90>2+", "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘʟᴀʏ ᴡɪᴛʜ &a%realPlayers("tag")% &fᴘʟᴀʏᴇʀs":
+			close {_p}'s inventory
+			spawn({_p}, "tag")
+		make gui slot 33 with {head::unknown} named "&7&lUNKNOWN" with lore "&8ɢᴀᴍᴇᴍᴏᴅᴇ", "" and "&cCOMING SOON":
+			close {_p}'s inventory
+		make gui slot 40 with {head::spawn} named "&9&lSPAWN" with lore "&8ʟᴏʙʙʏ", "" and "<#78EFFF>ⓘ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ", " <#78EFFF>| &7Go back to the original", " <#78EFFF>| &7server spawn location!", "", and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴄʜɪʟʟ ᴡɪᴛʜ &a%realPlayers("lobby")% &fᴘʟᴀʏᴇʀs":
+			close {_p}'s inventory
+			spawn({_p})
+	open last gui for {_p}
+	invsfx({_p})
+	
+command menu:
+	prefix: core
+	trigger:
+		gamemenu(player)
+
+on tab complete of "spawn", "hub" or "lobby":
+	sender has permission "core.spawn.others"
+	set tab completions for position 1 to all players
+
+command spawn <player=%player%> <text="lobby">:
+	prefix: core
+	aliases: hub, lobby
+	usage: {@usage} /spawn &7[player] [world]
+	trigger:
+		sender = console:
+			arg-1 isn't set:
+				send "{@usage} /spawn <player> &7[world]"
+			else:
+				spawn(arg-1, arg-2)
+		else if arg-1 != player:
+			if player doesn't have permission "staff.chat":
+				send "{@notthis}"
+			else if priority(arg-1) > priority(player):
+				send "{@nothigh}"
+			else:
+				spawn(arg-1)
+		else:
+			spawn(player)
+
+# ===== #
+# STATS # 
+# ===== #
+
+on tab complete of "stats":
+	set tab completions for position 1 to all players
+
+command stats [<offlineplayer>]:
+	prefix: core
+	usage: {@usage} /stats &7[player]
+	trigger:
+		set {_p} to arg-1 ? player
+		{_p} hasn't played before:
+			send "{@warn} %{_p}% has not played before."
+		else:
+			send ""
+			send "{@info} Statistics for &d%{_p}% %"&7(You)" if {_p} = player else ""%"
+			send ""
+			send " &6» &fRank &7- &d%toHex({_p}'s prefix)%"
+			send " &6» &fJoined &7- &d%{_p}'s first login%"
+			send " &6» &fPlaytime &7- &d%{_p}'s time played%"
+			send " &6» &fBalance &7- &d$%numFormat({cash::%{_p}'s uuid%} ? 0)%"
+			send ""
+
+# === #
+# TPA #
+# === #
+
+on load:
+	delete {tp::*}
+
+on tab complete of "tpa", "tpahere", "tpaccept" and "tpdeny":
+	set tab completions for position 1 to all players
+
+command tptoggle:
+	prefix: core
+	executable by: players
+	trigger:
+		if {s::tptoggle::%player's uuid%} is not set:
+			set {s::tptoggle::%player's uuid%} to true
+			send "{@warn} You will no longer be able to receive teleport requests."
+		else:
+			delete {s::tptoggle::%player's uuid%}
+			send "{@info} &fYou will now be able to receive teleport requests."
+
+command tpa <player>:
+	prefix: core
+	executable by: players
+	usage: {@usage} /tpa &f<player>
+	trigger:
+		if {settings::tptoggle::%arg-1's uuid%} is not set:
+			if {tp::%executor's uuid%::%arg-1's uuid%} is not set:
+				send "{@info} &fYou have sent a teleport request to &e%arg-1%." to executor
+				send "","{@info} &e%executor% &fwishes to teleport to you. &fUse &e/tpaccept %executor% &fto accept this teleport.","" to arg-1
+				set {tp::%executor's uuid%::%arg-1's uuid%} to "t"
+				wait 60 seconds
+				delete {tp::%executor's uuid%::%arg-1's uuid%}
+			else:
+				send "{@warn} You have already sent a teleport request to this player." to executor
+		else:
+			send "{@warn} This player has teleport requests disabled."
+
+command tpahere <player>:
+	prefix: core
+	executable by: players
+	usage: {@usage} /tpahere &f<player>
+	trigger:
+		if {settings::tptoggle::%arg-1's uuid%} is not set:
+			if {tp::%executor's uuid%::%arg-1's uuid%} is not set:
+				send "{@info} &fYou have sent a teleport request to &e%arg-1%&f." to executor
+				send "","{@info} &e%executor% &fwishes for you to teleport to them. &fUse &e/tpaccept %executor% &fto accept this teleport.","" to arg-1
+				set {tp::%executor's uuid%::%arg-1's uuid%} to "h"
+				wait 60 seconds
+				delete {tp::%executor's uuid%::%arg-1's uuid%}
+			else:
+				send "{@warn} You have already sent a teleport request to this player." to executor
+		else:
+			send "{@warn} This player has teleport requests disabled."
+
+command tpaccept <player>:
+	prefix: core
+	executable by: players
+	usage: {@usage} /tpaccept &f<player>
+	trigger:
+		if {tp::%arg-1's uuid%::%executor's uuid%} is "t":
+			delete {tp::%arg-1's uuid%::%executor's uuid%}
+			send "{@info} &fYou have teleported to &e%executor%&f." to arg-1
+			teleport arg-1 to executor
+		else if {tp::%arg-1's uuid%::%executor's uuid%} is "h":
+			delete {tp::%arg-1's uuid%::%executor's uuid%}
+			send "{@info} &fYou have teleported to &e%executor%&f." to executor
+			teleport executor to arg-1
+				
+command tpdeny <player>:
+	prefix: core
+	executable by: players
+	usage: {@usage} /tpdeny &f<player>
+	trigger:
+		if {tp::%arg-1's uuid%::%executor's uuid%} is set:
+			send "{@warn} You have denied &e%arg-1%'s &crequest to teleport." to executor
+			send "{@info} &e%player% &chas denied your request to teleport." to arg-1
+			delete {tp::%arg-1's uuid%::%executor's uuid%}
+		else:
+			send "{@warn} There is no pending teleport request from this player."
+
+# ===== #
+# VAULT #
+# ===== #
+
+function openVault(player:offlineplayer, id:integer, admin:player={_unset}):
+	{_player} and {_id} are set
+	close {_player}'s inventory
+	invsfx({_player})
+	set {_uuid} to uuid of {_player}
+	set {_opener} to {_admin} ? {_player}
+	set metadata "vault;owner" of {_opener} to {_uuid}
+	set metadata "vault;id" of {_opener} to {_id}
+
+	set {_inv} to chest inventory with 3 row named "%{_player}%'s Vault #%{_id}%"
+	set metadata "vault;inventory" of {_opener} to {_inv}
+	set {-vaultCache::%{_uuid}%::%{_id}%} to {_inv}
+	loop indices of {vaults::%{_uuid}%::%{_id}%::*}:
+		set slot (loop-value parsed as an integer) of {_inv} to {vaults::%{_uuid}%::%{_id}%::%loop-value%}
+
+	open {_inv} to {_opener}
+	
+on inventory close:
+	player has metadata "vault;inventory"
+	invsfx(player)
+	set {_vaultOwner} to metadata "vault;owner" of player
+	set {_vaultId} to metadata "vault;id" of player
+	clear metadata "vault;inventory","vault;owner","vault;id" of players
+	clear {vaults::%{_vaultOwner}%::%{_vaultId}%::*}
+	loop items in event-inventory:
+		set {vaults::%{_vaultOwner}%::%{_vaultId}%::%index of loop-item%} to loop-item
+
+on rightclick on ender chest:
+	cancel event
+	event-world = {@supported_worlds}
+	VaultGui(player)
+
+on tab complete for "v" and "vault":
+	set tab completions for position 1 to indices of {vaults::%uuid of player%::*}
+
+command vault [<id:int>] [<text>]:
+	prefix: core
+	usage: {@usage} /<v | vault> &7[1-7]
+	aliases: v
+	trigger:
+		name of player's world = "50xSurvival":
+			send "{@nothere}"
+			stop
+		arg-2 is set:
+			send usage
+		else if sender = console:
+			send "{@notyou}"
+		else if player's world != {@supported_worlds}:
+			priority(player) < 7
+			send "{@nothere}"
+		else if arg-1 < 1:
+			send "{@warn} All vaults start from 1."
+		else if arg-1 > 7:
+			send "{@warn} You can only have a maximum of 7 vaults."
+		else if arg-1 is set:
+			player doesn't have permission "vault.%arg-1%":
+				send "{@warn} You do not have that much vaults."
+			else if player's world != {@supported_worlds}:
+				priority(player) < 7
+				send "{@nothere}"
+			else:
+				openVault(player, {_id})
+		VaultGui(player)
+			
+function VaultGui(p: offlineplayer):
+	create a gui with virtual chest inventory with 1 row named "Vaults of %{_p}%":
+		make gui slot (integers from 0 to 8) with black stained glass pane named ""
+		{_p} has permission "vault.1":
+			make gui slot 0 with chest named minimessage from "<gradient:#00FFFF:#00A2FF>Vault #1" with lore "&8ᴠᴀᴜʟᴛ" and "" and "&aClick &7to &fopen this vault&7!":
+				openVault({_p}, 1)
+		{_p} has permission "vault.2":
+			make gui slot 1 with chest named minimessage from "<gradient:#00FFFF:#00A2FF>Vault #2" with lore "&8ᴠᴀᴜʟᴛ" and "" and "&aClick &7to &fopen this vault&7!":
+				openVault({_p}, 2)
+		{_p} has permission "vault.3":
+			make gui slot 2 with chest named minimessage from "<gradient:#00FFFF:#00A2FF>Vault #3" with lore "&8ᴠᴀᴜʟᴛ" and "" and "&aClick &7to &fopen this vault&7!":
+				openVault({_p}, 3)
+		{_p} has permission "vault.4":
+			make gui slot 3 with chest named minimessage from "<gradient:#00FFFF:#00A2FF>Vault #4" with lore "&8ᴠᴀᴜʟᴛ" and "" and "&aClick &7to &fopen this vault&7!":
+				openVault({_p}, 4)
+		{_p} has permission "vault.5":
+			make gui slot 4 with chest named minimessage from "<gradient:#00FFFF:#00A2FF>Vault #5" with lore "&8ᴠᴀᴜʟᴛ" and "" and "&aClick &7to &fopen this vault&7!":
+				openVault({_p}, 5)
+		{_p} has permission "vault.6":
+			make gui slot 5 with chest named minimessage from "<gradient:#00FFFF:#00A2FF>Vault #6" with lore "&8ᴠᴀᴜʟᴛ" and "" and "&aClick &7to &fopen this vault&7!":
+				openVault({_p}, 6)
+		{_p} has permission "vault.7":
+			make gui slot 6 with chest named minimessage from "<gradient:#00FFFF:#00A2FF>Vault #7" with lore "&8ᴠᴀᴜʟᴛ" and "" and "&aClick &7to &fopen this vault&7!":
+				openVault({_p}, 7)
+		make gui slot 8 with barrier block named "&cClose" with lore "&8ᴀᴄᴛɪᴏɴ" and "" and "&aClick &7to &fclose the menu&7!":
+			close {_p}'s inventory
+			invsfx({_p})
+	open the last gui for {_p}
+	invsfx({_p})
+
+# ============== #
+# VOTE MAP RESET #
+# ============== #
+
+command testGui:
+	permission: op
+	trigger:
+		voteGui(player)
+
+function voteGui(p: offlineplayer):
+	create a gui with virtual chest inventory with 1 row named "&AMap Reset Vote":
+		make gui slot 3 with green_concrete named minimessage from "&a&lYes":
+			make {_p} execute command "/vmr"
+			close {_p}'s inventory
+		make gui slot 5 with red_concrete named minimessage from "&c&lNo":
+			close {_p}'s inventory
+	open the last gui for {_p}
+
+# ==== #
+# YELL #
+# ==== #
+
+import:
+    java.util.UUID
+    litebans.api.Database
+
+on load:
+    create section with {_p} stored in {-isMuted}:
+        set {_uuidString} to {_p}'s uuid
+        if Database.get().isPlayerMuted({_uuidString}, name of {_p}) = true:
+            return true
+        return false
+
+command yell <text>:
+	prefix: core
+	usage: {@usage} /<yell | shout> &f<message>
+	aliases: shout
+	cooldown: 10 rl minute
+	cooldown message: {@notnow}
+	cooldown bypass: staff.chat
+	trigger:
+		{mutechat} is set:
+			stop
+
+		sender's world is world "honey":
+			send "&eBut nobody heard..." to sender
+			stop
+		run section {-isMuted} async with player and store result in {_hmm} and wait
+		if {_hmm} is true:
+			send "{@warn} You are currently muted."
+			stop
+		
+		send "%nl%&6[YELL] &e%player%: &f%arg-1%%nl%" to all players where [input's world isn't world "honey"]
+		cancel cooldown if priority(player) > 4
+		wait 5 rl minute
+		cancel cooldown if priority(player) > 3
+		wait 3 rl minute
+		cancel cooldown if priority(player) > 2
+
+on inventory slot change:
+	if event-item is tag "bundles":
+		wait 3 ticks
+		remove event-item from player's inventory
+		remove event-item from player's inventory
+		send "{@warn} Bundles are disabled."
+
+on inventory slot change:
+	if event-item is trident:
+		wait 3 ticks
+		remove event-item from player's inventory
+		remove event-item from player's inventory
+		send "{@warn} Tridents are disabled."
+
+function msgPlayer(s: sender, p: player, m: string):
+	if {_p}'s world is world "honey":
+		{_s}'s world isn't world "honey"
+		send "&eSignal rejected..." to {_s}
+		stop
+	if {_s}'s world is world "honey":
+		{_p}'s world isn't world "honey"
+		send "&eOutgoing signal got stuck in the honey..." to {_s}
+		stop
+	send "&8[&6MSG&8] &7To &b%{_p}% &8>> &f%{_m}%" to {_s}
+	send "&8[&6MSG&8] &7From &b%{_s}%&8 >> &f%{_m}%" to {_p}
+	set {replymessage::%{_s}'s uuid%} to {_p}
+	set {replymessage::%{_p}'s uuid%} to {_s}
+
+command w <player> <text>:
+	prefix: core
+	usage: {@usage} /<msg | w> &f<player> &f<message>
+	aliases: w, whisper, msg
+	trigger:
+		msgPlayer(sender, arg 1, arg 2)
+
+command whisper <player> <text>:
+	prefix: core
+	usage: {@usage} /<msg | w> &f<player> &f<message>
+	aliases: w, whisper, msg
+	trigger:
+		msgPlayer(sender, arg 1, arg 2)
+
+command msg <player> <text>:
+	prefix: core
+	usage: {@usage} /<msg | w> &f<player> &f<message>
+	aliases: w, whisper, msg
+	trigger:
+		msgPlayer(sender, arg 1, arg 2)
+
+command reply <text>:
+	prefix: core
+	usage: {@usage} /<reply | r> &f<message>
+	aliases: r
+	trigger:
+		if {replymessage::%player's uuid%} is set:
+			if {replymessage::%player's uuid%} is online:
+				msgPlayer(sender, {replymessage::%sender's uuid%}, arg 1)
+			else:
+				send "{@warn} The recipient is offline."
+				stop
+		else:
+			send "{@warn} No one to reply to! D:"
+
+on leave:
+	delete {replymessage::%player's uuid%}

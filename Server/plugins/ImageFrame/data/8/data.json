@@ -1,0 +1,59 @@
+{
+  "type": "imageframe:url_static",
+  "index": 8,
+  "name": "corp",
+  "url": "https://cdn.discordapp.com/attachments/1340014977045757976/1515676120895193128/image.png?ex\u003d6a2fdee3\u0026is\u003d6a2e8d63\u0026hm\u003d377d8c25e1733d1e82a74a55955d64b152dc023ae6cb26021992bf7b70cd627d\u0026",
+  "width": 3,
+  "height": 3,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "hasAccess": {},
+  "creationTime": 1781435758740,
+  "mapdata": [
+    {
+      "mapid": 397,
+      "image": "0.png",
+      "markers": []
+    },
+    {
+      "mapid": 398,
+      "image": "1.png",
+      "markers": []
+    },
+    {
+      "mapid": 399,
+      "image": "2.png",
+      "markers": []
+    },
+    {
+      "mapid": 400,
+      "image": "3.png",
+      "markers": []
+    },
+    {
+      "mapid": 401,
+      "image": "4.png",
+      "markers": []
+    },
+    {
+      "mapid": 402,
+      "image": "5.png",
+      "markers": []
+    },
+    {
+      "mapid": 403,
+      "image": "6.png",
+      "markers": []
+    },
+    {
+      "mapid": 404,
+      "image": "7.png",
+      "markers": []
+    },
+    {
+      "mapid": 405,
+      "image": "8.png",
+      "markers": []
+    }
+  ]
+}

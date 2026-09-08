@@ -1,0 +1,115 @@
+# Tnt 38 168 -8 -> 78 168 32
+# Sand 38 169 -8 -> 78 169 32
+# Plates 38 170 -8 -> 78 170 32
+
+# Player Spawns floor 38 173 -8 -> 78 173 32
+
+on load:
+    set {Event::SPLEEF_BOTTOM::1} to location(38, 168, -8, world "Fragola")
+    set {Event::SPLEEF_BOTTOM::2} to location(78, 168, 32, world "Fragola")
+    set {Event::World} to world "Fragola"
+
+
+
+
+command /spleefstart:
+    executable by: players
+    prefix: Fragola
+    permission: fragola.spleef
+    trigger:
+
+        set (all blocks within {Event::SPLEEF_BOTTOM::1} and {Event::SPLEEF_BOTTOM::2}) to tnt
+
+        set (all blocks within {Event::SPLEEF_BOTTOM::1} ~ vector(0, 1, 0) and {Event::SPLEEF_BOTTOM::2} ~ vector(0, 1, 0)) to sand
+
+        set (all blocks within {Event::SPLEEF_BOTTOM::1} ~ vector(0, 2, 0) and {Event::SPLEEF_BOTTOM::2} ~ vector(0, 2, 0)) to stone pressure plate
+
+        set {spleef::players::*} to all players in world("Fragola")
+
+        set {_count} to size of {spleef::players::*}
+
+        if {_count} is 0:
+            send "&cNo players found in world Fragola!" to player
+            stop
+
+        set {_xMin} to x-coordinate of {Event::SPLEEF_BOTTOM::1}
+        set {_xMax} to x-coordinate of {Event::SPLEEF_BOTTOM::2}
+        set {_zMin} to z-coordinate of {Event::SPLEEF_BOTTOM::1}
+        set {_zMax} to z-coordinate of {Event::SPLEEF_BOTTOM::2}
+        set {_y} to 173
+
+        set {_cols} to ceiling(sqrt({_count}))
+        set {_rows} to ceiling({_count} / {_cols})
+
+        set {_xSpacing} to ({_xMax} - {_xMin}) / ({_cols} + 1)
+        set {_zSpacing} to ({_zMax} - {_zMin}) / ({_rows} + 1)
+
+        loop {spleef::players::*}:
+            set {_i} to loop-counter - 1
+            set {_col} to mod({_i}, {_cols})
+            set {_row} to floor({_i} / {_cols})
+
+            set {_x} to {_xMin} + ({_xSpacing} * ({_col} + 1))
+            set {_z} to {_zMin} + ({_zSpacing} * ({_row} + 1))
+
+            set {_loc} to location({_x} + 0.5, {_y}, {_z} + 0.5, world "Fragola")
+
+            teleport loop-value to {_loc}
+
+            set block at location({_x} + 0.5, {_y} - 1, {_z} + 0.5, world "Fragola") to glass
+
+            set metadata "event;no_move" of loop-value to true
+            set metadata "event;no_hurt" of loop-value to true
+
+        wait 1 second
+        loop all players in world("Fragola"):
+            send title "&e5" with subtitle "&7Get Ready..." to loop-player for 1 second with fadein 0 seconds and fade out 0 seconds
+        wait 1 second
+        loop all players in world("Fragola"):
+            send title "&e4" with subtitle "&7Get Ready..." to loop-player for 1 second with fadein 0 seconds and fade out 0 seconds
+        wait 1 second
+        loop all players in world("Fragola"):
+            send title "&e3" with subtitle "&7Steady..." to loop-player for 1 second with fadein 0 seconds and fade out 0 seconds
+        wait 1 second
+        loop all players in world("Fragola"):
+            send title "&e2" with subtitle "&7Steady..." to loop-player for 1 second with fadein 0 seconds and fade out 0 seconds
+        wait 1 second
+        loop all players in world("Fragola"):
+            send title "&a1" with subtitle "&7GO!" to loop-player for 1 second with fadein 0 seconds and fade out 0 seconds
+        wait 1 second
+        loop all players in world("Fragola"):
+            send title "&6&lSPLEEF!" with subtitle "&eGood Luck!" to loop-player for 3 seconds with fadein 0 seconds and fade out 5 seconds
+
+        delete metadata "event;no_move" of {spleef::players::*}
+        delete metadata "event;no_hurt" of {spleef::players::*}
+        set {_ls::*} to blocks at {spleef::players::*} 
+        set blocks at blocks 1 meter below {_ls::*} to air
+
+        delete {spleef::players::*}
+
+on player move:
+    if metadata "event;no_move" of player is true:
+        cancel event
+
+on damage:
+    if metadata "event;no_hurt" of victim is true:
+        cancel event
+
+on world change with priority highest:
+    event-world is "Fragola"
+    set entity's gamemode to survival
+
+command gms-all:
+    prefix: Fragola
+    permission: fragola.gms-all
+    trigger:
+        set {_players::*} to all players in {Event::World}
+        set {_players::*}'s gamemode to survival
+        send "&7Your gamemode has been set to &fSurvival &7by &f%player%&7." to {_players::*}
+
+    
+
+
+on damage:
+    "%region at victim%" is "sumo in world Fragola"
+    set damage to 0

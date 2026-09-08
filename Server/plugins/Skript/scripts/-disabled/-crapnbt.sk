@@ -1,0 +1,97 @@
+function CrappyNBTCheck(i: item, p: player) :: boolean:
+	if any:
+		{nbts::*} contains {_i}
+		priority({_p}) >= 5
+	then:
+		return false
+	
+	if any:
+		length of "%full nbt of {_i}%" >= 5000
+		length of lore of {_i} >= 2000
+		length of name of {_i} >= 1000
+	then:
+		return true
+	else:
+		return false
+
+every tick:
+	loop all players where [priority(input) < 5]:
+		loop all items in loop-player's inventory where [nbt tags of nbt of input contains "minecraft:attribute_modifiers"]:
+			delete tag "minecraft:attribute_modifiers" of nbt of loop-item
+
+
+
+# ───────────────
+# Inventory Events
+# ───────────────
+on inventory click:
+	if event-item is set:
+		if CrappyNBTCheck(event-item, player) = true:
+			cancel event
+			send "&cThat item is oversized and blocked." to player
+
+on place:
+	inventory of event-block is set
+	priority({_p}) < 5
+	set {_items::*} to (all items in (inventory of event-block)) where [input isn't tagged with tag "minecraft:banners"]
+	clear nbt of  {_items::*}
+
+on inventory drag:
+	if event-item is set:
+		if CrappyNBTCheck(event-item, player) = true:
+			cancel event
+			send "&cThat item is oversized and blocked." to player
+
+on inventory open:
+	loop all items in event-inventory:
+		if CrappyNBTCheck(loop-item, player) = true:
+			set loop-item to air
+			send "&cOversized items were cleaned from this inventory." to event-player
+
+on swap hand items:
+	if player's tool is set:
+		if (CrappyNBTCheck(player's tool, player) or CrappyNBTCheck(player' offhand item, player)) is true:
+			set player's tool to air
+			send "&cOversized items were cleaned from this inventory." to event-player
+
+on inventory slot change:
+	if event-slot is set:
+		if CrappyNBTCheck(event-slot, player) = true:
+			set event-slot to air
+			send "&cThat item is oversized and blocked." to player
+
+# ───────────────
+# Item Flow
+# ───────────────
+on block place:
+	if CrappyNBTCheck(player's tool, player) = true:
+		set player's tool to air
+		send "&cYou cannot place an item with oversized NBT." to player
+
+on player pickup:
+	if CrappyNBTCheck(event-item, player) = true:
+		cancel event
+
+on drop:
+	if CrappyNBTCheck(event-item, player) = true:
+		cancel event
+		send "&cYou cannot drop an oversized item." to player
+		set (player's offhand item and player's tool) to air
+
+on craft:
+	if CrappyNBTCheck(event-item, player) = true:
+		cancel event
+		send "&cCrafting blocked due to oversized item." to player
+
+on consume:
+	if CrappyNBTCheck(event-item, player) = true:
+		cancel event
+		send "&cThat item is oversized, you cannot consume it." to player
+
+command checkable:
+	permission: op
+	trigger:
+		send numFormat(length of "%full nbt of player's tool%")
+		send numFormat(length of name of player's tool)
+		length of "%full nbt of player's tool%" >= 10000
+		send "very huge"

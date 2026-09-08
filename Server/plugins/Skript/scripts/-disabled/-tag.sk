@@ -1,0 +1,202 @@
+options:
+	err: &8(&4&l❗&8)&c
+	info: &8(<##FC00FF>&l❗&8)&f
+	usage: &8(&4&l❗&8) &cCorrect command usage &7»&f
+	notyou: &8(&4&l❗&8) &cConsole may not use this command.
+	noperm: &8(&4&l❗&8) &cYou do not have permission for this command.
+	notthis: &8(&4&l❗&8) &cYou may not use this feature of the command.
+	nothere: &8(&4&l❗&8) &cYou may not use this command in this region.
+	nothigh: &8(&4&l❗&8) &cThat person has a higher authority than you.
+	notnow: &8(&4&l❗&8) &cYou may use this command after %remaining time%.
+	notplayed: &8(&4&l❗&8) &cPlayer hasn't played before
+
+on food level change:
+    player's world is world "tag"
+    set hunger of player to 20
+    cancel event
+
+on load:
+    set {TagWorld::TagSpawn} to location(0.50, 51.00, 0.50, world "tag")
+    
+    clear {TagWorld::Runner_Items::*}
+    clear {TagWorld::Tagger_Items::*}
+
+    set {TagWorld::Runner_Items::1} to Heart Of The Sea named "&b🐇 &fDash Orb &b🐇" # Runner Item
+    set {TagWorld::Runner_Items::2} to Prismarine Crystals named "&f✦ &7Ghostly Form &f✦" # Runner Item
+    set {TagWorld::Runner_Items::3} to rabbit hide named "&9Shrink Potion" # Runner Item
+
+    set {TagWorld::Tagger_Items::1} to Ender Eye named "&c⚔ &fPlayer Sense &c⚔" # Tagger Item
+    set {TagWorld::Tagger_Items::2} to feather named "&e⚡ &6Hasty Heels &e⚡" # Tagger Item
+    set {TagWorld::Tagger_Items::3} to blaze powder named "&dLeap Of Faith" # Tagger Item
+
+function applyItems():
+    set generic scale attribute of {TagWorld::Players::*} to 1
+    loop {TagWorld::Players::*}:
+        loop {TagWorld::Runner_Items::*}:
+            set slot (loop-counter-2) - 1 of loop-value-1 to loop-value-2
+    loop {TagWorld::Tagger_Items::*}:
+        set slot (loop-counter) - 1 of {TagWorld::Tagger} to loop-value
+
+on right click:
+    player doesn't have player's tool on cooldown
+    if 1 of player's tool is {TagWorld::Runner_Items::1}:
+        push player forward with speed 1
+        set item cooldown of {TagWorld::Runner_Items::1} for player to 8 seconds
+        
+    else if 1 of player's tool is {TagWorld::Tagger_Items::1}:
+        apply glowing to {TagWorld::Players::*} for 5 seconds
+        set item cooldown of {TagWorld::Tagger_Items::1} for player to 15 seconds
+        
+    else if 1 of player's tool is {TagWorld::Runner_Items::2}:
+        apply invisibility to player for 3 seconds
+        set item cooldown of {TagWorld::Runner_Items::2} for player to 12 seconds
+        
+    else if 1 of player's tool is {TagWorld::Tagger_Items::2}:
+        apply speed 2 to player for 5 seconds
+        set item cooldown of {TagWorld::Tagger_Items::2} for player to 10 seconds
+        
+    else if 1 of player's tool is {TagWorld::Runner_Items::3}:
+        set generic scale attribute of player to 0.5
+        set item cooldown of {TagWorld::Runner_Items::3} for player to 20 seconds
+        run 10 seconds later:
+            set generic scale attribute of player to 1
+    else if 1 of player's tool is {TagWorld::Tagger_Items::3}:
+        push player upwards with speed 1
+        set item cooldown of {TagWorld::Tagger_Items::3} for player to 20 seconds
+
+function selectRoles():
+    set glowing of {TagWorld::Players::*} to false
+    wait 1 tick
+    set {TagWorld::Tagger} to random element of {TagWorld::Players::*}
+    applyItems()
+    set gamemode of {TagWorld::Players::*} to survival
+    loop {TagWorld::Players::*}:
+        set {_message} to "You're the &eTagger&f!" if loop-value is {TagWorld::Tagger} else "You're a &eRunner&f!"
+        if {TagWorld::Spectate::%loop-value's uuid%} is true:
+            set {_message} to "You're a &eSpectator&f!"
+            set gamemode of loop-value to spectator
+        send title "Tag Started!" with subtitle {_message} to loop-value for 2 seconds
+    set glowing of {TagWorld::Tagger} to true
+
+command starttag:
+    permission: tag_world.start
+    trigger:
+        if {TagWorld::isTagStarted} is true:
+            send "{@err} There is already a game going on!" to sender
+        set {TagWorld::isTagStarted} to true
+        set {TagWorld::Players::*} to all players where [input's world is world "tag"]
+        if amount of {TagWorld::Players::*} where [{TagWorld::Spectate::%input's uuid%} isn't true] is less than 2:
+            send "{@err} Not enough players! You're gonna need at least 2 to play!"
+            stop
+        loop 5 times:
+            set {_s} to "s" if loop-counter < 5 else ""
+            send title "Tag Starting" with subtitle "In %5 - ((loop-counter) - 1)% Second%{_s}%" to {TagWorld::Players::*} where [{TagWorld::Spectate::%input's uuid%} isn't true] for 1 second
+            wait 1 second
+        clear {TagWorld::Players::*}'s inventory
+        selectRoles()
+        wait 1 second
+        set {_blocks::*} to all blocks within location(21.5, 1, 21.5, world "tag") and location(-20.5, 1, -20.5, world "tag") where [input is air]
+        set {_blocks::*} to {_blocks::*} where [block 1 block above input is air]
+        loop {TagWorld::Players::*}:
+            set {_loc} to random element of {_blocks::*}
+            teleport loop-value to {_loc}
+            remove {_loc} from {_blocks::*}
+        loop 180 times:
+            set {_s} to "s" if loop-counter < 60 else ""
+            if {TagWorld::isTagStarted} isn't true:
+                exit loop
+            send actionbar "Time remaining: %180 - ((loop-counter) - 1)% Second%{_s}%" to {TagWorld::Players::*}
+            wait 1 second
+        send "&e%{TagWorld::Tagger}%&f has lost!" to {TagWorld::Players::*}
+        endTag()
+
+function endTag():
+    set glowing of {TagWorld::Players::*} to false
+    send title "Tag Ended" with subtitle "Returning you back to spawn..." to {TagWorld::Players::*} for 1 second
+    teleport {TagWorld::Players::*} to {TagWorld::TagSpawn}
+    set gamemode of {TagWorld::Players::*} to survival
+    clear {TagWorld::Players::*}'s inventory
+    delete {TagWorld::isTagStarted}
+    delete {TagWorld::Players::*}
+    delete {TagWorld::Tagger}
+
+command endtag:
+    permission: tag_world.end
+    trigger:
+        if {TagWorld::isTagStarted} isn't true:
+            send "{@err} There is no game going on!" to sender
+        send "{@info} Ending tag..." to sender
+        endTag()
+        
+on damage with priority highest:
+    victim's world is world "tag"
+    cancel event
+    {TagWorld::Players::*} contains victim
+    if difference between {TagWorld::Cooldown::%attacker's uuid%} and now is less than 1 second:
+        send "{@err} No tag backs!" to attacker
+    attacker is {TagWorld::Tagger}
+    set {TagWorld::Tagger} to victim
+    set {_Tagger} to victim
+    set {_Runner} to attacker
+    apply slowness 255 to {_Tagger} for 1 second
+    send title "Role Change!" with subtitle "You're the &eTagger&f!" to {_Tagger} for 1 second
+    send title "Role Change!" with subtitle "You're the &eRunner&f!" to {_Runner} for 1 second
+    set glowing of {_Tagger} to true
+    set glowing of {_Runner} to false
+    set entity interaction range attribute of {_Tagger} to 0
+    set {TagWorld::Cooldown::%{_Tagger}'s uuid%} to now
+    clear {_Tagger}'s inventory
+    clear {_Runner}'s inventory
+    applyItems()
+
+    run 1 second later:
+        set entity interaction range attribute of {_Tagger} to 5
+
+function reRollRoles(p: player):
+    remove {_p} from {TagWorld::Players::*}
+    if amount of {TagWorld::Players::*} < 2:
+        endTag()
+    if {_p} is {TagWorld::Tagger}:
+        selectRoles()
+    send "{@info} You left tag :(" to {_p}
+
+on quit:
+    reRollRoles(player)
+
+
+on drop:
+    player's world is world "tag"
+    {TagWorld::isTagStarted} is true
+    cancel event
+
+on break:
+    player's world is world "tag"
+    cancel event
+
+
+on command:
+    player's world is world "tag"
+    {TagWorld::isTagStarted} is set
+    player isn't an operator
+    command isn't "spawn":
+        send "{@err} You can't run commands while a game is going on!"
+        cancel event
+    else:
+        reRollRoles(player)
+
+on tab complete:
+    event-string is "/tag-spectate":
+        set tab completion for position 1 to "yes", "toggle", and "no"
+
+command tag-spectate [<string=toggle>]:
+    trigger:
+        if arg isn't ("yes", "toggle", or "no"):
+            send "{@err} Invalid Option."
+            stop
+        if {TagWorld::Spectate::%sender's uuid%} isn't set:
+            set {TagWorld::Spectate::%sender's uuid%} to false
+        if arg is "toggle":
+            set {TagWorld::Spectate::%sender's uuid%} to inverse of {TagWorld::Spectate::%sender's uuid%}
+        else:
+            set {TagWorld::Spectate::%sender's uuid%} to arg parsed as a boolean
+        send "{@info} You have set Spectator Mode to %"True" if {TagWorld::Spectate::%sender's uuid%} is true else "False"%"

@@ -1,0 +1,1056 @@
+# ================================================================================================================================================================= #
+
+options:
+	name: %minimessage from "<b><gradient:#1685FF:#16E3FF>50xCreative</gradient></b>"%
+	info: &8[<##167BFF>&l❗&8]&f
+	warn: &8[<##FF0000>&l❗&8]&c
+	
+	primary: <#0079FF>
+	secondary: <#16AFFF>
+	tertiary: <#16E3FF>
+	
+	usage: &8[<##FF0000>&l❗&8]&c Correct command usage &7»&f
+	notyou: &8[<##FF0000>&l❗&8]&c Console may not use this command.
+	noperm: &8[<##FF0000>&l❗&8]&c You do not have permission for this command.
+	notthis: &8[<##FF0000>&l❗&8]&c You may not use this feature of the command.
+	nothere: &8[<##FF0000>&l❗&8]&c You may not use this command in this region.
+	nothigh: &8[<##FF0000>&l❗&8]&c That person has a higher authority than you.
+	notnow: &8[<##FF0000>&l❗&8]&c You may use this command after %remaining time%.
+	supported_worlds: "donor", "creative", or "plots"
+
+# ================================================================================================================================================================= #
+
+#███╗░░░███╗░█████╗░████████╗██████╗░
+#████╗░████║██╔══██╗╚══██╔══╝██╔══██╗
+#██╔████╔██║██║░░██║░░░██║░░░██║░░██║
+#██║╚██╔╝██║██║░░██║░░░██║░░░██║░░██║
+#██║░╚═╝░██║╚█████╔╝░░░██║░░░██████╔╝
+#╚═╝░░░░░╚═╝░╚════╝░░░░╚═╝░░░╚═════╝░
+
+on server list ping:
+	set fake max players count to 2025
+	set motd to minimessage from "               <b><gradient:#1685FF:#16E3FF>50xCreative</gradient></b> <dark_gray>| <white>1.13 - 1.21.8<newline>       <#A54BFF>ᴄʀᴇᴀᴛɪᴠᴇ <gray>• <#FF47FB>ᴘʟᴏᴛs <gray>• <#FF5454>ᴇᴄᴏɴᴏᴍʏ <gray>• <#FF9947>ʀᴏʟᴇᴘʟᴀʏ"
+
+# ================================================================================================================================================================= #
+
+on skript load:
+	while true = true:
+		wait 1 minute
+		# 5$ EVERY 30 MINUTES
+		loop all players:
+			add 5 to {cash::%loop-player's uuid%}
+			send "{@info} You have earned &a5$ &ffor playing the game!" to loop-player
+			play sound "block.note_block.pling" at pitch 1.5 for loop-player
+
+		# AUTOBROADCAST AND CHAT GAMES
+		wait 4 minute
+		loop all players where [{s::bcast::%input's uuid%} isn't set]:
+			play sound "block.note_block.pling" at pitch 1.2 for loop-player
+			send "%minimessage from "<gradient:#AE0000:#FF2929:#AE0000><st>•                                                 •"%" to loop-player
+			send "" to loop-player
+			send " <#AE0000>&lWITNESS RULE BREAKERS?" to loop-player
+			send " <#E0E0E0>Report them as soon as possible and" to loop-player
+			send " <#E0E0E0>our staffs will take care of them." to loop-player
+			send "" to loop-player
+			send " <#AE0000>→ &fᴄʟɪᴄᴋ <ttp:&aᴄʟɪᴄᴋ ᴍᴇ><cmd:/report>&a&nʜᴇʀᴇ&r ᴛᴏ ʀᴇᴘᴏʀᴛ <#AE0000>←" to loop-player
+			send "" to loop-player
+			send "%minimessage from "<gradient:#AE0000:#FF2929:#AE0000><st>•                                                 •"%" to loop-player
+
+		wait 2.5 minute
+		chatGames(1) if {cgames::now} isn't set
+		wait 2.5 minute
+		loop all players where [{s::bcast::%input's uuid%} isn't set]:
+			play sound "block.note_block.pling" at pitch 1.2 for loop-player
+			send "%minimessage from "<gradient:#FF9100:#FFB939:#FF9100><st>•                                                 •"%" to loop-player
+			send "" to loop-player
+			send " <#FF9100>&lFOLLOW ALL RULES" to loop-player
+			send " <#E0E0E0>Keep our server safe and fun by" to loop-player
+			send " <#E0E0E0>following all rules at all times." to loop-player
+			send "" to loop-player
+			send " <#FF9100>→ &fᴄʟɪᴄᴋ <ttp:&aᴄʟɪᴄᴋ ᴍᴇ><cmd:/rules>&a&nʜᴇʀᴇ&r ᴛᴏ ʀᴇᴀᴅ <#FF9100>←" to loop-player
+			send "" to loop-player
+			send "%minimessage from "<gradient:#FF9100:#FFB939:#FF9100><st>•                                                 •"%" to loop-player
+
+		wait 5 minute
+		loop all players where [{s::bcast::%input's uuid%} isn't set]:
+			play sound "block.note_block.pling" at pitch 1.2 for loop-player		
+			send "%minimessage from "<gradient:#00FF11:#39FF46:#00FF11><st>•                                                 •"%" to loop-player
+			send "" to loop-player
+			send " <#00FF11>&lVOTE FOR OUR SERVER" to loop-player
+			send " <#E0E0E0>Vote for us to gain rewards" to loop-player
+			send " <#E0E0E0>and help us to grow bigger!" to loop-player
+			send "" to loop-player
+			send " <#00FF11>→ &fᴄʟɪᴄᴋ <ttp:&aᴄʟɪᴄᴋ ᴍᴇ><cmd:/vote>&a&nʜᴇʀᴇ&r ᴛᴏ ᴠᴏᴛᴇ <#00FF11>←" to loop-player
+			send "" to loop-player
+			send "%minimessage from "<gradient:#00FF11:#39FF46:#00FF11><st>•                                                 •"%" to loop-player
+
+		wait 2.5 minute
+		chatGames(2) if {cgames::now} isn't set
+		wait 2.5 minute
+		loop all players where [{s::bcast::%input's uuid%} isn't set]:
+			play sound "block.note_block.pling" at pitch 1.2 for loop-player	
+			send "%minimessage from "<gradient:#7129FF:#BE93FF:#7129FF><st>•                                                 •"%" to loop-player
+			send "" to loop-player
+			send " <#9651FF>&lWE HAVE DISCORD" to loop-player
+			send " <#E0E0E0>Come and chat with other members," to loop-player
+			send " <#E0E0E0>join in events and giveaways too!" to loop-player
+			send "" to loop-player
+			send " <#9651FF>→ &fᴄʟɪᴄᴋ <ttp:&aᴄʟɪᴄᴋ ᴍᴇ><url:https://discord.gg/2e9xuYGFUx/>&a&nʜᴇʀᴇ&r ᴛᴏ ᴊᴏɪɴ <#9651FF>←" to loop-player
+			send "" to loop-player
+			send "%minimessage from "<gradient:#7129FF:#BE93FF:#7129FF><st>•                                                 •"%" to loop-player
+
+###
+			play sound "block.note_block.pling" at pitch 1.2 for loop-player	
+			send "%minimessage from "<gradient:#0079FF:#6CC9FF:#0079FF><st>•                                                 •"%" to loop-player
+			send "" to loop-player
+			send " <#0079FF>&lAPPLY FOR STAFF" to loop-player
+			send " <#E0E0E0>Come and apply to be a staff here" to loop-player
+			send " <#E0E0E0>and help us to moderate the server!" to loop-player
+			send "" to loop-player
+			send " <#0079FF>→ &fᴄʟɪᴄᴋ <ttp:&aᴄʟɪᴄᴋ ᴍᴇ><url:https://discord.gg/2e9xuYGFUx/>&a&nʜᴇʀᴇ&r ᴛᴏ ᴀᴘᴘʟʏ <#0079FF>←" to loop-player
+			send "" to loop-player
+			send "%minimessage from "<gradient:#0079FF:#6CC9FF:#0079FF><st>•                                                 •"%" to loop-player
+###
+		wait 5 minute
+		loop all players where [{s::bcast::%input's uuid%} isn't set]:
+			play sound "block.note_block.pling" at pitch 1.2 for loop-player	
+			send "%minimessage from "<gradient:#7129FF:#BE93FF:#7129FF><st>•                                                 •"%" to loop-player
+			send "" to loop-player
+			send " <#9651FF>&lWE HAVE DISCORD" to loop-player
+			send " <#E0E0E0>Come and chat with other members," to loop-player
+			send " <#E0E0E0>join in events and giveaways too!" to loop-player
+			send "" to loop-player
+			send " <#9651FF>→ &fᴄʟɪᴄᴋ <ttp:&aᴄʟɪᴄᴋ ᴍᴇ><url:https://discord.gg/2e9xuYGFUx/>&a&nʜᴇʀᴇ&r ᴛᴏ ᴊᴏɪɴ <#9651FF>←" to loop-player
+			send "" to loop-player
+			send "%minimessage from "<gradient:#7129FF:#BE93FF:#7129FF><st>•                                                 •"%" to loop-player
+
+		wait 2.5 minute
+		chatGames(3) if {cgames::now} isn't set
+		wait 2.5 minute
+		loop all players where [{s::bcast::%input's uuid%} isn't set]:
+			play sound "block.note_block.pling" at pitch 1.2 for loop-player		
+			send "%minimessage from "<gradient:#FF00F8:#FF6CF5:#FF00F8><st>•                                                 •"%" to loop-player
+			send "" to loop-player
+			send " <#FF00F8>&lVISIT OUR WEBSTORE" to loop-player
+			send " <#E0E0E0>Check out our online webstore" to loop-player
+			send " <#E0E0E0>for ranks at reasonable prices!" to loop-player
+			send "" to loop-player
+			send " <#FF00F8>→ &fᴄʟɪᴄᴋ <ttp:&aᴄʟɪᴄᴋ ᴍᴇ><url:https://discord.gg/2e9xuYGFUx/>&a&nʜᴇʀᴇ&r ᴛᴏ ᴠɪsɪᴛ <#FF00F8>←" to loop-player
+			send "" to loop-player
+			send "%minimessage from "<gradient:#FF00F8:#FF6CF5:#FF00F8><st>•                                                 •"%" to loop-player
+
+# ================================================================================================================================================================= #
+
+#██████╗░░█████╗░░██████╗░██████╗██████╗░░█████╗░██████╗░
+#██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗██╔══██╗██╔══██╗
+#██████╦╝██║░░██║╚█████╗░╚█████╗░██████╦╝███████║██████╔╝
+#██╔══██╗██║░░██║░╚═══██╗░╚═══██╗██╔══██╗██╔══██║██╔══██╗
+#██████╦╝╚█████╔╝██████╔╝██████╔╝██████╦╝██║░░██║██║░░██║
+#╚═════╝░░╚════╝░╚═════╝░╚═════╝░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝
+
+every 20 seconds:
+	delete bossbar named "x"
+	set {_bar} to bossbar named "x" with title "&d&lSTORE &7» <#FF99FF>discord.gg/2e9xuYGFUx" with color pink with style solid bar with progress 100
+	add all players to {_bar}
+	loop 100 times:
+		set bossbar progress of {_bar} to 100 - loop-value
+		wait 1 tick
+	delete bossbar named "x"
+	set {_bar} to bossbar named "x" with title "&9&lDISCORD &7» <#7777FF>discord.gg/2e9xuYGFUx" with color purple with style solid bar with progress 100
+	add all players to {_bar}
+	loop 100 times:
+		set bossbar progress of {_bar} to 100 - loop-value
+		wait 1 tick
+	delete bossbar named "x"
+	set {_bar} to bossbar named "x" with title "&a&lWEBSITE &7» <#99FF99>www.50xCreative.fun" with color light green with style solid bar with progress 100
+	add all players to {_bar}
+	loop 100 times:
+		set bossbar progress of {_bar} to 100 - loop-value
+		wait 1 tick
+	delete bossbar named "x"
+	set {_bar} to bossbar named "x" with title "&6&lSERVER IP &7» &e50xCreative.fun" with color gold with style solid bar with progress 100
+	add all players to {_bar}
+	loop 100 times:
+		set bossbar progress of {_bar} to 100 - loop-value
+		wait 1 tick
+
+# ================================================================================================================================================================= #
+
+# CHAT GAMES
+
+on load:
+	loop indices of {cgames::now::*}:
+		if difference between {cgames::now::%loop-value%} and now > 1 minute:
+			delete {cgames::ans::%loop-value%} and {cgames::now::%loop-value%}
+	set {cgpref} to "%minimessage from "<b><gradient:#47FFF8:#0098FF>CHAT GAMES"%"
+	set {typeout::*} to "adrenocorticotropin", "adrenocorticotrophin", "anthropomorphization", "anthropomorphisation", "antidisestablishmentarianism", "antixerophthalmic", "autothaumaturgist", "canaliculodacryocystorhinostomy", "chargoggagoggmanchauggagoggchaubunagungamaugg", "cholangiopancreatography", "convolvulaceous", "corticopontocerebellar", "counterimmunoelectrophoresis", "dehydrothiotoluidine", "dextrodeorsumversion", "erythrocytapheresis", "ferriprotoporphyrin", "floccinaucinihilipilification", "gastroenterologist", "gegenstandstheorie", "hexakosioihexekontahexaphobia", "hippopotomonstrosesquippedaliophobia", "hippopotomonstrosesquipedaliophobia", "honorificabilitudinity", "honourificabilitudinity", "laryngotracheobronchitis", "oligonucleotide", "otorhinolaryngological", "parallelogrammatic", "photoplethysmography", "pneumoencephalography", "pneumonoultramicroscopicsilicovolcanoconiosis",  "polyphiloprogenitive", "pseudopseudohypoparathyroidism", "pseudorhombicuboctahedron", "psychoneuroendocrinological", "psychoneuroimmunology", "psychophysicotherapeutics", "radiometeorograph", "sclerectoiridectomy", "spectrophotofluorometry", "sphygmomanometer", "stereoelectroencephalography", "supercalifragilisticexpialidocious", "tonsillopharyngitis", and "ventriculocisternostomy"
+	set {unscramble::*} to "creative", "builder", "masterpiece", "minecraft", "diamond", "pickaxe", "survival", "adventure", "overworld", "stronghold", "cobblestone", "enchant", "armor", "beacon", "slime", "piston", "shulker", "blaze", "ghast", "witch", "campfire", "lightning", "amethyst", and "emerald"
+
+import:
+    java.lang.String as JavaString
+
+function rad_to_deg(r: number) :: number:
+	return {_r} * 57.2957795130823
+ 
+function chatGames(i: int, ov: number = 99, op: number = 99):
+	{_i} < 7
+	
+	# Generate unique game ID
+	add 1 to {cgames::id}
+	set {_gameId} to {cgames::id}
+	
+	{_i} = 1: # Word
+		set {cgames::ans::%{_gameId}%} to random element out of ({typeout::*})
+		broadcast "%nl%%{cgpref}%%nl%<#47FFF8>&l| &fType out the word: <#83FFEC>%{cgames::ans::%{_gameId}%}%%nl%<#47FFF8>&l| &fWinner gets rewarded with &acash&f!%nl%"
+ 
+	{_i} = 2: # Unscramble
+		set {cgames::ans::%{_gameId}%} to random element out of ({unscramble::*})
+		broadcast "%nl%%{cgpref}%%nl%<#47FFF8>&l| &fUnscramble the word: <#83FFEC>%join (shuffled (split {cgames::ans::%{_gameId}%} at "")) with ""%%nl%<#47FFF8>&l| &fWinner gets rewarded with &acash&f!%nl%"
+	
+	{_i} = 3: # Math
+		set {_x} to random integer between 1 and 7 if {_ov} is 99 else {_ov}
+		{_x} = 1:
+			set {_a} to random integer between 1 and 50
+			set {_b} to random integer between 1 and 50
+			set {_o} to "%{_a}% + %{_b}%"
+			set {cgames::ans::%{_gameId}%} to {_a} + {_b}
+		{_x} = 2:
+			set {_a} to random integer between 1 and 50
+			set {_b} to random integer between 1 and 50
+			set {_o} to "%{_a}% - %{_b}%"
+			set {cgames::ans::%{_gameId}%} to {_a} - {_b}
+		{_x} = 3:
+			set {_a} to random integer between 1 and 12
+			set {_b} to random integer between 1 and 12
+			set {_o} to "%{_a}% x %{_b}%"
+			set {cgames::ans::%{_gameId}%} to {_a} * {_b}
+		{_x} = 4:
+			set {_t} to random integer between 1 and 2
+			set {_a} to random integer between 1 and 5
+			set {_b} to floor((random integer between 1 and 25) /{_a})*{_a}
+			set {_c} to random integer between 1 and 100
+			set {_o} to "%{_b}%/%{_a}%+%{_c}%" if {_t} is 1 else "%{_b}%/%{_a}%-%{_c}%"
+			set {cgames::ans::%{_gameId}%} to ({_b}/{_a})+{_c} if {_t} is 1 else ({_b}/{_a})-{_c}
+		{_x} = 5:
+			set {_d} to (random integer between 1 and 3) if {_op} > 15 else {_op}
+			set {_a} to random integer between 5 and 70
+			set {_b} to random integer between 5 and 70
+			
+			set {_min_c} to abs({_a} - {_b}) + 1
+			set {_max_c} to {_a} + {_b} - 1
+			
+			set {_c} to random integer between {_min_c} and {_max_c}
+ 
+			set {_s} to ({_a} + {_b} + {_c}) / 2
+			set {_Area} to sqrt({_s} * ({_s} - {_a}) * ({_s} - {_b}) * ({_s} - {_c}))
+ 
+			set {_check} to round({_Area}, {_d})
+			set {cgames::ans::%{_gameId}%} to JavaString.format("%%.%{_d}%f", {_check})
+ 
+			add "%nl%%{cgpref}%" to {_lines::*}
+			add "<#47FFF8>&l| &fUsing Heron's formula, what is the area of a triangle?" to {_lines::*}
+			add "<#47FFF8>&l| &fSides: A=<#83FFEC>%{_a}%<#FFFFFF> B=<#83FFEC>%{_b}%<#FFFFFF> C=<#83FFEC>%{_c}%" to {_lines::*}
+			add "<#47FFF8>&l| &fRound your answer to %{_d}% decimal place(s)." to {_lines::*}
+			add "<#47FFF8>&l| &fWinner gets rewarded with &acash&f!" to {_lines::*}
+		
+		{_x} = 6:
+			set {_d} to (random integer between 1 and 3) if {_op} > 15 else {_op}
+			set {_a} to random integer between 8 and 20
+			set {_b} to random integer between 8 and 20
+			set {_angle_deg} to random integer between 10 and 170
+ 
+			set {_c_squared} to ({_a} ^ 2) + ({_b} ^ 2) - (2 * {_a} * {_b} * cos({_angle_deg}))
+			set {_c_side} to sqrt({_c_squared})
+ 
+			set {_check} to round({_c_side}, {_d})
+			set {cgames::ans::%{_gameId}%} to JavaString.format("%%.%{_d}%f", {_check})
+ 
+			set {_lines::*} to "%nl%%{cgpref}%"
+			add "<#47FFF8>&l| &fUsing the Law of Cosines, find the missing side (c)!" to {_lines::*}
+			add "<#47FFF8>&l| &fMeasures: a=<#83FFEC>%{_a}%<#FFFFFF> b=<#83FFEC>%{_b}%<#FFFFFF> C=<#83FFEC>%{_angle_deg}%°" to {_lines::*}
+			add "<#47FFF8>&l| &fRound your answer to %{_d}% decimal place(s)." to {_lines::*}
+			add "<#47FFF8>&l| &fWinner gets rewarded with &acash&f!" to {_lines::*}
+		
+		{_x} = 7:
+			set {_option} to random integer between 1 and 3
+			set {_d} to (random integer between 1 and 3) if {_op} > 15 else {_op}
+			set {_a} to random integer between 10 and 30
+			set {_b} to random integer between 10 and 30
+ 
+			set {_min_c} to abs({_a} - {_b}) + 1
+			set {_max_c} to {_a} + {_b} - 1
+			set {_c} to random integer between {_min_c} and {_max_c}
+			
+			if {_option} is 1:
+				set {_num} to ({_b} ^ 2) + ({_c} ^ 2) - ({_a} ^ 2)
+				set {_den} to 2 * {_b} * {_c}
+				set {_find_angle} to "A"
+			else if {_option} is 2:
+				set {_num} to ({_a} ^ 2) + ({_c} ^ 2) - ({_b} ^ 2)
+				set {_den} to 2 * {_a} * {_c}
+				set {_find_angle} to "B"
+			else:
+				set {_num} to ({_a} ^ 2) + ({_b} ^ 2) - ({_c} ^ 2)
+				set {_den} to 2 * {_a} * {_b}
+				set {_find_angle} to "C"
+ 
+			set {_cos_val} to {_num} / {_den}
+			set {_angle_deg} to acos({_cos_val})
+ 
+			set {_check} to round({_angle_deg}, {_d})
+			set {cgames::ans::%{_gameId}%} to JavaString.format("%%.%{_d}%f", {_check})
+ 
+			set {_lines::*} to "%nl%%{cgpref}%"
+			add "<#47FFF8>&l| &fUsing the Law of Cosines, find the missing angle (%{_find_angle}%)!" to {_lines::*}
+			add "<#47FFF8>&l| &fSides: a=<#83FFEC>%{_a}%<#FFFFFF> b=<#83FFEC>%{_b}%<#FFFFFF> c=<#83FFEC>%{_c}%" to {_lines::*}
+			add "<#47FFF8>&l| &fRound your answer to %{_d}% decimal place(s)." to {_lines::*}
+			add "<#47FFF8>&l| &fWinner gets rewarded with &acash&f!" to {_lines::*}
+ 
+		{_x} = 8:
+			set {_d} to (random integer between 1 and 3) if {_op} > 15 else {_op}
+			set {_n} to random integer between 2 and 6
+			set {_a_coef} to random integer between 1 and 10
+			set {_lower} to random integer between 0 and 5
+			set {_upper} to {_lower} + (random integer between 1 and 6)
+ 
+			set {_result} to ({_a_coef} / ({_n} + 1)) * (({_upper} ^ ({_n} + 1)) - ({_lower} ^ ({_n} + 1)))
+ 
+			set {_check} to round({_result}, {_d})
+			set {cgames::ans::%{_gameId}%} to JavaString.format("%%.%{_d}%f", {_check})
+ 
+			set {_lines::*} to "%nl%%{cgpref}%"
+			add "<#47FFF8>&l| &fEvaluate the definite integral!" to {_lines::*}
+			add "<#47FFF8>&l| &f∫ <#83FFEC>%{_a_coef}%x^%{_n}% <#FFFFFF>dx from <#83FFEC>%{_lower}% <#FFFFFF>to <#83FFEC>%{_upper}%" to {_lines::*}
+			add "<#47FFF8>&l| &fRound your answer to %{_d}% decimal place(s)." to {_lines::*}
+			add "<#47FFF8>&l| &fWinner gets rewarded with &acash&f!" to {_lines::*}
+ 
+		{_x} = 9:
+			set {_d} to (random integer between 1 and 3) if {_op} > 15 else {_op}
+			set {_a_coef} to random integer between 1 and 8
+			set {_lower_mult} to random integer between 0 and 3
+			set {_upper_mult} to {_lower_mult} + (random integer between 1 and 4)
+ 
+			set {_lower_rad} to {_lower_mult} * 3.14159265358979 / 2
+			set {_upper_rad} to {_upper_mult} * 3.14159265358979 / 2
+ 
+			set {_result} to {_a_coef} * ((-1 * cos(rad_to_deg({_upper_rad}))) + cos(rad_to_deg({_lower_rad})))
+ 
+			set {_check} to round({_result}, {_d})
+			set {cgames::ans::%{_gameId}%} to JavaString.format("%%.%{_d}%f", {_check})
+ 
+			set {_lower_label} to "%{_lower_mult}%π/2" if {_lower_mult} > 0 else "0"
+			set {_upper_label} to "%{_upper_mult}%π/2"
+ 
+			set {_lines::*} to "%nl%%{cgpref}%"
+			add "<#47FFF8>&l| &fEvaluate the definite integral!" to {_lines::*}
+			add "<#47FFF8>&l| &f∫ <#83FFEC>%{_a_coef}%sin(x) <#FFFFFF>dx from <#83FFEC>%{_lower_label}% <#FFFFFF>to <#83FFEC>%{_upper_label}%" to {_lines::*}
+			add "<#47FFF8>&l| &fRound your answer to %{_d}% decimal place(s)." to {_lines::*}
+			add "<#47FFF8>&l| &fWinner gets rewarded with &acash&f!" to {_lines::*}
+ 
+		{_x} = 10:
+			set {_d} to (random integer between 2 and 4) if {_op} > 15 else {_op}
+ 
+			set {_a_coef} to random integer between 1 and 5
+			set {_b_coef} to random integer between 1 and 10
+			set {_n} to random integer between 3 and 7
+ 
+			set {_sigma} to 0
+			loop {_n} times:
+				set {_i} to loop-number
+				set {_sigma} to {_sigma} + (({_a_coef} * ({_i} ^ 2)) + {_b_coef})
+ 
+			set {_c_coef} to random integer between 1 and 4
+			set {_m} to random integer between 2 and 5
+ 
+			set {_product} to 1
+			loop {_m} times:
+				set {_i} to loop-number
+				set {_product} to {_product} * ({_c_coef} + {_i})
+ 
+			set {_final} to 0.5 * ({_product} ^ 2) * sin({_sigma})
+ 
+			set {_check} to round({_final}, {_d})
+			set {cgames::ans::%{_gameId}%} to JavaString.format("%%.%{_d}%f", {_check})
+ 
+			set {_lines::*} to "%nl%%{cgpref}%"
+			add "<#47FFF8>&l| &c&lGetting Productive" to {_lines::*}
+			add "<#47FFF8>&l| &f&lStep A: &fEvaluate the Sigma:" to {_lines::*}
+			add "<#47FFF8>&l|   &f Σ (<#83FFEC>%{_a_coef}%i² + %{_b_coef}%<#FFFFFF>) &ffrom i=<#83FFEC>1 <#FFFFFF>to <#83FFEC>%{_n}%" to {_lines::*}
+			add "<#47FFF8>&l|   &7→ Use this as angle θ (in degrees)" to {_lines::*}
+			add "<#47FFF8>&l| &f&lStep B: &fEvaluate the Product:" to {_lines::*}
+			add "<#47FFF8>&l|   &f Π (<#83FFEC>%{_c_coef}% + i<#FFFFFF>) &ffrom i=<#83FFEC>1 <#FFFFFF>to <#83FFEC>%{_m}%" to {_lines::*}
+			add "<#47FFF8>&l|   &7→ Use this as hypotenuse h" to {_lines::*}
+			add "<#47FFF8>&l| &f&lFinal: &fFind the area of the isosceles triangle:" to {_lines::*}
+			add "<#47FFF8>&l|   &fA = ½ · h² · sin(θ)" to {_lines::*}
+			add "<#47FFF8>&l| &fRound your answer to %{_d}% decimal place(s)." to {_lines::*}
+			add "<#47FFF8>&l| &fWinner gets rewarded with &acash&f!" to {_lines::*}
+ 
+		{_x} = 11:
+			set {_d} to (random integer between 2 and 4) if {_op} > 15 else {_op}
+ 
+			set {_a_coef} to random integer between 1 and 4
+			set {_b_coef} to random integer between 1 and 6
+			set {_n} to random integer between 3 and 6
+ 
+			set {_sigma} to 0
+			loop {_n} times:
+				set {_i} to loop-number
+				set {_sigma} to {_sigma} + (({_a_coef} * ({_i} ^ 3)) - ({_b_coef} * {_i}))
+ 
+			set {_p_coef} to random integer between 2 and 6
+			set {_e_exp} to random integer between 3 and 5
+			set {_derivative_val} to {_p_coef} * {_e_exp} * ({_sigma} ^ ({_e_exp} - 1))
+ 
+			set {_b_imag} to random integer between 5 and 30
+			set {_modulus} to sqrt(({_derivative_val} ^ 2) + ({_b_imag} ^ 2))
+ 
+			set {_int_div} to random integer between 2 and 4
+			set {_upper_rad} to 3.14159265358979 / {_int_div}
+ 
+			set {_final} to {_modulus} * sin(rad_to_deg({_upper_rad}))
+ 
+			set {_check} to round({_final}, {_d})
+			set {cgames::ans::%{_gameId}%} to JavaString.format("%%.%{_d}%f", {_check})
+ 
+			set {_lines::*} to "%nl%%{cgpref}%"
+			add "<#47FFF8>&l| &4&lChain Reaction" to {_lines::*}
+			add "<#47FFF8>&l| &f&lStep A: &fEvaluate the Sigma (result = k):" to {_lines::*}
+			add "<#47FFF8>&l|   &f Σ (<#83FFEC>%{_a_coef}%i³ - %{_b_coef}%i<#FFFFFF>) &ffrom i=<#83FFEC>1 <#FFFFFF>to <#83FFEC>%{_n}%" to {_lines::*}
+			add "<#47FFF8>&l| &f&lStep B: &fDifferentiate, then evaluate at x=k:" to {_lines::*}
+			add "<#47FFF8>&l|   &ff(x) = <#83FFEC>%{_p_coef}%x^%{_e_exp}%  <#FFFFFF>→ find <#83FFEC>f'(k)" to {_lines::*}
+			add "<#47FFF8>&l|   &7→ Call this result r" to {_lines::*}
+			add "<#47FFF8>&l| &f&lStep C: &fFind the modulus of complex number z:" to {_lines::*}
+			add "<#47FFF8>&l|   &fz = r + <#83FFEC>%{_b_imag}%<#FFFFFF>i  →  |z| = √(r² + %{_b_imag}%²)" to {_lines::*}
+			add "<#47FFF8>&l|   &7→ Call this result m" to {_lines::*}
+			add "<#47FFF8>&l| &f&lFinal: &fEvaluate the definite integral:" to {_lines::*}
+			add "<#47FFF8>&l|   &f∫ <#83FFEC>m·cos(x) <#FFFFFF>dx from <#83FFEC>0 <#FFFFFF>to <#83FFEC>π/%{_int_div}%" to {_lines::*}
+			add "<#47FFF8>&l| &fRound your answer to %{_d}% decimal place(s)." to {_lines::*}
+			add "<#47FFF8>&l| &fWinner gets rewarded with &acash&f!" to {_lines::*}
+		
+		if {_x} < 5:
+			broadcast "%nl%%{cgpref}%%nl%<#47FFF8>&l| &fSomeone quickly solve what is <#83FFEC>%{_o}%%nl%<#47FFF8>&l| &fWinner gets rewarded with &acash&f!%nl%"
+		else:
+			broadcast components (merge components {_lines::*} joined with newline) and nl
+ 
+	set {cgames::now::%{_gameId}%} to now
+	play sound "block.note_block.pling", "block.note_block.bit", "block.note_block.chime" at volume 2 for all players
+	wait 1 minute
+	{cgames::ans::%{_gameId}%} is set
+	broadcast "%nl%%{cgpref}%%nl%<#47FFF8>&l| &7No one solved the chat game.%nl%<#47FFF8>&l| &7The answer was: <#83FFEC>%{cgames::ans::%{_gameId}%}%%nl%"
+	play sound "block.note_block.pling" at pitch 0.1 for all players
+	delete {cgames::ans::%{_gameId}%} and {cgames::now::%{_gameId}%}
+
+
+# ================================================================================================================================================================= #
+
+on load:
+	set {-tab} to objective with id "ping" with criteria "dummy" named "ping" with render type integer with display slot player_list
+	
+	create section stored in {-header}:
+		set {_h::1} to minimessage from "<gradient:#003BFF:#0079FF:#003BFF><st>┏%" " repeated 70 time%</st>┓"
+		set {_h::2} to ""
+		set {_h::3} to {-anim}
+		set {_h::4} to minimessage from "<gradient:#CBCBCB:#FFFFFF:#CBCBCB>ᴛʜᴇ </gradient><gradient:#3FD8FF:#ABFCFF>ᴘʀᴇᴍɪᴜᴍ </gradient>ᴄʀᴇᴀᴛɪᴠᴇ ᴇxᴘᴇʀɪᴇɴᴄᴇ"
+		set {_h::5} to ""
+		set all players's tablist header to (join {_h::*} with nl)
+
+every tick:
+	set title of (all players where [isInRegion(input) isn't true])'s fastboard to "%{-anim}%"
+	run section {-header} async
+
+import:
+	org.bukkit.Statistic
+
+every second:
+	set {_highlight} to "<shadow:#000000AA>"
+	loop all players:
+
+		# SCOREBOARD
+		if isInRegion(loop-player) isn't true:
+			set title of loop-player's fastboard to minimessage from "%{_highlight}%<b><gradient:#1685FF:#16E3FF>50xCreative"
+			set line 1 of loop-player's fastboard to minimessage from "%{_highlight}%<st><gradient:#003BFF:#0079FF:#003BFF>•                             •"
+			set line 2 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF><b>ᴘʟᴀʏᴇʀ"
+			set line 3 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF>| <#00FF73>💲 <white>ᴍᴏɴᴇʏ <gray>→ <#00FF73>%numFormat({cash::%loop-player's uuid%})%"
+			set line 4 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF>| <#FFE300>⚛ <white>ᴋᴀʀᴍᴀ <gray>→ <#FFE300>%numFormat({karma::%loop-player's uuid%})%"
+			set line 5 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF>| <#FF7C00>█ <white>ᴘʟᴏᴛs <gray>→ <#FF7C00>%loop-player's claimed plots%/%loop-player's max plots%"
+			set line 6 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF>| <#FF4949>🪓 <white>ᴡᴀɴᴅ <gray>→ <#FF4949>soon!"
+			set line 7 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF>| <#FF49DD>⏳ <white>ᴛɪᴍᴇ <gray>→ <#FF49DD>%timeFormat2(loop-player's time played)%"
+			set line 8 of loop-player's fastboard to ""
+			set line 9 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF><b>sᴇʀᴠᴇʀ"
+			set line 10 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF>| <#66CAFF>⏲ <white>ᴛᴘs <gray>→ <#8BD7FF>%spark tps%"
+			set line 11 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF>| <#66CAFF>🗄 <white>ᴍsᴘᴛ <gray>→ <#8BD7FF>%spark mspt%"
+			set line 12 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF>| <#66CAFF>⚡ <white>ʟᴏᴀᴅ <gray>→ <#8BD7FF>%spark cpu%%%"
+			set line 13 of loop-player's fastboard to ""
+			set line 14 of loop-player's fastboard to minimessage from "%{_highlight}%<#16AFFF>⛏ <#DEDEDE>50xCreative.fun"
+			set line 15 of loop-player's fastboard to minimessage from "%{_highlight}%<st><gradient:#003BFF:#0079FF:#003BFF>•                             •"
+
+		set {_val} to (loop-player's ping/500) if loop-player's ping < 500 else 1
+		set {_pingAmount} to loop-player's ping
+		if loop-player's name is "Kundaliel":
+			set {_val} to 0
+			set {_pingAmount} to 0
+		set number format of {-tab} for loop-player to minimessage from "<transition:#27FF4F:#FDFF5A:#FF4141:%{_val}%>%{_pingAmount}%ᴍs"
+
+		# TABLIST NAME
+		set {_tabname::1} to " %logo(name of loop-player's world)%&f "
+		set {_tabname::2} to loop-player's prefix
+		set {_tabname::3} to "%shorten(toHex({nick::%loop-player's uuid%})) ? loop-player%&r"
+		set {_tabname::4} to loop-player's suffix
+		set {_tabname::5} to loop-player's staff status
+		set {_tabname::6} to loop-player's dc status
+		set {_tabname::7} to loop-player's vanish status
+		set {_tabname::8} to loop-player's afk status
+		set loop-player's tablist name to concat({_tabname::*})
+
+		# FOOTER
+		set {_f::1} to ""
+		set {_f::2} to "&fᴡᴏʀʟᴅ: <#16AFFF>%smallcaps(name of loop-player's world)% &7(%realPlayers(name of loop-player's world)%) &8- &fᴏɴʟɪɴᴇ: <#16AFFF>%realPlayers()% &8- &fꜱᴛᴀꜰꜰ: <#16AFFF>%realStaff()%"
+		set {_f::3} to "<#DEDEDE>ᴅᴀᴛᴇ: <#16E3FF>%smallcaps(now formatted as "EEE, dd MMM")% &8⋆ <#DEDEDE>ᴛɪᴍᴇ: <#16E3FF>%capitalised now formatted as "h:mm a"% &8⋆ <#DEDEDE>ᴜᴘᴛɪᴍᴇ: <#16E3FF>%timeFormat2(uptime)%"
+		set {_f::4} to ""
+		set {_f::5} to "&750xCreative.fun"
+		set {_f::6} to ""
+		set {_f::7} to minimessage from "<gradient:#003BFF:#0079FF:#003BFF><st>┗%" " repeated 70 time%</st>┛"
+		set loop-player's tablist footer to (join {_f::*} with nl)
+
+# ================================================================================================================================================================= #
+
+import:
+	de.myzelyam.api.vanish.PlayerHideEvent
+	de.myzelyam.api.vanish.PlayerShowEvent
+
+local function joinQuitMessage(p: player, s: string):
+	{_s} = "new":
+		broadcast "&8[<#16AFFF>➕&8] &fWelcome <#16E3FF>%{_p}% &fto {@name} &8(<#7EF0FF>#%size of all offline players%&8)"
+		post "## :partying_face: `%{_p}%` has joined the server for the first time! `(#%size of all offline players%)`" to text channel with id "1417472418217197679" with bot bot "50xCreative"
+	{_s} = "join":
+		set {_m} to random element out of ("&7<#4BFFA0>%{_p}%&7 joined the server.", "&7Welcome back, <#4BFFA0>%{_p}%&7.", "<#4BFFA0>%{_p}%&7 has returned.", "<#4BFFA0>%{_p}%&7 has entered.", "&7Here comes <#4BFFA0>%{_p}%&7.", "&7Guess who's back? <#4BFFA0>%{_p}%&7!", "&7<#4BFFA0>%{_p}%&7 rejoined.", "&7<#4BFFA0>%{_p}%&7 just logged in.", "&7<#4BFFA0>%{_p}%&7 has reconnected.")
+		broadcast "&8[<#00D263>➕&8] <#49FF9F>%{_m}%"
+		post ":arrow_right: `%{_p}%` has joined." to text channel with id "1417472418217197679" with bot bot "50xCreative"
+	{_s} = "quit":
+		set {_m} to random element out of ("&7<#FF5050>%{_p}%&7 has left.", "&7Farewell, <#FF5050>%{_p}%&7.", "&7<#FF5050>%{_p}%&7 disconnected.", "&7Goodbye, <#FF5050>%{_p}%&7.", "&7<#FF5050>%{_p}%&7 logged out.", "&7Safe travels, <#FF5050>%{_p}%&7.", "&7See you next time, <#FF5050>%{_p}%&7.")
+		broadcast "&8[<#D20000>➖&8] <#FF5050>%{_m}%"
+		post ":arrow_left: `%{_p}%` has left." to text channel with id "1417472418217197679" with bot bot "50xCreative"
+
+on PlayerHideEvent:
+	joinQuitMessage(event.getPlayer(), "quit")
+
+on PlayerShowEvent:
+	joinQuitMessage(event.getPlayer(), "join")
+
+on quit:
+	set quit message to ""
+	player doesn't have metadata "vanished"
+	joinQuitMessage(player, "quit")
+
+on join:
+	set join message to ""
+	send nl repeated 500 time to player
+	set {_h::*} to "" #playerHead(player)
+	set {_l::1} to "&8&m                                                                              "
+	set {_l::2} to "%{_h::1} ? ""% &8&l┋ &fWelcome to {@name}"
+	set {_l::3} to "%{_h::2} ? ""% &8&l┋ &b★ <#DEDEDE>ᴘʀᴇᴍɪᴜᴍ ᴄʀᴇᴀᴛɪᴠᴇ ᴇxᴘᴇʀɪᴇɴᴄᴇ &b★"
+	set {_l::4} to "%{_h::3} ? ""% &8&l┋ "
+	set {_l::5} to "%{_h::4} ? ""% &8&l┋ <#7777FF>■ &7Get updates & giveaways in our <ttp:&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴊᴏɪɴ ᴏᴜʀ ᴅɪsᴄᴏʀᴅ sᴇʀᴠᴇʀ><url:https://discord.gg/2e9xuYGFUx/><#7777FF>&ndiscord&r"
+	set {_l::6} to "%{_h::5} ? ""% &8&l┋ <#FF99FF>■ &7Support us by shopping at our <ttp:&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴠɪsɪᴛ ᴏᴜʀ sᴛᴏʀᴇ><url:https://50xCreative.tebex.io/><#FF99FF>&nstore&r"
+	set {_l::7} to "%{_h::6} ? ""% &8&l┋ <#FF6767>■ &7Remember to follow all of the <ttp:&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ʀᴇᴀᴅ ᴛʜᴇ sᴇʀᴠᴇʀ ʀᴜʟᴇs><cmd:/rules><#FF6767>&nrules&r"
+	set {_l::8} to "%{_h::7} ? ""% &8&l┋ "
+	set {_l::9} to "%{_h::8} ? ""% &8&l┋ <ttp:&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴄᴏᴘʏ ᴏᴜʀ sᴇʀᴠᴇʀ ɪᴘ><sgt:50xCreative.fun><#16E3FF>50xCreative.fun"
+	set {_l::10} to "&8&m                                                                              "
+	send formatted {_l::*} to player
+	player has played before:
+		player doesn't have metadata "vanished"
+		joinQuitMessage(player, "join")
+	else:
+		joinQuitMessage(player, "new")
+		set player's metadata "wlc" to true
+		wait 10 second
+		clear player's metadata "wlc"
+	spawn(player, "lobby")
+
+# ================================================================================================================================================================= #
+
+local function chatPlaceholder(o: item) :: object:
+	set {_t} to text component from (name of {_o} ? {_o})
+	set hover event of {_t} to hover event showing {_o}
+	return merge components ("[", {_t}, "]")
+
+###
+import:
+    com.ibm.icu.text.SpoofChecker
+    com.ibm.icu.text.SpoofChecker$Builder as SpoofCheckerBuilder
+
+on script load:
+    # Build once, reuse — it's expensive to construct
+    set {spoof::checker} to new SpoofCheckerBuilder().build()
+
+function normalizedText(text: text) :: text:
+    return {spoof::checker}.getSkeleton(0, {_text})
+###
+
+on load:
+	set {ChatSymbols::*} to ":skull:đ☠", ":sword:đ🗡", ":swords:đ⚔", ":pickaxe:đ⛏", ":crossbow:đ🏹", ":rod:đ🎣", ":fire:đ🔥", ":sob:đ😭", ":heart:đ❤", ":star:đ⭐", ":check:đ✔", ":x:đ✖", ":crown:đ👑", ":diamond:đ💎", ":coin:đ🪙", ":shield:đ🛡", ":bow:đ🏹", ":axe:đ🪓", ":hammer:đ🔨", ":wrench:đ🔧", ":gem:đ💠", ":potion:đ🧪", ":book:đ📖", ":scroll:đ📜", ":key:đ🔑", ":chest:đ📦", ":trophy:đ🏆", ":medal:đ🏅", ":flag:đ🚩", ":warning:đ⚠", ":lightning:đ⚡", ":snowflake:đ❄", ":leaf:đ🍃", ":rock:đ🪨", ":water:đ💧", ":wind:đ💨", ":boom:đ💥", ":spark:đ✨", ":dizzy:đ💫", ":comet:đ☄", ":sun:đ☀", ":moon:đ🌙", ":cloud:đ☁", ":rain:đ🌧", ":thunder:đ⛈", ":eye:đ👁", ":hand:đ✋", ":fist:đ✊", ":point:đ👉", ":up:đ⬆", ":down:đ⬇", ":left:đ⬅", ":right:đ➡", ":arrow:đ➔", ":target:đ🎯", ":crosshair:đ⊕", ":plus:đ➕", ":minus:đ➖", ":multiply:đ✖", ":divide:đ➗", ":infinity:đ∞", ":skull2:đ💀", ":ghost:đ👻", ":alien:đ👽", ":robot:đ🤖", ":dragon:đ🐉", ":unicorn:đ🦄", ":phoenix:đ🔥🦅", ":anchor:đ⚓", ":gear:đ⚙", ":hourglass:đ⌛", ":clock:đ🕐", ":bomb:đ💣", ":syringe:đ💉", ":pill:đ💊", ":bandage:đ🩹", ":magic:đ🪄", ":crystal:đ🔮", ":compass:đ🧭", ":map:đ🗺", ":backpack:đ🎒", ":tent:đ⛺", ":campfire:đ🏕", ":mountain:đ⛰", ":volcano:đ🌋", ":island:đ🏝", ":desert:đ🏜", ":tableflip:đ(╯°□°)╯︵ ┻━┻"
+# CHAT
+on chat:
+	event isn't cancelled
+	cancel event
+	isPlotChatting(player) isn't true
+	player's world is world "honey":
+		stop
+	# Slur Filter
+	replace all "nigger", "n1gger", "nigga", "n1gga", "ngger" with "Ice Person" in message
+	replace all "slut" with "flirtatious" in message
+
+	# Chat Symbols
+	loop {ChatSymbols::*}:
+		set {_symbol::*} to loop-value split at "đ"
+		replace all {_symbol::1} with {_symbol::2} in message
+
+	# Chat Filters
+	set message to chatEvent(player, message)
+
+	# Chat Games
+	loop indices of {cgames::ans::*}:
+		set {_gameId} to loop-value
+		if message = "%{cgames::ans::%{_gameId}%}%" or "baha blast":
+			{cgames::ans::%{_gameId}%} and {cgames::now::%{_gameId}%} is set
+			play sound "block.note_block.pling" at pitch 2 for all players
+			broadcast "%nl%%{cgpref}%%nl%<#47FFF8>&l| &b%player% &fwon in &3%time since {cgames::now::%{_gameId}%}% &fand received &a$10&f!%nl%<#47FFF8>&l| &fThe answer was &f%{cgames::ans::%{_gameId}%}%!%nl%"
+			delete {cgames::ans::%{_gameId}%} and {cgames::now::%{_gameId}%}
+			add 1 to {ChatGameWins::%player's uuid%}
+			add 10 to {cash::%player's uuid%}
+			stop
+
+
+	# Mute Chat
+	{mutechat} is set:
+		player doesn't have permission "staff.mutechat"
+		send "{@warn} Chat is currently muted."
+		sfx(player, "fail")
+		stop
+
+	{supermutechat} is set:
+		player isn't in operators
+		send "{@warn} Chat is currently muted."
+		sfx(player, "fail")
+		stop
+
+	# Chat Format
+	set message to formatted message
+	set message to uncolored message if priority(player) < 2
+	set message to unformatted message if priority(player) < 3
+
+	# Admin Chat
+	player has metadata "adminchat":
+		adminchat(player, message)
+		stop
+
+	# Staff Chat
+	player has metadata "staffchat":
+		staffchat(player, message)
+		stop
+
+	# Donor Chat
+	player has metadata "donorchat":
+		donorchat(player, message)
+		stop
+
+	priority(player) < 10:
+		message contains "nigger", "n1gger", "nigga", "n1gga", "ngger", "ngga", "nga":
+			stop
+		# Broken!!!!
+###
+		message matches "(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})(\.[a-zA-Z0-9]{2,})?":
+			send "{@warn} You may not advertise."
+			stop
+###
+		message contains "/join" or "minehut.gg" or "minehut gg":
+			send "{@warn} You may not advertise."
+			stop	
+		formatted message = "":
+			send "{@warn} Your message must contain something!"
+			stop
+		player's metadata "chat_cooldown" is set:
+			send "{@warn} You may chat again in %1 rl second - time since player's metadata "chat_cooldown"%."
+			stop
+
+	# Chat Ping
+	loop all players where [input != player]:
+		unformatted message contains "%loop-player%"
+		{s::ping::%loop-player's uuid%} isn't set
+		loop-player's metadata "vanished" isn't set
+		set {_ping} to minimessage from "<reset><gradient:#FFA760:#FFE760>@%loop-player%<reset>"
+		replace all "%loop-player%" with "%{_ping}%%{cf::%player's uuid%} ? "<#DEDEDE>"%" in message
+		send action bar "{@info} <#75C9FF>%player% &fhas pinged you!" to loop-player
+		play sound "block.note_block.pling" at pitch 1.8 for loop-player
+
+	# Chat Color / Gradient
+	length of raw {cf::%player's uuid%} > 2:
+		set message to minimessage from "%{cf::%player's uuid%} ? "<#E0E0E0>"%%message%"
+	else:
+		set message to "%{cf::%player's uuid%} ? "<#E0E0E0>"%%message%"
+ 
+	set {_format} to text component from "%player's prefix%%toHex({nick::%player's uuid%}) ? player%&f%player's suffix% <#6E6E6E>» <#E0E0E0>%toHex(message)%"
+
+	# Tooltip Hover Event
+	set {_x::1} to "<#0079FF>&m                                         "
+	set {_x::2} to "<#16AFFF>&l%player%"
+	set {_x::3} to "<#DDDDDD>Their current statistics."
+	set {_x::4} to ""
+	set {_x::5} to "<#16E3FF>| <#00FF73>💲 &fᴍᴏɴᴇʏ &7→ <#00FF73>%numFormat({cash::%player's uuid%})%"
+	set {_x::6} to "<#16E3FF>| <#FFE300>⚛ &fᴋᴀʀᴍᴀ &7→ <#FFE300>%numFormat({karma::%player's uuid%})%"
+	set {_x::7} to "<#16E3FF>| <#FF49DD>⏳ &fᴛɪᴍᴇ &7→ <#FF49DD>%timeFormat2(player's time played)%"
+	set {_x::8} to "<#16E3FF>| <#DA2FFF>👤 &fᴊᴏɪɴᴇᴅ &7→ <#DA2FFF>%timeFormat2(time since player's first login)% ᴀɢᴏ"
+	set {_x::9} to ""
+	set {_x::10} to "&7(Click to message %player%)"
+	set {_x::11} to "<#0079FF>&m                                         "
+	add hover event showing (text component from (join {_x::*} with nl)) to {_format}
+	add click event to suggest command "/msg %player% " to {_format}
+	
+	# Show Items
+	"%{_format}%" contains "[item]" or "hand":
+		component replace "\[item]" and "\[hand]" with chatPlaceholder(player's tool) in {_format}
+
+	"%{_format}%" contains "[offhand]":
+		component replace "\[offhand]" with chatPlaceholder(player's offhand tool) in {_format}
+
+	"%{_format}%" contains "[helmet]":
+		component replace "\[helmet]" with chatPlaceholder(player's helmet) in {_format}
+	
+	"%{_format}%" contains "[chestplate]":
+		component replace "\[chestplate]" with chatPlaceholder(player's chestplate) in {_format}
+	
+	"%{_format}%" contains "[leggings]":
+		component replace "\[leggings]" with chatPlaceholder(player's leggings) in {_format}
+
+	"%{_format}%" contains "[boots]":
+		component replace "\[boots]" with chatPlaceholder(player's boots) in {_format}
+
+	"%{_format}%" contains "[inv]":
+		set {_e} to player
+		set {_t} to text component from "%player%'s Inventory"
+		set hover event of {_t} to hover event showing "&aClick &fto see their inventory!"
+		create callback for {_t} with -1 uses:
+			create a gui with virtual chest inventory with 4 rows named "%{_e}%'s Inventory":
+				loop 36 times:
+					make gui slot (loop-value - 1) with slot (loop-value - 1) of {_e}'s inventory
+			set lock status of last gui to true
+			open the last gui for player
+		component replace "\[inv]" with merge components ("[", {_t}, "]") in {_format}
+	set {_format} to merge components (minimessage from "<head:%player%:true> ") and {_format}
+	send component {_format} to console and all players where [{Ignored.Players::%input's uuid%::*} doesn't contain player]
+	DCChatLog(player, message)
+	priority(player) = 1
+	set player's metadata "chat_cooldown" to now
+	wait 1 second
+	clear player's metadata "chat_cooldown"
+
+# ================================================================================================================================================================= #
+
+# DEATH MESSAGES
+
+local function showAttackerTool(o: item) :: object:
+	set {_t} to text component from (name of {_o} ? {_o})
+	set hover event of {_t} to hover event showing {_o}
+	return {_t}
+
+on death of player:
+	set death message to ""
+	if attacker is a player:
+		victim is a player
+		set {_format} to text component from "&4☠ &8→ &c%victim% <reset>was %"shot" if projectile is set else "slain"% by &c%attacker% &8[&c%attacker's health%♥&8] &rusing &8[&6<BLUH>&8]"
+		component replace "<BLUH>" with showAttackerTool(attacker's tool) ? "Bare hands" in {_format}
+		broadcast component {_format}
+		stop
+	broadcast "&4☠ &8→ &c%victim%&f thought they were in Creative Mode." if damage was caused by fall
+	broadcast "&4☠ &8→ &c%victim% &fswam in orange juice." if damage was caused by lava
+	broadcast "&4☠ &8→ &c%victim% &fwas too lit to live." if damage was caused by burning
+	broadcast "&4☠ &8→ &c%victim% &fnever learned how to swim." if damage was caused by drown
+	broadcast "&4☠ &8→ &c%victim% &fforgot how to use the microwave." if damage was caused by starvation
+	broadcast "&4☠ &8→ &c%victim% &flied to God." if damage was caused by lightning
+	broadcast "&4☠ &8→ &c%victim% &fgot too close to an explosion." if damage was caused by block explosion
+	broadcast "&4☠ &8→ &c%victim% &fsat on a prickle." if damage was caused by contact
+	broadcast "&4☠ &8→ &c%victim% &fforgot how to breathe." if damage was caused by suffocation
+	broadcast "&4☠ &8→ &c%victim% &fsweat to death."  if damage was caused by melting
+	broadcast "&4☠ &8→ &c%victim% &fwanted to find Jesus."  if damage was caused by suicide
+	broadcast "&4☠ &8→ &c%victim% &ffell in the void." if damage was caused by void
+	broadcast "&4☠ &8→ &c%victim% &ftried the tide pod challenge." if damage was caused by poison
+	broadcast "&4☠ &8→ &c%victim% &fwithered away..." if damage was caused by wither
+	broadcast "&4☠ &8→ &c%victim% &fwas crushed by a block because it wanted love." if damage was caused by falling block
+	broadcast "&4☠ &8→ &c%victim% &fdidn't see a block."  if damage was caused by hitting wall while flying
+	broadcast "&4☠ &8→ &c%victim% &fcan't handle the crowd of labubu fans." if damage was caused by cramming
+	broadcast "&4☠ &8→ &c%victim% &fmagically vaporized into nothingness." if damage was caused by kill
+	keep the inventory and experiences
+	cancel drops
+	force victim to respawn
+	wait 1 tick
+	spawn(victim, "lobby")
+
+# ================================================================================================================================================================= #
+
+# EVENTS
+on command "lp", "perm", "perms", "permission", "permissions" or "luckperms":
+	priority(sender) >= 13
+	loop all players:
+		clear team of loop-player
+		rankPlayer(loop-player)
+		wait 1 tick
+
+# INV SOUND EFFECTS
+on tool change:
+	{s::invsfx::%player's uuid%} isn't set
+	play sound "block.note_block.hat" at volume 0.1 at pitch 1.6 for event-player
+
+on inventory slot change:
+	{s::invsfx::%player's uuid%} isn't set
+	play sound "block.note_block.hat" at volume 0.1 at pitch 2 for event-player
+
+on inventory click:
+	{s::invsfx::%player's uuid%} isn't set
+	play sound "block.note_block.hat" at volume 0.1 at pitch 2 for event-player
+
+on inventory drag:
+	{s::invsfx::%player's uuid%} isn't set
+	play sound "block.note_block.hat" at volume 0.1 at pitch 2 for event-player
+
+on walk on yellow carpet:
+	event-world = "lobby"
+	push player upwards at speed 1
+	wait 2 tick
+	push player forward at speed 5
+	play sound "entity.firework_rocket.launch" to player
+	
+on swap item:
+	event-world = "lobby"
+	priority(event-player) < 12
+	cancel event
+
+on player drop:
+	event-world = "lobby"
+	priority(event-player) < 12
+	cancel event
+
+on player pickup:
+	event-world = "lobby"
+	priority(event-player) < 12
+	cancel event
+
+on player inventory click:
+	event-world = "lobby"
+	priority(event-player) < 12
+	cancel event
+
+on region enter:
+	if region is "EnterStaffRoom":
+		teleport event-player to {staffentwarnoom}
+
+# CANVAS
+
+on place:
+	event-world = "canvas"
+	event-block isn't solid
+	cancel event
+	send "{@warn} Blocks must be solid." to player
+	
+on dispense:
+	event-world = "canvas"
+	cancel event
+
+on flow:
+	event-world != "plots"
+	getAllowedWorlds() doesn't contain event-world
+	cancel event
+
+# VOTING
+
+on vote:
+	username of event-vote parsed as offlineplayer has played before
+	send "{@name} &8| &a%username of event-vote% &fjust voted and received &a1x Voting Crate Key&f!" to all players
+	add 1 to {vkey::%username of event-vote parsed as offlineplayer's uuid%}
+
+# ============ #
+# ENTITY LIMIT #
+# ============ #
+
+on player drop:
+	getAllowedWorlds() doesn't contain event-world
+	delete event-dropped item
+
+every tick:
+	set {_d::*} to dropped items where [getAllowedWorlds() doesn't contain input's world]
+	set {_d::*} to {_d::*} where [input isn't Invulnerable]
+	kill {_d::*}
+
+on mine:
+	getAllowedWorlds() doesn't contain event-world
+	clear drops
+
+on break:
+	getAllowedWorlds() doesn't contain event-world
+	clear drops
+
+on portal:
+	cancel event
+
+on portal enter:
+	cancel event
+	
+on portal create:
+	cancel event
+
+on rightclick with ender pearl:
+	reset item cooldown of player's tool for player
+
+on place of end portal frame:
+	set event-block to end portal frame
+
+on shoot:
+	getAllowedWorlds() doesn't contain event-world
+	wait 10 second
+	metadata "yes" of event-projectile isn't true
+	kill event-projectile
+    
+on shoot:
+	getAllowedWorlds() doesn't contain event-world
+	event-projectile is thrown potion
+	cancel event
+
+# NBT TYPE SHIT
+
+on spawn:
+	event-spawnreason = mob spawner:
+		cancel event
+	event-entity is an area effect cloud:
+		entity isn't invulnerable
+		cancel event
+	"%nbt compound of event-entity%" contains "attribute_modifiers":
+		event-world = "creative"
+		cancel event
+	"%nbt compound of event-entity%" contains "Invisible:1b":
+		event-entity != item frame or glow item frame:
+			cancel event
+
+	event-world = "creative":
+		set {_entities::*} to all entities in world "creative" where [input isn't a player, item frame, glow item frame, or painting]
+		set {_entities::*} to {_entities::*} where [input isn't invulnerable]
+		set {_x} to number of {_entities::*}
+		{_x} > 200:
+			kill {_entities::*}
+			stafflog("&fCleared all entities in creative. &7(%{_x}%)")
+		
+
+on dispense:
+	"%nbt compound of event-block%" contains "attribute_modifiers", "run_command" or "play_sound"
+	cancel event
+
+on player tool change:
+	priority(event-player) < 4
+	"%nbt compound of event-player's tool%" contains "attribute_modifiers", "run_command" or "play_sound"
+	set event-player's tool to air
+
+on player inventory slot change:
+	priority(event-player) < 4
+	"%nbt compound of event-player's tool%" contains "attribute_modifiers", "run_command" or "play_sound"
+	set event-player's tool to air
+
+on swap hand items:
+	priority(event-player) < 4
+	"%nbt compound of event-player's tool%" contains "attribute_modifiers", "run_command" or "play_sound"
+	set event-player's tool to air
+
+on vehicle create:
+	event-world != {@supported_worlds}:
+		cancel event
+	else:
+		{el::%name of event-world%} < 100:
+			add 1 to {el::%name of event-world%}
+		else:
+			set {el::%name of event-world%} to 0
+			kill all boats and minecarts in event-world
+
+on vehicle destroy:
+	event-world = "creative" or "donor"
+	remove 1 from {el::%name of event-world%}
+
+on player egg throw:
+	set the hatching number to 0
+
+on explode:
+	event-world != "event"
+	event-entity isn't wind charge or tnt
+	cancel event
+
+on explode:
+	event-entity is tnt
+	cancel event
+#	create safe explosion of force 3 at event-location
+
+on firework explode:
+	kill event-entity
+
+on book edit:
+    page 50 of event-item is set
+    cancel event
+    send "You can't write book with more than 49 pages"
+
+on player start spectating:
+	event.getPlayer().getSpectatorTarget().hasPermission("staff.chat")
+	player doesn't have permission "staff.chat"
+	cancel event
+
+on player swap spectating of player:
+	event.getPlayer().getSpectatorTarget().hasPermission("staff.chat")
+	player doesn't have permission "staff.chat"
+	cancel event
+
+on teleport:
+	"%event-teleportcause%" is "spectate"
+	event.getPlayer().getSpectatorTarget().hasPermission("staff.chat")
+	player doesn't have permission "staff.chat"
+	cancel event
+
+on rightclick with goat horn:
+	player doesn't have permission "staff.chat"
+	cancel event
+###
+import:
+	com.plotsquared.core.PlotAPI
+	com.plotsquared.core.player.PlotPlayer
+	com.plotsquared.core.location.Location
+	org.bukkit.event.player.PlayerInteractEvent
+	org.bukkit.event.block.Action
+
+on PlayerInteractEvent:
+	event.getPlayer().getName() = "siqns"
+	send 1 to player("siqns")
+	event.getAction() = Action.LEFT_CLICK_BLOCK
+	send 2 to player("siqns")
+	event.getPlayer() doesn't have permission "staff.chat"
+	send 3 to player("siqns")
+	event.getPlayer().hasPermission("fawe.permpack.basic")
+	send 4 to player("siqns")
+	event.getPlayer().getLocation().isPlotRoad()
+	send 5 to player("siqns")
+	event.setCancelled(true)
+###
+# =============== #
+# BOUGHTFROMSTORE #
+# =============== #
+
+command boughtfromstore69 <text> <text>:
+	permission: op
+	trigger:
+		if arg-2 is "Architect":
+			set {_x} to "<#00FFC7>&ki&8[<#00FFC7>ᴀʀᴄʜɪᴛᴇᴄᴛ&8]<#00FFC7>&ki"
+		if arg-2 is "Engineer":
+			set {_x} to "<#FFD64E>&ki&8[<#FFD64E>ᴇɴɢɪɴᴇᴇʀ&8]<#FFD64E>&ki"
+		if arg-2 is "Creator":
+			set {_x} to "<#FF8F4E>&ki&8[<#FF8F4E>ᴄʀᴇᴀᴛᴏʀ&8]<#FF8F4E>&ki"
+		if arg-2 is "Designer":
+			set {_x} to "<#00EAFF>&ki&8[<#00EAFF>ᴅᴇsɪɢɴᴇʀ&8]<#00EAFF>&ki"
+		broadcast "%nl%&8-----------------------------------------------------"
+		broadcast "                           <#08FB5D>5<#12FB67>0<#1DFA71>x<#27FA7B>C<#31F985>r<#3CF98F>e<#46F899>a<#50F8A3>t<#5BF7AD>i<#65F7B7>v<#6FF6C1>e<#79F6CB> <#84F5D5>S<#8EF5DF>t<#98F4E9>o<#A3F4F3>r<#ADF3FD>e                 "
+		broadcast "               &b&l%ARG-1% &r&ajust bought %{_x}%&r&a rank!      "
+		broadcast "                                    <#08FB5D>/<#31F985>b<#5BF7AD>u<#84F5D5>y<#ADF3FD>!"
+		loop all players:
+			play sound "ui.toast.challenge_complete" with pitch 1.5 to loop-player
+		broadcast "&8-----------------------------------------------------%nl%"

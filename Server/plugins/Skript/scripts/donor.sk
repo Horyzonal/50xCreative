@@ -1,0 +1,808 @@
+#==========================================================================#
+
+options:
+	err: &8(&4&l❗&8)&c
+	info: &8(<##FC00FF>&l❗&8)&f
+
+	usage: &8(&4&l❗&8) &cCorrect command usage &7»&f
+	notyou: &8(&4&l❗&8) &cConsole may not use this command.
+	noperm: &8(&4&l❗&8) &cYou do not have permission for this command.
+	notthis: &8(&4&l❗&8) &cYou may not use this feature of the command.
+	nothere: &8(&4&l❗&8) &cYou may not use this command in this region.
+	nothigh: &8(&4&l❗&8) &cThat person has a higher authority than you.
+	notnow: &8(&4&l❗&8) &cYou may use this command after %remaining time%.
+	notworld: &8(&4&l❗&8) &cThat person does not have access to your world.
+	supported_worlds: "donor", "creative", "canvas" or "plots"
+
+#==========================================================================#
+
+# COSMETICS
+
+options:
+	lockc: structure void named "&cLocked" with lore "&8ᴄᴏsᴍᴇᴛɪᴄ", "", "&c&l￫ &7ʏᴏᴜ ᴅᴏ ɴᴏᴛ ʜᴀᴠᴇ ᴀᴄᴄᴇss ᴛᴏ ᴛʜɪs ᴄᴏsᴍᴇᴛɪᴄ"
+
+function cosmetics(p: player):
+	create a gui with virtual chest inventory with 3 rows named "           &n♦ Cosmetics ♦":
+		make gui slot (integers from 10 to 16) with {@lockc}
+		make gui slot 11 with cyan dye named "&3Chat Colors" with lore "&8ᴄᴏsᴍᴇᴛɪᴄ", "", "&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴏᴘᴇɴ ᴛʜɪs ᴍᴇɴᴜ" if {_p} has permission "cosmetic.chatcolor" else {@lockc}:
+			cc({_p}) if {_p} has permission "cosmetic.chatcolor"
+		make gui slot 12 with red dye named "&cChat Gradients" with lore "&8ᴄᴏsᴍᴇᴛɪᴄ", "", "&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴏᴘᴇɴ ᴛʜɪs ᴍᴇɴᴜ" if {_p} has permission "cosmetic.chatgradient" else {@lockc}:
+			cg({_p}) if {_p} has permission "cosmetic.chatgradient"
+###
+		make gui slot 13 with blaze powder named "&6Particle Effects" with lore "&8ᴄᴏsᴍᴇᴛɪᴄ", "", "&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴏᴘᴇɴ ᴛʜɪs ᴍᴇɴᴜ" if {_p} has permission "cosmetic.particles" else {@lockc}:
+			pe({_p}) if {_p} has permission "cosmetic.particles"
+###
+		make gui slot 10 with name tag named "&2Chat Tags" with lore "&8ᴄᴏsᴍᴇᴛɪᴄ", "", "&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴏᴘᴇɴ ᴛʜɪs ᴍᴇɴᴜ" if {_p} has permission "cosmetic.tags" else {@lockc}:
+			ct({_p}) if {_p} has permission "cosmetic.tags"
+		set lock status of last gui to true
+	open last gui to {_p}
+	invsfx({_p}, 1)
+
+command cosmetics:
+	prefix: core
+	executable by: players
+	trigger:
+		cosmetics(player)
+
+# ================= #
+# COSMETICS OPTIONS #
+# ================= #
+
+options:
+	ctlore: lore "<#7A7A7A>ᴄʜᴀᴛ ᴛᴀɢ%nl%%nl%&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇʟᴇᴄᴛ ᴛʜɪs ᴄʜᴀᴛ ᴛᴀɢ"
+	cclore: lore "<#7A7A7A>ᴄʜᴀᴛ ᴄᴏʟᴏʀ%nl%%nl%&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇʟᴇᴄᴛ ᴛʜɪs ᴄʜᴀᴛ ᴄᴏʟᴏʀ"
+	cglore: lore "<#7A7A7A>ᴄʜᴀᴛ ɢʀᴀᴅɪᴇɴᴛ%nl%%nl%&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇʟᴇᴄᴛ ᴛʜɪs ᴄʜᴀᴛ ɢʀᴀᴅɪᴇɴᴛ"
+	pelore: lore "<#7A7A7A>ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ %nl%%nl%&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ sᴇʟᴇᴄᴛ ᴛʜɪs ᴘᴀʀᴛɪᴄʟᴇ ᴇғғᴇᴄᴛ"
+
+function cs(p: player, i: int, c: text="<#E0E0E0>Default"): #cosmetic settings = cs
+	invsfx({_p}, 3)
+	{_i} = 1:
+		first character of {_c} = "<":
+			set {cf::%{_p}'s uuid%} to first 9 characters of {_c}
+		else:
+			set {cf::%{_p}'s uuid%} to first 2 characters of {_c}
+		delete {cf::%{_p}'s uuid%} if {_c} = "<#E0E0E0>Default"
+		send formatted "{@info} Your chat color is now set to: %{_c}%&f." to {_p}
+	else if {_i} = 2:
+		set {_x::*} to {_c} split at ">"
+		set {cf::%{_p}'s uuid%} to "%{_x::1}%>"
+		set {_a} to minimessage from "%{cf::%{_p}'s uuid%}%%{_c}%"
+		send "{@info} Your chat gradient is now set to: %{_a}%&f." to {_p}
+	else if {_i} = 3:
+		delete {pe::%{_p}'s uuid%}
+		set {pe::%{_p}'s uuid%} to 1 if {_c} = "<gradient:#C8D7FF:#ADF3FD>Cloud"
+		set {pe::%{_p}'s uuid%} to 2 if {_c} = "<gradient:#084CFB:#00FFFF>Blue Flame"
+		set {pe::%{_p}'s uuid%} to 3 if {_c} = "<gradient:#084CFB:#7500FF>Blue Storm"
+		set {pe::%{_p}'s uuid%} to 4 if {_c} = "<gradient:#2E4C9B:#7FC5E7>Clear Storm"
+		set {pe::%{_p}'s uuid%} to 5 if {_c} = "<gradient:#9B2E2E:#F30000>Red Death"
+		set {pe::%{_p}'s uuid%} to 6 if {_c} = "<gradient:#A2FFA1:#55730D>Celestial Stars"
+		set {pe::%{_p}'s uuid%} to 7 if {_c} = "<gradient:#191F19:#777777>Mysterious Ashes"
+		send "{@info} Your particle effect is now set to: %minimessage from {_c}%&f." to {_p}
+	else:
+		if {_c} = "<#E0E0E0>Default":
+			delete {_p}'s suffix
+		else:
+			set {_p}'s suffix to " &#888888[%{_c}%&#888888]&r"
+		send "{@info} Your chat tag now set to: %toHex({_c})%&f." to {_p}
+
+# ========== #
+# CHAT COLOR #
+# ========== #
+
+function cc(p: player):
+	create a gui with virtual chest inventory with 4 rows named minimessage from "          ♦ Chat Colors ♦":	
+		make gui slot (integers from 0 to 35) with black stained glass pane named "&f"
+		make gui slot 4 with cyan dye named "&3Chat Colors" with lore "&8ᴄᴏsᴍᴇᴛɪᴄ"
+		make gui slot 10 with red concrete named "&4Crimson Red" with {@cclore}:
+			cs({_p}, 1, "&4Crimson Red")
+		make gui slot 11 with orange concrete named "&6Pumpkin Orange" with {@cclore}:
+			cs({_p}, 1, "&6Pumpkin Orange")
+		make gui slot 12 with yellow concrete named "&eChrysanthemum Yellow" with {@cclore}:
+			cs({_p}, 1, "&eChrysanthemum Yellow")
+		make gui slot 13 with lime concrete named "&aLime Green" with {@cclore}:
+			cs({_p}, 1, "&aLime Green")
+		make gui slot 14 with green concrete named "&2Forest Green" with {@cclore}:
+			cs({_p}, 1, "&2Forest Green")
+		make gui slot 15 with light blue concrete named "&bAquamarine Blue" with {@cclore}:
+			cs({_p}, 1, "&bAquamarine Blue")
+		make gui slot 16 with cyan concrete named "&3Turquoise Blue" with {@cclore}:
+			cs({_p}, 1, "&3Turquoise Blue")
+		make gui slot 19 with blue concrete named "&1Navy Blue" with {@cclore}:
+			cs({_p}, 1, "&1Navy Blue")
+		make gui slot 20 with purple concrete named "&9Blurple Purple" with {@cclore}:
+			cs({_p}, 1, "&9Blurple Purple")
+		make gui slot 21 with magenta concrete named "&5Dark Magenta" with {@cclore}:
+			cs({_p}, 1, "&5Dark Magenta")
+		make gui slot 22 with pink concrete named "&dCute Pink" with {@cclore}:
+			cs({_p}, 1, "&dCute Pink")
+		make gui slot 23 with white concrete named "&fPure White" with {@cclore}:
+			cs({_p}, 1, "&fPure White")
+		make gui slot 24 with light gray concrete named "&7Ash Gray" with {@cclore}:
+			cs({_p}, 1, "&7Ash Gray")
+		make gui slot 25 with gray concrete named "&8Concrete Gray" with {@cclore}:
+			cs({_p}, 1, "&8Concrete Gray")
+		make gui slot 31 with smooth stone named "<#E0E0E0>Default" with {@cclore}:
+			cs({_p}, 1)
+		make gui slot 27 with arrow named "&e&lBack" with lore "&8ᴀᴄᴛɪᴏɴ%nl%%nl%&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ɢᴏ ʙᴀᴄᴋ ᴛᴏ ᴛʜᴇ ᴘʀᴇᴠɪᴏᴜs ᴍᴇɴᴜ":
+			cosmetics({_p})
+		set lock status of gui to true
+	open last gui for {_p}
+	invsfx({_p}, 1)
+
+on tab complete of "chatcolor" or "chatcolour":
+	set tab completion for position 1 to "CRIMSON_RED", "PUMPKIN_ORANGE", "CHRYSANTHEMUM_YELLObW", "LIME_GREEN", "FOREST_GREEN", "AQUAMARINE_BLUE", "TURQUOISE_BLUE", "NAVY_BLUE", "BLURPLE_PURPLE", "DARK_MAGENTA", "CUTE_PINK", "PURE_WHITE", "ASH_GRAY", "CONCRETE_GRAY" and "DEFAULT" if sender has permission "cosmetic.chatcolor"
+
+command chatcolor [<text>] [<text>]:
+	prefix: cosmetic
+	aliases: chatcolour
+	usage: {@usage} /chatcolor <chatcolor>
+	executable by: players
+	permission: cosmetic.chatcolor
+	permission message: {@noperm}
+	trigger:
+		arg-2 is set:
+			send usage
+			stop
+		arg-1 = "CRIMSON_RED":
+			cs(player, 1, "&4Crimson Red")
+		else if arg-1 = "PUMPKIN_ORANGE":
+			cs(player, 1, "&6Pumpkin Orange")
+		else if arg-1 = "CHRYSANTHEMUM_YELLOW":
+			cs(player, 1, "&eChrysanthemum Yellow")
+		else if arg-1 = "LIME_GREEN":
+			cs(player, 1, "&aLime Green")
+		else if arg-1 = "FOREST_GREEN":
+			cs(player, 1, "&2Forest Green")
+		else if arg-1 = "AQUAMARINE_BLUE":
+			cs(player, 1, "&bAquamarine Blue")
+		else if arg-1 = "TURQUOISE_BLUE":
+			cs(player, 1, "&3Turquoise Blue")
+		else if arg-1 = "NAVY_BLUE":
+			cs(player, 1, "&1Navy Blue")
+		else if arg-1 = "BLURPLE_PURPLE":	
+			cs(player, 1, "&9Blurple Purple")
+		else if arg-1 = "DARK_MAGENTA":
+			cs(player, 1, "&5Dark Magenta")
+		else if arg-1 = "CUTE_PINK":
+			cs(player, 1, "&dCute Pink")
+		else if arg-1 = "PURE_WHITE":
+			cs(player, 1, "&fPure White")
+		else if arg-1 = "ASH_GRAY":
+			cs(player, 1, "&7Ash Gray")
+		else if arg-1 = "CONCRETE_GRAY":
+			cs(player, 1, "&8Concrete Gray")
+		else if arg-1 = "DEFAULT":
+			cs(player, 1)
+		else:
+			cc(player)
+
+# =============== #
+# CHAT COLOR PLUS #
+# =============== #
+
+command chatcolorplus <text>:
+	prefix: cosmetic
+	aliases: chatcolourplus
+	usage: {@usage} /chatcolorplus <##hex>
+	executable by: players
+	permission: cosmetic.chatcolorplus
+	permission message: {@noperm}
+	trigger:
+		arg-1 doesn't match "^#([0-9a-fA-F]{6})$":
+			send "{@err} hex codes should be in such format: (e.g. #ABC123)"
+		else:
+			cs(player, 1, "<%arg-1%>Custom")
+
+# ============= #
+# CHAT GRADIENT #
+# ============= #
+
+function cg(p: player):
+	create a gui with virtual chest inventory with 5 rows named "         ♦ Chat Gradient ♦":
+		make gui slot (integers from 0 to 44) with black stained glass pane named "&a"
+		make gui slot (integers from 12 to 16) with air
+		make gui slot 4 with red dye named "&cChat Gradients" with lore "&8ᴄᴏsᴍᴇᴛɪᴄ"
+		make gui slot 10 with spruce sapling named minimessage from "<gradient:#00FF83:#64D3FF>Seasonal Chat Gradients" with lore "<#7A7A7A>ɪɴғᴏʀᴍᴀᴛɪᴏɴ" and "" and "&7This row is for &fseasonal chatcolors&7," and "&7meaning that it will appear when there" and "&7are special seasons, such as Christmas." and "" and " &8&l▪ &fsᴛᴀᴛᴜs: &cnone" and "" and "&7Check back later!"
+		make gui slot 19 with white stained glass pane named minimessage from "<rainbow>Rainbow" with {@cglore}:
+			cs({_p}, 2, "<rainbow>Rainbow")
+		make gui slot 20 with white stained glass pane named minimessage from "<gradient:#00DDFF:#FF00FF>Blurple" with {@cglore}:
+			cs({_p}, 2, "<gradient:#00DDFF:#FF00FF>Blurple")
+		make gui slot 21 with white stained glass pane named minimessage from "<gradient:#2E3192:#1BFFFF>Ocean Blue" with {@cglore}:
+			cs({_p}, 2, "<gradient:#2E3192:#1BFFFF>Ocean Blue")
+		make gui slot 22 with white stained glass pane named minimessage from "<gradient:#D4145A:#FBB03B>Sanguine" with {@cglore}:
+			cs({_p}, 2, "<gradient:#D4145A:#FBB03B>Sanguine")
+		make gui slot 23 with white stained glass pane named minimessage from "<gradient:#009245:#FCEE21>Luscious Lime" with {@cglore}:
+			cs({_p}, 2, "<gradient:#009245:#FCEE21>Luscious Lime")
+		make gui slot 24 with white stained glass pane named minimessage from "<gradient:#662D8C:#ED1E79>Purple Lake" with {@cglore}:
+			cs({_p}, 2, "<gradient:#662D8C:#ED1E79>Purple Lake")
+		make gui slot 25 with white stained glass pane named minimessage from "<gradient:#EE9CA7:#FFDDE1>Aesthetic Pink" with {@cglore}:
+			cs({_p}, 2, "<gradient:#EE9CA7:#FFDDE1>Aesthetic Pink")
+		make gui slot 28 with white stained glass pane named minimessage from "<gradient:#614385:#516395>Kashmir" with {@cglore}:
+			cs({_p}, 2, "<gradient:#614385:#516395>Kashmir")
+		make gui slot 29 with white stained glass pane named minimessage from "<gradient:#02AABD:#00CDAC>Aquatic Sea" with {@cglore}:
+			cs({_p}, 2, "<gradient:#02AABD:#00CDAC>Aquatic Sea")
+		make gui slot 30 with white stained glass pane named minimessage from "<gradient:#FF512F:#DD2476>Bloody Mary" with {@cglore}:
+			cs({_p}, 2, "<gradient:#FF512F:#DD2476>Bloody Mary")
+		make gui slot 31 with white stained glass pane named minimessage from "<gradient:#FF5F6D:#FFC371>Sweet Morning" with {@cglore}:
+			cs({_p}, 2, "<gradient:#FF5F6D:#FFC371>Sweet Morning")
+		make gui slot 32 with white stained glass pane named minimessage from "<gradient:#EA8D8D:#A890FE>Yosemite" with {@cglore}:
+			cs({_p}, 2, "<gradient:#EA8D8D:#A890FE>Yosemite")
+		make gui slot 33 with white stained glass pane named minimessage from "<gradient:#4E65FF:#92EFFD>Orbital" with {@cglore}:
+			cs({_p}, 2, "<gradient:#4E65FF:#92EFFD>Orbital")
+		make gui slot 34 with white stained glass pane named minimessage from "<gradient:#C33764:#1D2671>Celestial" with {@cglore}:
+			cs({_p}, 2, "<gradient:#C33764:#1D2671>Celestial")
+		make gui slot 40 with smooth stone named "<#E0E0E0>Default" with {@cclore}:
+			cs({_p}, 1)
+		make gui slot 36 with arrow named "&e&lBack" with lore "&8ᴀᴄᴛɪᴏɴ%nl%%nl%&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ɢᴏ ʙᴀᴄᴋ ᴛᴏ ᴛʜᴇ ᴘʀᴇᴠɪᴏᴜs ᴍᴇɴᴜ":
+			cosmetics({_p})
+		set lock status of gui to true
+	open last gui for {_p}
+	invsfx({_p}, 1)
+
+on tab complete of "chatgradient":
+	set tab completion for position 1 to "RAINBOW", "BLURPLE", "OCEAN_BLUE", "SANGUINE", "LUSCIOUS_LIME", "PURPLE_LAKE", "AESTHETIC_PINK", "KASHMIR", "AQUATIC_SEA", "BLOODY_MARY", "SWEET_MORNING", "YOSEMITE", "ORBITAL", "CELESTIAL" and "DEFAULT" if sender has permission "cosmetic.chatgradient"
+
+command chatgradient [<text>] [<text>]:
+	prefix: cosmetic
+	usage: {@usage} /chatgradient <chatgradient>
+	executable by: players
+	permission: cosmetic.chatgradient
+	permission message: {@noperm}
+	trigger:
+		arg-2 is set:
+			send usage
+			stop
+		arg-1 = "RAINBOW":
+			cs(player, 2, "<rainbow>Rainbow")
+		else if arg-1 = "BLURPLE":
+			cs(player, 2, "<gradient:#00DDFF:#FF00FF>Blurple")
+		else if arg-1 = "OCEAN_BLUE":
+			cs(player, 2, "<gradient:#2E3192:#1BFFFF>Ocean Blue")
+		else if arg-1 = "SANGUINE":
+			cs(player, 2, "<gradient:#D4145A:#FBB03B>Sanguine")
+		else if arg-1 = "LUSCIOUS_LIME":
+			cs(player, 2, "<gradient:#009245:#FCEE21>Luscious Lime")
+		else if arg-1 = "PURPLE_LAKE":
+			cs(player, 2, "<gradient:#662D8C:#ED1E79>Purple Lake")
+		else if arg-1 = "AESTHETIC_PINK":
+			cs(player, 2, "<gradient:#EE9CA7:#FFDDE1>Aesthetic Pink")
+		else if arg-1 = "KASHMIR":
+			cs(player, 2, "<gradient:#614385:#516395>Kashmir")
+		else if arg-1 = "AQUATIC_SEA":
+			cs(player, 2, "<gradient:#02AABD:#00CDAC>Aquatic Sea")
+		else if arg-1 = "BLOODY_MARY":
+			cs(player, 2, "<gradient:#FF512F:#DD2476>Bloody Mary")
+		else if arg-1 = "SWEET_MORNING":
+			cs(player, 2, "<gradient:#FF5F6D:#FFC371>Sweet Morning")
+		else if arg-1 = "YOSEMITE":
+			cs(player, 2, "<gradient:#EA8D8D:#A890FE>Yosemite")
+		else if arg-1 = "ORBITAL":
+			cs(player, 2, "<gradient:#4E65FF:#92EFFD>Orbital")
+		else if arg-1 = "CELESTIAL":
+			cs(player, 2, "<gradient:#C33764:#1D2671>Celestial")
+		else if arg-1 = "DEFAULT":
+			cs(player, 1)
+		else:
+			cg(player)
+
+# ================== #
+# CHAT GRADIENT PLUS #
+# ================== #
+
+command chatgradientplus <text>:
+	prefix: cosmetic
+	usage: {@usage} /chatgradientplus <##hex> <##hex2> ...
+	executable by: players
+	permission: cosmetic.chatgradientplus
+	permission message: {@noperm}
+	trigger:
+		arg-1 doesn't contain " ":
+			send "{@err} Chat gradients must at least have two colors or more!"
+		else:
+			set {_m::*} to arg-1 split at " "
+			loop {_m::*}:
+				loop-value doesn't match "^#([0-9a-fA-F]{6})$"
+				send "{@err} hex codes should be in such format: (e.g. #ABC123)"
+				stop
+			cs(player, 2, "<gradient:#%join {_m::*} with ":#"%>︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳︳")
+
+# ========= #
+# CHAT TAGS #
+# ========= #
+
+function ct(p: player):
+	create a gui with virtual chest inventory with 6 rows named minimessage from "            ♦ Chat Tags ♦":	
+		make gui slot (integers from 0 to 53) with black stained glass pane named "&f"
+		make gui slot 4 with name tag named "&2Chat Tags" with lore "&8ᴄᴏsᴍᴇᴛɪᴄ"
+		make gui slot 10 with copper ingot named minimessage from "<#FC9982>ᴄᴏᴘᴘᴇʀ" with {@ctlore}:
+			cs({_p}, 4, "&#FC9982ᴄᴏᴘᴘᴇʀ")
+		make gui slot 11 with iron ingot named "&fɪʀᴏɴ" with {@ctlore}:
+			cs({_p}, 4, "&fɪʀᴏɴ")
+		make gui slot 12 with redstone named "&cʀᴇᴅsᴛᴏɴᴇ" with {@ctlore}:
+			cs({_p}, 4, "&cʀᴇᴅsᴛᴏɴᴇ")
+		make gui slot 13 with gold ingot named "&6ɢᴏʟᴅ" with {@ctlore}:
+			cs({_p}, 4, "&6ɢᴏʟᴅ")
+		make gui slot 14 with diamond named "&bᴅɪᴀᴍᴏɴᴅ" with {@ctlore}:
+			cs({_p}, 4, "&bᴅɪᴀᴍᴏɴᴅ")
+		make gui slot 15 with emerald named "&2ᴇᴍᴇʀᴀʟᴅ" with {@ctlore}:
+			cs({_p}, 4, "&2ᴇᴍᴇʀᴀʟᴅ")
+		make gui slot 16 with amethyst shard named "&dᴀᴍᴇᴛʜʏsᴛ" with {@ctlore}:
+			cs({_p}, 4, "&dᴀᴍᴇᴛʜʏsᴛ")
+		make gui slot 19 with lapis lazuli named "&9ʟᴀᴘɪs" with {@ctlore}:
+			cs({_p}, 4, "&9ʟᴀᴘɪs")
+		make gui slot 20 with coal named "&8ᴄᴏᴀʟ" with {@ctlore}:
+			cs({_p}, 4, "&8ᴄᴏᴀʟ")
+		make gui slot 21 with quartz named "&fǫᴜᴀʀᴛᴢ" with {@ctlore}:
+			cs({_p}, 4, "&fǫᴜᴀʀᴛᴢ")
+		make gui slot 22 with obsidian named minimessage from "<#301934>ᴏʙsɪᴅɪᴀɴ" with {@ctlore}:
+			cs({_p}, 4, "&#301934ᴏʙsɪᴅɪᴀɴ")
+		make gui slot 23 with netherite scrap named minimessage from "<#4C4C4C>ɴᴇᴛʜᴇʀɪᴛᴇ" with {@ctlore}:
+			cs({_p}, 4, "&#4C4C4Cɴᴇᴛʜᴇʀɪᴛᴇ")
+		make gui slot 24 with glowstone dust named minimessage from "<#FFFCA8>ɢʟᴏᴡ" with {@ctlore}:
+			cs({_p}, 4, "&#FFFCA8ɢʟᴏᴡ")
+		make gui slot 25 with prismarine shard named minimessage from "<#5FCAD1>ᴘʀɪsᴍᴀʀɪɴᴇ" with {@ctlore}:
+			cs({_p}, 4, "&#5FCAD1ᴘʀɪsᴍᴀʀɪɴᴇ")
+		make gui slot 28 with ender pearl named minimessage from "<#4E9EFF>ᴇɴᴅᴇʀ" with {@ctlore}:
+			cs({_p}, 4, "&#4E9EFFᴇɴᴅᴇʀ")
+		make gui slot 29 with chorus fruit named minimessage from "<#AA5FCC>ᴄʜᴏʀᴜs" with {@ctlore}:
+			cs({_p}, 4, "&#AA5FCCᴄʜᴏʀᴜs")
+		make gui slot 30 with slime ball named "&aꜱʟɪᴍᴇ" with {@ctlore}:
+			cs({_p}, 4, "&aꜱʟɪᴍᴇ")
+		make gui slot 31 with honeycomb named minimessage from "<#F9B233>ʜᴏɴᴇʏ" with {@ctlore}:
+			cs({_p}, 4, "&#F9B233ʜᴏɴᴇʏ")
+		make gui slot 32 with blaze powder named minimessage from "<#FF7A00>ʙʟᴀᴢᴇ" with {@ctlore}:
+			cs({_p}, 4, "&#FF7A00ʙʟᴀᴢᴇ")
+		make gui slot 33 with ghast tear named minimessage from "<#C3E5FF>ɢʜᴀsᴛ" with {@ctlore}:
+			cs({_p}, 4, "&#C3E5FFɢʜᴀsᴛ")
+		make gui slot 34 with phantom membrane named minimessage from "<#6D7B8D>ᴘʜᴀɴᴛᴏᴍ" with {@ctlore}:
+			cs({_p}, 4, "&#6D7B8Dᴘʜᴀɴᴛᴏᴍ")
+		make gui slot 37 with turtle egg named minimessage from "<#88FFCC>ᴛᴜʀᴛʟᴇ" with {@ctlore}:
+			cs({_p}, 4, "&#88FFCCᴛᴜʀᴛʟᴇ")
+		make gui slot 38 with turtle scute named minimessage from "<#55FFAA>sᴄᴜᴛᴇ" with {@ctlore}:
+			cs({_p}, 4, "&#55FFAAsᴄᴜᴛᴇ")
+		make gui slot 39 with feather named "&fꜰᴇᴀᴛʜᴇʀ" with {@ctlore}:
+			cs({_p}, 4, "&fꜰᴇᴀᴛʜᴇʀ")
+		make gui slot 40 with book named minimessage from "<#FF66CC>ᴍᴀɢɪᴄ" with {@ctlore}:
+			cs({_p}, 4, "&#FF66CCᴍᴀɢɪᴄ")
+		make gui slot 41 with totem of undying named minimessage from "<#FFD700>ᴛᴏᴛᴇᴍ" with {@ctlore}:
+			cs({_p}, 4, "&#FFD700ᴛᴏᴛᴇᴍ")
+		make gui slot 42 with beacon named minimessage from "<#7FFFD4>ʙᴇᴀᴄᴏɴ" with {@ctlore}:
+			cs({_p}, 4, "&#7FFFD4ʙᴇᴀᴄᴏɴ")
+		make gui slot 43 with dragon breath named minimessage from "<#E6A0C4>ᴅʀᴀɢᴏɴ" with {@ctlore}:
+			cs({_p}, 4, "&#E6A0C4ᴅʀᴀɢᴏɴ")
+		make gui slot 49 with smooth stone named "<#E0E0E0>Default" with {@ctlore}:
+			cs({_p}, 4)
+		make gui slot 45 with arrow named "&e&lBack" with lore "&8ᴀᴄᴛɪᴏɴ%nl%%nl%&a&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ɢᴏ ʙᴀᴄᴋ ᴛᴏ ᴛʜᴇ ᴘʀᴇᴠɪᴏᴜs ᴍᴇɴᴜ":
+			cosmetics({_p})
+		set lock status of gui to true
+	open last gui for {_p}
+	invsfx({_p}, 1)
+
+command tags [<text>] [<text>]:
+	prefix: cosmetic
+	usage: {@usage} /tags <tag>
+	executable by: players
+	permission: cosmetic.tags
+	permission message: {@noperm}
+	trigger:
+		arg-2 is set:
+			send usage
+			stop
+		arg-1 = "COPPER":
+			cs({_p}, 4, "&#FC9982ᴄᴏᴘᴘᴇʀ")
+		else if arg-1 = "IRON":
+			cs({_p}, 4, "&fɪʀᴏɴ")
+		else if arg-1 = "REDSTONE":
+			cs({_p}, 4, "&cʀᴇᴅsᴛᴏɴᴇ")
+		else if arg-1 = "GOLD":
+			cs({_p}, 4, "&6ɢᴏʟᴅ")
+		else if arg-1 = "DIAMOND":
+			cs({_p}, 4, "&bᴅɪᴀᴍᴏɴᴅ")
+		else if arg-1 = "EMERALD":
+			cs({_p}, 4, "&2ᴇᴍᴇʀᴀʟᴅ")
+		else if arg-1 = "AMETHYST":
+			cs({_p}, 4, "&dᴀᴍᴇᴛʜʏsᴛ")
+		else if arg-1 = "DEFAULT":
+			cs({_p}, 4)
+		else:
+			ct(player)
+
+# ========= #
+# DONORCHAT #
+# ========= #
+
+function donorchat(p: sender, m: text):
+	send "&8[%minimessage from "<bold><gradient:#5FE2C5:#4498DB>DONORCHAT"%&8] &r%toHex({_p}'s prefix) ? ""%&r%toHex({nick::%{_p}'s uuid%}) ? {_p}%&r%toHex({_p}'s suffix) ? ""%&7: &f%{_m}%" to console and all players where [input has permission "donator.chat"]
+
+on tab complete of "donorchat" and "dchat":
+	sender has permission "donator.chat"
+	set tab completions for position 1 to "<message>"
+
+command donorchat [<text>]:
+	prefix: donor
+	aliases: dchat
+	usage: {@usage} /<dchat | donorchat> &7[message]
+	permission: donator.chat
+	permission message: {@noperm}
+	trigger:
+		run section {-isMuted} async with player and store result in {_hmm} and wait
+		if {_hmm} is true:
+			send "{@err} You are muted and cannot use donor chat."
+			stop
+		
+		arg-1 is set:
+			set {_m} to chatEvent(player, arg-1)
+			donorchat(sender, {_m})
+		else:
+			sender = console:
+				send "{@usage} /<dchat | donorchat> <message>"
+			else:
+				player's metadata "donorchat" is set:
+					clear player's metadata "adminchat"
+					clear player's metadata "staffchat"
+					clear player's metadata "donorchat"
+				else:
+					set player's metadata "donorchat" to true
+
+				send "{@info} You have toggled donor chat to %"&aon" if player's metadata "donorchat" is set else "&coff"%&f."
+				
+# === #
+# HAT #
+# === #
+
+command hat:
+	prefix: donor
+	usage: {@usage} /hat
+	permission: donator.hat
+	permission message: {@noperm}
+	trigger:
+		player's held item = air:
+			send "{@err} You must hold something to set as your hat."
+		else:
+			set helmet of player to player's held item
+			remove player's held item from player's inventory
+			send "{@info} Enjoy your new hat!"
+
+# ======== #
+# NICKNAME #
+# ======== #
+
+command nick <text>:
+	prefix: donor
+	usage: {@usage} /<nick | nickname> <nickname>
+	aliases: nickname
+	permission: donator.nick
+	permission message: {@noperm}
+	cooldown: 1 rl minute
+	cooldown message: {@notnow}
+	cooldown bypass: staff.chat
+	trigger:
+		arg-1 contains " ":
+			send "{@err} Nicknames must not contain spaces."
+			cancel cooldown
+		else if arg-1 = "off":
+			{nick::%player's uuid%} isn't set:
+				send "{@err} You do not have a nickname to begin with."
+				cancel cooldown
+			else:
+				delete {nick::%player's uuid%}
+				send "{@info} You no longer have a nickname."
+		else if arg-1 doesn't match "[A-Za-z0-9_\\.\\&]+":
+			cancel cooldown
+			send "{@err} Nicknames must not contain special characters."
+		else if length of unformatted arg-1 > 20:
+			cancel cooldown
+			send "{@err} Nicknames must not be longer than 20 characters, formatting and color inclusive."
+		else if unformatted arg-1 matches {nick::*}:
+			cancel cooldown
+			send "{@err} Someone has already thought of that nickname or is already their name, try another one."
+		else if unformatted arg-1 contains "fuck" or "shit" or "piss" or "nigger" or "nigga" or "dick" or "cock " or " cock" or "vagina" or "pussy" or "pussies" or "twat" or "cunt" or "blowjob" or "dickjob" or "retard" or "sisterfuck" or " cum " or " ass " or "whore" or "masturbat" or "orgy" or "porn" or "jizz" or "cumstain" or "rape" or "dildo" or "slut" or "prostitut" or "testes" or "testicle" or "ballsack" or "nutting" or "nutted" or "jerk" or "faggot" or "douchebag" or "asshol" or "xham" or "xrate" or "cyka blyat" or "sextap" or "doggystyl":
+			cancel cooldown
+			send "{@err} Nicknames must not contain profanities."
+		else if unformatted arg-1 = "":
+			cancel cooldown
+			send "{@err} Nicknames after color formatting must contain at least 1 visible letter!"
+		else if arg-1 contains "&k":
+			cancel cooldown
+			send "{@err} Nicknames must not contain obfuscated visuals!"
+		else:
+			set {nick::%player's uuid%} to arg-1
+			send "{@info} You have changed your nickname to: %toHex(arg-1)%"
+			priority(player) > 2
+			cancel cooldown
+
+command removenick <offlineplayer>:
+	permission: op
+	permission message: {@noperm}
+	trigger:
+		delete {nick::%arg-1's uuid%}
+		send "{@info} %arg-1% no longer has a nickname."
+
+# ===== #
+# SCALE #
+# ===== #
+
+on tab complete of "scale":
+	priority(sender) >= 10
+	set tab completions for position 2 to all players
+
+command scale <number> [<string>]:
+	prefix: donor
+	usage: {@usage} /<scale> &7<0.25-2>
+	permission: donator.size
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		priority(player) < 10:
+			player's world != {@supported_worlds}:
+				send "{@nothere}"
+				stop
+		player's group = "creator":
+			set {_max} to 10
+			set {_min} to 0.01
+		player's group = "engineer":
+			set {_max} to 8
+			set {_min} to 0.01
+		player's group = "architect":
+			set {_max} to 6
+			set {_min} to 0.01
+		player's group = "designer":
+			set {_max} to 4
+			set {_min} to 0.01
+		priority(player) < 10:
+			arg-1 is not between {_max} and {_min}
+			send "{@err} Your minimum scale can only be %{_min}% and a maximum scale of %{_max}%!"
+			stop
+		set {_p} to player
+		if all:
+			priority(player) >= 10
+			arg 2 is set
+		then:
+			priority(player) >= priority(player(arg 2)):
+				set {_p} to player(arg 2)
+			else:
+				send "{@nothigh}"
+				stop
+		set {_p}'s generic scale attribute to arg-1
+
+# ===== #
+# SKULL #
+# ===== #
+
+on tab complete of "skull" and "head":
+	sender has permission "donator.skull"
+	set tab completions for position 1 to all players
+
+command skull <text>:
+	prefix: donor
+	usage: {@usage} /<head | skull> <player>
+	aliases: head
+	permission: donator.skull
+	permission message: {@noperm}
+	trigger:
+		give player player head with nbt compound from "{profile:{name:""%arg-1%""}}" 
+		send "{@info} You have been given the skull of &d%arg-1 if arg-1 is set else "yourself"%&f."
+
+# ===== #
+# SPEED #
+# ===== #
+
+command flyspeed [<number>]:
+	prefix: donor
+	permission: donator.flyspeed
+	usage: {@err} /flyspeed <number>
+	aliases: fspeed
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		arg-1 isn't set:
+			set player's fly speed to 0.1
+			send "{@info} Reset %player%'s fly speed."
+		else:
+			arg is between 0.1 and 10:
+				set player's fly speed to arg / 10
+				send "{@info} Set %player%'s fly speed to %arg%."
+			else:
+				send "{@err} Choose a number from 0.1 to 10."
+
+command walkspeed [<number>]:
+	prefix: donor
+	permission: donator.walkspeed
+	usage: {@err} /walkspeed <number>
+	aliases: wspeed
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		arg-1 isn't set:
+			set player's walk speed to 0.2
+			send "{@info} Reset %player%'s walk speed."
+		else:
+			arg is between 0.1 and 5:
+				set player's walk speed to arg / 5
+				send "{@info} Set %player%'s walk speed to %arg%."
+			else:
+				send "{@err} Choose a number from 0.1 to 5."
+
+# ====== #
+# STICKO #
+# ====== #
+
+on rightclick with stick:
+	1 of player's tool = stick named minimessage from "<gradient:#5FE2C5:#4498DB><bold>S T I C K O"
+	player has permission "50x.sticko" or "donator.sticko":
+		player's world = world {@supported_worlds}
+		player's target block is solid
+		block above player's target block isn't solid
+		block 2 blocks above player's target block isn't solid
+		teleport player to block above player's target block
+		play sound "entity.enderman.teleport" at player's location
+
+command sticko:
+	prefix: donor
+	executable by: players
+	permission: donator.sticko
+	permission message: {@noperm}
+	trigger:
+		priority(player) < 10:
+			player's world != {@supported_worlds}:
+				send "{@nothere}"
+				stop
+		give player stick named minimessage from "<gradient:#5FE2C5:#4498DB><bold>S T I C K O"
+
+# ===== #
+# TPPOS #
+# ===== #
+
+command tppos <number> <number> <number>:
+	prefix: donor
+	usage: {@usage} /tppos <X-Coordinate> <Y-Coordinate> <Z-Coordinate>
+	executable by: players
+	permission: donator.tppos
+	permission message: {@noperm}
+	trigger:
+		priority(player) < 10:
+			player's world != {@supported_worlds}:
+				send "{@nothere}"
+				stop
+		arg-1 isn't between 100 and -100:
+			send "{@err} You may only teleport to a maximum of 100 and minimum of -100 for both X and Z coordinates."
+		else if arg-3 isn't between 100 and -100:
+			send "{@err} You may only teleport to a maximum of 100 and minimum of -100 for both X and Z coordinates."
+		else:
+			teleport player to location(arg-1, arg-2, arg-3, player's world)
+			send "{@info} You have teleported to &dX: %arg-1%&f, &dY: %arg-2%&f, &dZ: %arg-3% &fin your world."
+
+# =========== #
+# TELEPORT V2 #
+# =========== #
+
+command silenttptoggle:
+	prefix: staff
+	usage: {@usage} /<silenttptoggle | stptoggle>
+	permission: staff.silenttp
+	permission message: {@noperm}
+	trigger:
+		{stp::%player's uuid%} isn't set:
+			set {stp::%player's uuid%} to true
+			send "{@info} You have toggled silent teleportation to &aon&f."
+		else:
+			clear {stp::%player's uuid%}
+			send "{@info} You have toggled silent teleportation to &coff."
+
+command tp <player> [<text>]:
+	prefix: donor
+	usage: {@usage} /tp <player>
+	permission: donator.tp
+	permission message: {@noperm}
+	trigger:
+		sender = console:
+			send "{@notyou}"
+		else if arg-2 is set:
+			send usage
+		else:
+			priority(arg-1) > priority(player):
+				priority(arg 1) != 15
+				priority(player) < 10
+				send "{@nothigh}"
+				stop
+			priority(player) < 10:
+				{s::tptoggle::%arg-1's uuid%} is set
+				send "{@err} That player has teleportation disabled."
+				stop
+			teleport sender to arg-1 retaining vehicle and passengers
+			send "{@info} You have been teleported to &d%arg-1%%" &fsilently." if {stp::%player's uuid%} is set else "&f."%"
+			send "{@info} &d%sender% &fhas teleported to you." to arg-1 if {stp::%player's uuid%} isn't set
+			
+command tphere <text> [<text>]:
+	prefix: donor
+	usage: {@usage} /tphere <player | ** | *> &7[silent: true | false]
+	permission: donator.tphere
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		sender = console:
+			send "{@notyou}"
+		else if arg-2 is set:
+			send usage
+		else:
+			arg-1 = "*" or "**":
+				priority(player) < 10
+				send "{@notthis}"
+				stop
+			arg-1 != "*" or "**":
+				arg-1 parsed as player isn't online:
+					send "{@err} %arg-1% isn't online or doesn't exist."
+					stop
+				priority(arg-1 parsed as player) > priority(player):
+					priority(arg 1 parsed as player) != 12
+					priority(player) < 10
+					send "{@nothigh}"
+					stop
+				priority(player) < 10:
+					{s::tptoggle::%(arg-1 parsed as player)'s uuid%} is set
+					send "{@err} That player has teleportation disabled."
+					stop
+			arg-1 = "*":
+				set {_x} to "&deveryone"
+				teleport all players to player
+				send "{@info} &d%sender% &fhas teleported you to them." to all players if {stp::%player's uuid%} isn't set
+			else if arg-1 = "**":
+				set {_x} to "&deveryone in your world"
+				teleport all players in sender's world to player
+				send "{@info} &d%sender% &fhas teleported you to them." to all players in sender's world if {stp::%player's uuid%} isn't set
+			else:
+				set {_x} to "&d%arg-1%"
+				set {_p} to arg-1 parsed as player
+				if player's world is "50xDonator":
+					priority({_p}) < 2
+					send "{@notworld}"
+					stop
+				if player's world is "50xStaff":
+					priority({_p}) < 8
+					send "{@notworld}"
+					stop
+				teleport {_p} to player
+				send "{@info} &d%sender% &fhas teleported you to them." to arg-1 parsed as player if {stp::%player's uuid%} isn't set
+			send "{@info} You have teleported &d%arg-1% &fto you%" silently." if {stp::%player's uuid%} is set else "."%"
+
+on tab complete:
+	event-string is "/tphere"
+	set tab completions for position 1 to all players where [priority(sender) >= priority(input)]
+
+
+command donorworld:
+	prefix: donor
+	permission: donator.donorworld
+	usage: {@usage} /donorworld
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		spawn(player, "donor")
+
+on teleport:
+	set {_w} to (world of event-location)
+	if teleport cause is nether portal, end portal or end gateway:
+		cancel event
+	{_w} = "donor":
+		priority(event-entity) < 2
+		cancel event
+		send "&8(&4&l❗&8) &cYou do not have access to %{_w}%."
+
+on command:
+	command contains ("tphere")
+	player's world is "donor"
+	priority(sender) < 12
+	set {_args::*} to args
+	if priority(player({_args::1})) < 2:
+		send "{@notworld}"
+		cancel event
+
+command lastseen <offline player>:
+	prefix: donor
+	permission: donor.lastseen
+	permission message: {@noperm}
+	trigger:
+		arg hasn't played before:
+			send "{@err} %arg-1% has not played before!"
+		else:
+			send "{@info} &e%arg-1% &fis currently &aonline&f!" if arg-1 is online else "{@info} &e%arg-1% &fis last seen &6%difference between now and {find::%arg-1's uuid%}% &fago."

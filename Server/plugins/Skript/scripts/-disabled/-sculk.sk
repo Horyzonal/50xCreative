@@ -1,0 +1,42 @@
+import:
+    java.lang.Thread
+
+command /spreadsculk [<integer>]:
+    trigger:
+        if arg-1 is not set:
+            send "&cUsage: /spreadsculk <length>"
+            stop
+
+        set {_length} to arg-1
+        set {_loc} to location of player
+        set {_y} to y-coordinate of {_loc}
+        
+        send "&aStarting sculk vein spread..."
+        
+        loop {_length} times:
+            set {_block} to block at {_loc}
+            
+            if {_block} is air:
+                set block at {_loc} to sculk_vein[down=true]
+                if mod(loop-counter, 50) = 0:
+                    wait 1 tick
+            
+            set {_direction} to random integer between 1 and 4
+            set {_x} to x-coordinate of {_loc}
+            set {_z} to z-coordinate of {_loc}
+            set {_world} to world of {_loc}
+            
+            if {_direction} is 1:
+                set {_nextLoc} to location({_x}, {_y}, {_z} - 1, {_world})
+            else if {_direction} is 2:
+                set {_nextLoc} to location({_x}, {_y}, {_z} + 1, {_world})
+            else if {_direction} is 3:
+                set {_nextLoc} to location({_x} + 1, {_y}, {_z}, {_world})
+            else:
+                set {_nextLoc} to location({_x} - 1, {_y}, {_z}, {_world})
+            
+            set {_nextBlock} to block at {_nextLoc}
+            if {_nextBlock} is air or sculk vein:
+                set {_loc} to {_nextLoc}
+        
+        send "&aSculk vein spread complete!"

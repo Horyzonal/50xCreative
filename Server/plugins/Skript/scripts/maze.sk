@@ -1,0 +1,168 @@
+command /backrooms <number>:
+	usage: /backrooms size block
+	permission: op
+	trigger:
+		set {_size} to arg
+		if {_size} is not set:
+			send "&cInvalid size."
+			stop
+		if {_size} < 5:
+			send "&cSize must be at least 5."
+			stop
+
+		set {_origin} to location of block at player's location
+		set {_worldSize} to {_size} * 4 + 1
+		set {_total} to {_size} * {_size} - 1
+
+		send "&eShelling the backrooms (%{_worldSize}%x%{_worldSize}%)..."
+		set {_pos1} to "%{_origin}'s x coord%,%({_origin}'s y coord) - 1%,%{_origin}'s z coord%"
+		set {_pos2} to "%({_origin}'s x coord) + {_worldSize} - 1%,%({_origin}'s y coord) + 4%,%({_origin}'s z coord) + {_worldSize} - 1%"
+
+		execute console command "//world %player's world%", "//pos1 %{_pos1}%", "//pos2 %{_pos2}%", "//set stone"
+
+		teleport player to {_origin} ~ vector(2, 6, 2)
+		send "&eWaiting 5 seconds for WorldEdit..."
+		wait 5 seconds
+		send "&aBeginning backrooms layout..."
+		set {_startTime} to now
+
+		set {_stack::*} to "0,0"
+		set {_visited::0::0} to true
+
+		while size of {_stack::*} > 0:
+			set {_le} to length of "%{_total}%"
+			send actionbar "&f%floor((loop-counter / {_total}) * 100)%&7%% &7(&f%padNumber(loop-counter, {_le}, "left")%/%{_total}%&7) &7Carving..."
+
+			set {_current} to last element of {_stack::*}
+			remove {_current} from {_stack::*}
+			set {_co::*} to split {_current} at ","
+			set {_cx} to {_co::1} parsed as integer
+			set {_cy} to {_co::2} parsed as integer
+
+			clear {_nb::*}
+			loop ("north", "south", "east", "west"):
+				set {_dir} to loop-value
+				if {_dir} is "north":
+					set {_dx} to 0
+					set {_dz} to -1
+				else if {_dir} is "south":
+					set {_dx} to 0
+					set {_dz} to 1
+				else if {_dir} is "east":
+					set {_dx} to 1
+					set {_dz} to 0
+				else:
+					set {_dx} to -1
+					set {_dz} to 0
+
+				set {_nx} to {_cx} + {_dx}
+				set {_nz} to {_cy} + {_dz}
+				if all:
+					{_nx} >= 0
+					{_nz} >= 0
+					{_nx} < {_size}
+					{_nz} < {_size}
+					{_visited::%{_nx}%::%{_nz}%} is not set
+				then:
+					add "%{_nx}%,%{_nz}%,%{_dx}%,%{_dz}%" to {_nb::*}
+
+			if size of {_nb::*} > 0:
+				add "%{_cx}%,%{_cy}%" to {_stack::*}
+				set {_rand} to random element out of {_nb::*}
+				set {_rc::*} to split {_rand} at ","
+				set {_nx} to {_rc::1} parsed as integer
+				set {_nz} to {_rc::2} parsed as integer
+				set {_dx} to {_rc::3} parsed as integer
+				set {_dz} to {_rc::4} parsed as integer
+
+				set {_bx} to {_cx} * 4 + 1
+				set {_bz} to {_cy} * 4 + 1
+				set {_loc1} to {_origin} ~ vector({_bx}, -1, {_bz})
+				set {_loc2} to {_origin} ~ vector({_bx} + 2, 2, {_bz} + 2)
+				set blocks within {_loc1} and {_loc2} to air
+
+				if {_dx} is 1:
+					set {_wx} to {_cx} * 4 + 4
+					set {_loc1} to {_origin} ~ vector({_wx}, -1, {_bz})
+					set {_loc2} to {_origin} ~ vector({_wx}, 2, {_bz} + 2)
+					set blocks within {_loc1} and {_loc2} to air
+				else if {_dx} is -1:
+					set {_wx} to {_nx} * 4 + 4
+					set {_nbz} to {_nx} * 4 + 1
+					set {_loc1} to {_origin} ~ vector({_wx}, -1, {_nbz})
+					set {_loc2} to {_origin} ~ vector({_wx}, 2, {_nbz} + 2)
+					set blocks within {_loc1} and {_loc2} to air
+				else if {_dz} is 1:
+					set {_wz} to {_cy} * 4 + 4
+					set {_loc1} to {_origin} ~ vector({_bx}, -1, {_wz})
+					set {_loc2} to {_origin} ~ vector({_bx} + 2, 2, {_wz})
+					set blocks within {_loc1} and {_loc2} to air
+				else if {_dz} is -1:
+					set {_wz} to {_nz} * 4 + 4
+					set {_nbx} to {_nx} * 4 + 1
+					set {_loc1} to {_origin} ~ vector({_nbx}, -1, {_wz})
+					set {_loc2} to {_origin} ~ vector({_nbx} + 2, 2, {_wz})
+					set blocks within {_loc1} and {_loc2} to air
+
+				set {_visited::%{_nx}%::%{_nz}%} to true
+				add "%{_nx}%,%{_nz}%" to {_stack::*}
+
+			if mod(loop-counter, 10) = 0:
+				wait 1 tick
+
+		send "&7Adding backrooms disjoints..."
+		set {_extraCount} to 0
+		loop {_size} times:
+			set {_cx} to (loop-counter-2) - 1
+			loop {_size} times:
+				set {_cy} to (loop-counter-2) - 1
+				set {_bx} to {_cx} * 4 + 1
+				set {_bz} to {_cy} * 4 + 1
+
+				if all:
+					{_cx} < {_size} - 1
+					random integer from 1 to 100 <= 30
+				then:
+					set {_wx} to {_cx} * 4 + 4
+					set {_loc1} to {_origin} ~ vector({_wx}, -1, {_bz})
+					set {_loc2} to {_origin} ~ vector({_wx}, 2, {_bz} + 2)
+					set blocks within {_loc1} and {_loc2} to air
+					add 1 to {_extraCount}
+
+				if all:
+					{_cy} < {_size} - 1
+					random integer from 1 to 100 <= 30
+				then:
+					set {_wz} to {_cy} * 4 + 4
+					set {_loc1} to {_origin} ~ vector({_bx}, -1, {_wz})
+					set {_loc2} to {_origin} ~ vector({_bx} + 2, 2, {_wz})
+					set blocks within {_loc1} and {_loc2} to air
+					add 1 to {_extraCount}
+
+		wait 1 tick
+
+		send "&7Placing backrooms pillars..."
+		loop {_size} times:
+			set {_cx} to (loop-counter-2) - 1
+			loop {_size} times:
+				set {_cy} to (loop-counter-2) - 1
+				if random integer from 1 to 100 <= 20:
+					set {_bx} to {_cx} * 4 + 1
+					set {_bz} to {_cy} * 4 + 1
+					set {_px} to random integer from 0 to 2
+					set {_pz} to random integer from 0 to 2
+					set {_ploc1} to {_origin} ~ vector({_bx} + {_px}, -1, {_bz} + {_pz})
+					set {_ploc2} to {_origin} ~ vector({_bx} + {_px}, 2, {_bz} + {_pz})
+					set blocks within {_ploc1} and {_ploc2} to stone
+
+		set {_sloc1} to {_origin} ~ vector(1, -1, 1)
+		set {_sloc2} to {_origin} ~ vector(2, -1, 2)
+		set blocks within {_sloc1} and {_sloc2} to lime wool
+
+		set {_ex} to ({_size} - 1) * 4 + 1
+		set {_ez} to ({_size} - 1) * 4 + 1
+		set {_eloc1} to {_origin} ~ vector({_ex}, -1, {_ez})
+		set {_eloc2} to {_origin} ~ vector({_ex} + 1, -1, {_ez} + 1)
+		set blocks within {_eloc1} and {_eloc2} to red wool
+
+		send "&aBackrooms done! %{_worldSize}%x%{_worldSize}% | +%{_extraCount}% disjoints | Time: %timeFormat(difference between {_startTime} and now)%"

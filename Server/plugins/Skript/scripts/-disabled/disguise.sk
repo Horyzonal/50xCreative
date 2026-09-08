@@ -1,0 +1,109 @@
+using for loop
+import:
+    net.luckperms.api.node.NodeType
+    net.luckperms.api.LuckPermsProvider
+    net.luckperms.api.model.user.User
+    net.luckperms.api.node.types.PrefixNode
+    net.luckperms.api.node.types.SuffixNode
+    net.luckperms.api.node.types.InheritanceNode
+    net.luckperms.api.node.types.PermissionNode
+
+expression [player] profile name of %player%:
+    get:
+        return (expr-1).getPlayerProfile().getName()
+    set:
+        set {_player} to expr-1
+        set {_name} to change value
+        if length of {_name} > 16:
+            set {_name} to first 16 characters of {_name}
+        set {_pro} to {_player}.getPlayerProfile()
+        {_pro}.setName({_name})
+        {_player}.setPlayerProfile({_pro})
+    reset:
+        set {_player} to expr-1
+        set {_pro} to {_player}.getPlayerProfile()
+        {_pro}.setName({_player}.getName())
+        {_player}.setPlayerProfile({_pro})
+
+function clearParent(p: offlineplayer):
+    set {_group_perms::*} to permissions of {_p} where [input starts with "group."]
+    set {_user} to LPUser({_p})
+    set {_api} to LuckPermsProvider.get()
+    
+    loop {_group_perms::*}:
+        set {_groupName} to loop-value.replace("group.", "")
+        
+        set {_node} to InheritanceNode.builder({_groupName}).build()
+        {_user}.data().remove({_node})
+        
+        set {_permNode} to PermissionNode.builder("old_%loop-value%").build()
+        {_user}.data().add({_permNode})
+    
+    {_api}.getUserManager().saveUser({_user})
+
+function restoreParent(p: offlineplayer):
+    set {_user} to LPUser({_p})
+    set {_api} to LuckPermsProvider.get()
+    
+    set {_all_perms::*} to permissions of {_p}
+    
+    loop {_all_perms::*}:
+        if loop-value starts with "group.":
+            set {_groupName} to loop-value.replace("group.", "")
+            set {_node} to InheritanceNode.builder({_groupName}).build()
+            {_user}.data().remove({_node})
+        
+        if loop-value starts with "old_group.":
+            set {_groupName} to loop-value.replace("old_group.", "")
+            
+            set {_oldPermNode} to PermissionNode.builder(loop-value).build()
+            {_user}.data().remove({_oldPermNode})
+            
+            set {_newNode} to InheritanceNode.builder({_groupName}).build()
+            {_user}.data().add({_newNode})
+    
+    {_api}.getUserManager().saveUser({_user})
+
+on tab complete:
+    event-string is "/changeplayer":
+        set tab completions for position 1 to all players
+
+command /changeplayer <name:string> [<p:player=%player%>]:
+    permission: op
+    trigger:
+        if {_p}'s display name is {_p}'s name:
+            set {SavedPrefix::%{_p}'s display name%} to {_p}'s prefix
+            set {SavedSuffix::%{_p}'s display name%} to {_p}'s suffix
+        set profile name of {_p} to {_name}
+        set skin of {_p} to skin of {_name}
+        set player({_p}'s uuid)'s prefix to (offlineplayer({_name})'s prefix)
+        set player({_p}'s uuid)'s suffix to (offlineplayer({_name})'s suffix)
+        set {SavedNick::%{_p}'s display name%} to {nick::%player({_p}'s uuid)'s uuid%}
+        set {nick::%player({_p}'s uuid)'s uuid%} to {nick::%offlineplayer({_name})'s uuid%}
+        clearParent({_p})
+        set {_p}'s group to offlineplayer({_name})'s group
+        rankPlayer({_p})
+
+command resetplayer [<p:offlineplayer=%player%>]:
+    permission: op
+    trigger:
+        set profile name of {_p} to {_p}'s display name
+        set skin of {_p} to skin of {_p}'s display name
+        set {_p}'s prefix to {SavedPrefix::%{_p}'s display name%}
+        set {_p}'s suffix to {SavedSuffix::%{_p}'s display name%}
+        delete {nick::%player({_p}'s uuid)'s uuid%}
+        set {nick::%{_p}'s uuid%} to {SavedNick::%{_p}'s display name%}
+        restoreParent({_p})
+        rankPlayer({_p})
+
+###
+command /changeuuid <string>:
+    permission: op
+    trigger:
+        send player.getClass().getSuperclass().getSuperclass().getSuperclass()
+###
+
+command sendrank <string>:
+    cooldown: 5s
+    trigger:
+        send "%nl%&8▌ &b%player%&7's Test Rank%nl%&8▌ &r%toHex(arg)%%nl%" to all players where [priority(input) is greater than or equal to 1]

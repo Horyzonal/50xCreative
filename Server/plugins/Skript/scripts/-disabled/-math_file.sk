@@ -1,0 +1,2 @@
+on right click:
+	send "%player's name%: %event-item%" to console

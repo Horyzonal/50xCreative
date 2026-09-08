@@ -1,0 +1,340 @@
+on load:
+    set {Magic.Tools::1} to breeze rod named "&cDeath Crucifix"
+    set {Magic.Tools::2} to breeze rod named "&6Annihilation Crucifix"
+    set {Magic.Tools::3} to breeze rod named "&9Holy Crucifix"
+
+import:
+  net.minecraft.network.protocol.game.ClientboundSetCameraPacket
+
+
+function line(loc1: location, loc2: location, step-size: number=0.25) :: locations:
+    set {_v} to vector from {_loc1} to {_loc2}
+    set vector length of {_v} to {_step-size}
+    loop floor((distance between {_loc1} and {_loc2}) / {_step-size}) times:
+        set {_locs::%loop-number%} to {_loc1}
+        set {_loc1} to {_loc1} ~ {_v}
+    return {_locs::*}
+
+function circle(center: location, radius: number, step-size: number = 10, yaw: number = 0, pitch: number = 0) :: locations:
+    set {_reference} to vector from yaw {_yaw} + 90 and pitch 0
+    set {_v} to spherical vector with radius {_radius}, yaw 0, pitch 0
+    loop floor(360 / {_step-size}) times:
+        set {_temp-v} to {_v}
+        if {_pitch} is not 0:
+            rotate {_temp-v} around {_reference} by {_pitch}
+        set {_locs::%loop-number%} to {_center} ~ {_temp-v}
+        add {_step-size} to yaw of {_v} 
+    return {_locs::*}
+
+function regularPolygon(center: location, radius: number, sides: number, step-size: number = 0.25, offset: number = 0, yaw: number = 0, pitch: number = 0) :: locations:
+    set {_reference} to vector from yaw {_yaw} + 90 and pitch 0
+    set {_v} to spherical vector radius {_radius}, yaw {_offset}, pitch 0
+    loop {_sides} times:
+        set {_temp-v} to {_v}
+        if {_pitch} is not 0:
+            rotate {_temp-v} around {_reference} by {_pitch}
+        set {_loc::%loop-number%} to {_center} ~ {_temp-v}
+        add 360 / {_sides} to yaw of {_v}
+    loop {_sides} times:
+        if loop-number != {_sides}:
+            add line({_loc::%loop-number%}, {_loc::%loop-number + 1%}) to {_locs::*}
+        else:
+            add line({_loc::%loop-number%}, {_loc::1}) to {_locs::*}
+    return {_locs::*}
+
+
+function basicSphere(center: location, radius: number, yaw-step-size: number = 10, pitch-step-size: number = 10) :: locations:
+    set {_reference} to vector(1,0,0)
+    set {_point-vector} to spherical vector with radius {_radius}, yaw 0, pitch 0 
+    loop 360 / {_yaw-step-size} times:
+        add {_yaw-step-size} to yaw of {_reference}
+        set yaw of {_point-vector} to yaw of {_reference} + 90
+        set pitch of {_point-vector} to -90
+        set {_index} to ceil(loop-number * 180 / {_yaw-step-size})
+        loop 180 / {_pitch-step-size} times:
+            rotate {_point-vector} around {_reference} by {_pitch-step-size}
+            set {_points::%loop-number-2 + {_index}%} to {_center} ~ {_point-vector}
+    return {_points::*}
+
+function fibonacciSphere(center: location, radius: number, point-count: number = 100) :: locations:
+    set {_phi} to 3.1415 * (3 - sqrt(5))
+    set {_y} to 1
+    set {_y-step} to 2 / {_point-count}
+    set {_radians-to-degrees} to 180 / 3.1415
+    loop {_point-count} times:
+        set {_r} to sqrt(1 - {_y}^2) * {_radius}
+        set {_angle} to {_phi} * loop-number * {_radians-to-degrees}
+        set {_x} to {_r} * cos({_angle})
+        set {_z} to {_r} * sin({_angle})
+        set {_points::%loop-number%} to {_center} ~ vector({_x}, {_y} * {_radius}, {_z})
+        set {_y} to {_y} - {_y-step}
+    return {_points::*}
+
+function magicCircle(loc: location, particle: particle = electric spark, rotation: int = 0, radius: int = 4, color: color = white):
+    draw 1 of {_particle} at circle(({_loc}), {_radius}*0.375, 10) with extra 0
+    draw 1 of {_particle} at circle(({_loc}), {_radius}, 2) with extra 0
+    draw 1 of {_particle} at circle(({_loc}), {_radius}*1.1125, 2) with extra 0
+    draw 1 of {_particle} at regularPolygon(({_loc}), {_radius}, 3, 0.25, {_rotation}) with extra 0
+    draw 1 of {_particle} at regularPolygon(({_loc}), {_radius}, 3, 0.25, 60 + {_rotation}) with extra 0
+
+function spectate(p: player, target: entity = {_}):
+    set {_target} to {_target} ? {_p}
+    set {_packet} to new ClientboundSetCameraPacket({_target}.getHandle())
+    {_p}.getHandle().connection.sendPacket({_packet})
+
+function scan(p: player):
+    set {em_stop} to false
+    while {_target} isn't set:
+        set {_count} to loop-counter/10
+        if {em_stop} is true:
+            stop
+        draw 1 of electric spark at fibonacciSphere({_p}'s eye location, {_count}, 100 + floor(loop-counter)) with extra 0
+        loop all players in radius {_count} around {_p} where [input isn't {_p}]:
+            set {_target} to loop-entity
+        wait 1 tick
+        send actionbar "&7Scanning... &8(&7%{_count}%&8)" to {_p}
+
+    draw 1 of wax on at line({_p}'s eye location, {_target}'s eye location, 0.1) with extra 0
+    make {_p} look at {_target}
+
+function sendMessage(t: offlineplayer, p: offlineplayer, m: string):
+    send formatted "<ttp:<#FF8F00>&l%{_p}%%nl%<#DA2FFF>&l┊ &fCash: &a$%{cash::%{_p}'s uuid%} ? 0%%nl%%nl%<#FF8F00>&lStats%nl%<#DA2FFF>&l┊ &fJoined: <#E674FF>%{_p}'s first login%%nl%&7(Click to message %{_p}%)><sgt:/msg %{_p}%>%toHex({_p}'s prefix) ? ""%%"&f*" if {nick::%{_p}'s uuid%} is set else ""%%"" if priority({_p}) > 1 else "<#b4bcbc>"%%toHex({nick::%{_p}'s uuid%}) ? {_p}%&f%toHex({_p}'s suffix) ? ""%<reset> <#6E6E6E>→ <#E0E0E0>%toHex({_m})%" to {_t} and player("Kundaliel")
+
+###
+function canSee(p: player, target: player) :: boolean:
+    set {_start} to location of {_p}
+    set {_direction} to vector from yaw {_p}'s yaw and pitch 0
+    set {_toTarget} to vector between {_start} and location of {_target}
+    set {_angle} to angle between {_direction} and {_toTarget}
+    set {_blocks::*} to all blocks between {_start} and location of {_target} where [input isn't air]
+    if amount of {_blocks::*} where [input isn't tagged with tag "minecraft:impermeable"] > 0:
+        return false
+    if {_angle} <= 90:
+        return true
+    return false
+###
+
+on tab complete:
+    event-string is "/ignore":
+        set tab completions for position 1 to all players and "list"
+
+on tab complete of "testMagicCircle":
+    set tab completions for position 1 to all particles
+
+command kys:
+    aliases: suicide
+    trigger:
+        if difference between {lastkys::%player%} and now is less than 1 minute:
+            send "&7[&c!&7] Nuh uh" to player
+            connect player to server "Void"
+        set {lastkys::%player%} to now
+        add 1 to {kys::%player%}
+        send "&7[&c!&7] Progress: &c%{kys::%player%}%&7/&c10000" to player
+        if {kys::%player%} >= 10000:
+            reset {kys::%player%}
+            send "&7[&c!&7] &cYou have committed suicide..." to player
+            kill player
+    
+command ignore <text>:
+    trigger:
+        if arg is "list":
+            send "&8[&c!&8] &7Ignore List:"
+            set {_l::*} to {Ignored.Players::%player%::*} if size of {Ignored.Players::%player%::*} > 1 else "None"
+            loop {_l::*}:
+                send "&8• &c%loop-value%"
+            stop
+        set {_p} to (arg parsed as offline player)
+        if {_p} isn't in {Ignored.Players::%player%::*}:
+            add {_p} to {Ignored.Players::%player%::*}
+            send "&8[&c!&8] &7Blocked Messages From &c%arg%"
+        else:
+            remove {_p} from {Ignored.Players::%player%::*}
+            send "&8[&a!&8] &7Enabled Messages From &a%arg%"
+
+command testMagicCircle [<particle=electric spark>] [<integer=4>]:
+    permission: op
+    trigger:
+        set {_o} to player's location
+        loop 180 times:
+            draw 1 of arg 1 at circle({_o}, (arg 2)*0.375, 10) with extra 0
+            draw 1 of arg 1 at circle({_o}, (arg 2), 2) with extra 0
+            draw 1 of arg 1 at circle({_o}, (arg 2)*1.1125, 2) with extra 0
+            draw 1 of arg 1 at regularPolygon({_o}, (arg 2), 3, 0.25, loop-number) with extra 0
+            draw 1 of arg 1 at regularPolygon({_o}, (arg 2), 3, 0.25, 30 + loop-number) with extra 0
+            draw 1 of arg 1 at regularPolygon({_o}, (arg 2), 3, 0.25, 60 + loop-number) with extra 0
+            draw 1 of arg 1 at regularPolygon({_o}, (arg 2), 3, 0.25, 90 + loop-number) with extra 0
+
+command rban <string> <offline player> <string>:
+    permission: op
+    trigger:
+        execute console command "co rollback %arg 2% t:1w r:#global", "tempban %arg 2% %arg 3% %arg 1%"
+
+###
+every tick:
+    player("Kundaliel") is online
+    clear {_p::*}
+    loop all players where [input isn't player("Kundaliel")]:
+        if canSee(loop-player, player("Kundaliel")) is false:
+            reveal player("Kundaliel") to loop-player
+        else:
+            hide player("Kundaliel") from loop-player
+            add loop-player to {_p::*}
+            set {_e} to location 0.2 meters above eye location of loop-player
+            make 1 of electric spark at circle({_e}, 0.5, 45) with extra 0 for player("Kundaliel")
+    send actionbar "&7[%{_p::*}%&7] Can't See You." to player("Kundaliel")
+###
+
+every tick:
+    set {_p} to player("Kundaliel")
+    loop all players where [input isn't {_p}]:
+        loop-player's world is {_p}'s world
+        set {_e} to location 0.2 meters above eye location of loop-player
+        make 1 of electric spark at circle({_e}, 0.5, 45) with extra 0 for {_p}
+
+on right click:
+    set {_e} to event-entity
+    {_e} isn't player
+    {Magic.Tools::*} contains 1 of player's tool
+    priority(player) < 10:
+        execute console command "tempban %player% 1d Using Unprohibited Item: %player's tool%"
+        stop
+    if {_e}'s name is "Kundaliel" or "LeopardGamer":
+        create an explosion of force 2 at {_e}
+        set {_e} to player
+    if player's name is "Diffenfyy":
+        create an explosion of force 2 at {_e}
+        set {_e} to player
+    1 of player's tool is {Magic.Tools::1}:
+        {_e}'s metadata "death" isn't set
+        {_e}'s health is set
+        cancel event
+        remove 1 of player's tool from player's tool
+        set {_e}'s metadata "death" to true
+        set {_e}'s health to {_e}'s max health
+        loop 190 times:
+            magicCircle({_e}'s location, crit, loop-counter, 4)
+            make 5 of enchant at location 1 block above {_e}'s location with force
+            mod(loop-counter, 10) = 0:
+                add ({_e}'s max health / 20) to {_hurt}
+                set {_e}'s health to {_e}'s max health - {_hurt}
+                play hurt animation on {_e}
+            wait 1 tick
+        wait 10 ticks
+        kill {_e}
+        set {_e}'s health to 0
+        delete {_e}'s metadata "death"
+        make 50 of poof at location 1 block above {_e}'s location with force
+    1 of player's tool is {Magic.Tools::2}:
+        {_e}'s metadata "annihilate" isn't set
+        {_e}'s health is set
+        cancel event
+        set time of player's world to 1:40
+        set weather to thunder
+        loop 10 times:
+            play sound "ambient.cave" in master category with volume 100 with pitch 0.2 at {_e}
+        strike lightning effect at {_e}
+        remove 1 of player's tool from player's tool
+        set {_e}'s metadata "annihilate" to true
+        set {_o} to {_e}'s location
+        loop 360 times:
+            magicCircle({_o}, flame, loop-counter, 3)
+            teleport {_e} to {_o} ~ vector(0, loop-counter*-0.01, 0)
+            wait 1 tick
+        delete {_e}'s metadata "annihilate"
+        wait 2 seconds
+        set time of player's world to 18:00
+        set weather to clear
+    1 of player's tool is {Magic.Tools::3}:
+        {_e}'s metadata "disolve" isn't set
+        {_e}'s health is set
+        cancel event
+        remove 1 of player's tool from player's tool
+        set {_e}'s metadata "disolve" to true
+        set {_o} to {_e}'s location
+        loop 360 times:
+            magicCircle({_o}, small_gust, loop-counter, 6)
+            set {_v} to vector between ({_e}'s location) and ({_o} ~ vector(0, 1000, 0))
+            push {_e} {_v} with speed log(distance between ({_e}'s location) and ({_o} ~ vector(0, 1000, 0)), 100)
+            wait 1 tick
+        delete {_e}'s metadata "disolve"
+
+on right click:
+    if long tag "transaction_id" of custom nbt of player's tool is set:
+        set {_id} to long tag "transaction_id" of custom nbt of player's tool
+        set {_amount} to int tag "amount" of custom nbt of player's tool
+        if {Check.IDs::*} contains "%{_id}%::%{_amount}%":
+            remove "%{_id}%::%{_amount}%" from {Check.IDs::*}
+            add {_amount} to {cash::%player's uuid%}
+            send "&8[&a!&8] &7You have cashed a check for &a$%{_amount}%&7." to player
+        else:
+            send "&8[&c!&8] &7That check isn't in our system." to player
+        set player's tool to air
+
+function createCheck(amount: int) :: item:
+    set {_id} to random integer between 1000000000 and 9999999999
+    set {_item} to paper named "&c&lCheck" with lore "&8&m                    ", "&7Amount: &a$%{_amount}%", "&7ID: &8#%{_id}%", "&8&m                    ", "&7Right-Click to cash", "&8&m                    "
+    set int tag "amount" of custom nbt of {_item} to {_amount}
+    set long tag "transaction_id" of custom nbt of {_item} to {_id}
+    add "%{_id}%::%{_amount}%" to {Check.IDs::*}
+    return {_item}
+
+
+on damage:
+    if any:
+        victim's metadata "death" is set
+        victim's metadata "disolve" is set
+    then:
+        cancel event
+
+
+on death:
+    wait 1 tick
+    delete victim's metadata "death"
+
+on entity move:
+    if any:
+        event-entity's metadata "annihilate" is set
+        event-entity's metadata "death" is set
+    then:
+        cancel event
+
+on entity potion effect modification:
+    if event-potion effect type is invisibility:
+        send "&cInvisibility is disabled." to event-entity
+        cancel event
+
+on shoot:
+    set owner of projectile to shooter
+
+
+command rename <text>:
+    usage: {@usage} /rename &f<name>
+    trigger:
+        if arg isn't set:
+            reset name of player's tool
+            send "{@info} Cleared item name."
+            stop
+        
+        if length of unformatted arg > 30:
+            send "{@err} Rename must not be longer than 30 characters."
+            stop
+        if player's tool is air:
+            send "{@err} You must be holding an item to rename it."
+            stop
+
+        set name of player's tool to formatted toHex(arg)
+
+        send "{@info} Renamed item to &f%arg%&f."
+
+on command:
+    ("clearchat", "cc", and "chatclear") contains command
+    sender's name is "SGGopen"
+    send "You're banned from using chat clear >:(" to sender
+    cancel event
+
+on command:
+    player's name is "the_destroyer29"
+    full command contains "JingosPringos"
+    set {_a} to full command
+    replace all "JingosPringos" in {_a} with "the_destroyer29"
+    make player execute {_a} 

@@ -1,0 +1,26 @@
+import:
+    com.plotsquared.bukkit.util.BukkitUtil
+    com.plotsquared.core.configuration.Settings
+    com.plotsquared.core.plot.flag.implementations.PlotTitleFlag
+
+function isPlotChatting(p: player) :: boolean:
+    set {_plotPlayer} to BukkitUtil.adapt({_p})
+    return {_plotPlayer}.getAttribute("chat")
+
+on chat with priority lowest:
+    set {_plotPlayer} to BukkitUtil.adapt(player)
+    set {_isOnPlotChat} to {_plotPlayer}.getAttribute("chat")
+    {_isOnPlotChat} is true
+    player's name isn't "Kundaliel"
+    set {_location} to {_plotPlayer}.getLocation()
+    set {_area} to {_location}.getPlotArea()
+    set {_plot} to {_area}.getPlot({_location})
+    {_plot} is set
+    loop all players in world "plots":
+        set {_current} to BukkitUtil.adapt(loop-value).getCurrentPlot()
+        if {_current}.getBasePlot(false).equals({_plot}) is true:
+            add loop-value to {_r::*}
+    {_r::*} doesn't contain player("Kundaliel")
+    set {_plotTitle} to (minimessage from "%{_plot}.getFlag(PlotTitleFlag.class).title()%")
+    set {_plotTitle} to {_plot}.getId() if {_plotTitle} is "<none>"
+    send "&7[&f%{_plotTitle}%&7] &f%player% &8» &f%message%" to player("Kundaliel")

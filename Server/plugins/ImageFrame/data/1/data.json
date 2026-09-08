@@ -1,0 +1,59 @@
+{
+  "type": "imageframe:url_static",
+  "index": 1,
+  "name": "Capsy",
+  "url": "https://cdn.discordapp.com/attachments/1311367214795849861/1515105879387537589/aManNeverSpeaksIllOf.png?ex\u003d6a2dcbce\u0026is\u003d6a2c7a4e\u0026hm\u003d7a554aeb88ac38a2bbd7dbcfde8d324f8e1f9258a3f2b1861f97a37ed001ad80\u0026",
+  "width": 3,
+  "height": 3,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "hasAccess": {},
+  "creationTime": 1781299808297,
+  "mapdata": [
+    {
+      "mapid": 296,
+      "image": "0.png",
+      "markers": []
+    },
+    {
+      "mapid": 297,
+      "image": "1.png",
+      "markers": []
+    },
+    {
+      "mapid": 298,
+      "image": "2.png",
+      "markers": []
+    },
+    {
+      "mapid": 299,
+      "image": "3.png",
+      "markers": []
+    },
+    {
+      "mapid": 300,
+      "image": "4.png",
+      "markers": []
+    },
+    {
+      "mapid": 301,
+      "image": "5.png",
+      "markers": []
+    },
+    {
+      "mapid": 302,
+      "image": "6.png",
+      "markers": []
+    },
+    {
+      "mapid": 303,
+      "image": "7.png",
+      "markers": []
+    },
+    {
+      "mapid": 304,
+      "image": "8.png",
+      "markers": []
+    }
+  ]
+}

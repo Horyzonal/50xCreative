@@ -1,0 +1,120 @@
+options:
+    timerActive: false
+    countdown: 20
+    eventCountdown: 80
+    excludedItems: bedrock, barrier, command block, ender chest, chain command block, repeating command block
+    randItem: random item out of all items where [{@excludedItems} doesn't contain input]
+    info: &8(<##FC00FF>&l❗&8)&f
+
+import:
+    org.bukkit.event.entity.EntityPotionEffectEvent
+    org.bukkit.event.entity.EntityPotionEffectEvent$Cause
+    org.bukkit.entity.LivingEntity
+    org.bukkit.potion.PotionEffectType
+
+command ToggleRNG:
+    permission: op
+    trigger:
+        set {timerActive} to true if {timerActive} != true else false
+        send "{@info} &aTimer Toggled On" if {timerActive} is true else "{@info} &cTimer Toggled Off" to player
+        if {timerActive} is true:
+            set {countdown} to {@countdown}
+            set {eventCountdown} to {@eventCountdown}
+
+function giveRandomItem(p: player, t: integer = 1):
+    play sound "block.note_block.hat" at volume 0.3 at pitch 1.6 to {_p}
+    loop {_t} times:
+        give {_p} {@randItem}
+
+function parseItemName(i: item, dn: boolean = false) :: string:
+    set {_n} to "%amount of {_i}% %namespaced keys of {_i}%" if {_dn} is true else "%namespaced keys of {_i}%"
+    replace all "_" in {_n} with " "
+    replace all "minecraft:" in {_n} with ""
+    return {_n} in strict proper case
+
+every 1 second:
+    if {timerActive} is false:
+        stop
+    if {countdown} > 1:
+        subtract 1 from {countdown}
+    else:
+        set {countdown} to {@countdown}
+
+    if {eventCountdown} > 1:
+        subtract 1 from {eventCountdown}
+    else:
+        set {eventCountdown} to {@eventCountdown}
+
+    loop all players where [player input's world is "50xrngrush"]:
+        set loop-player's gamemode to survival if priority(loop-player) < 13
+        set {_t} to timeFormat("%{countdown}% Seconds" parsed as timespan)
+        set {_t2} to timeFormat("%{eventCountdown}% Seconds" parsed as timespan)
+        send action bar "Item Timer: &a%{_t}%&f | Event Timer: &a%{_t2}%&f" to loop-player
+        {countdown} is {@countdown}:
+            giveRandomItem(loop-player)
+        {eventCountdown} is {@eventCountdown}:
+            set {_r} to random integer between 1 and 5
+            if {_r} is 1:
+                send title "&1Item Rain" with subtitle "&9You received 3 random items" to loop-player
+                giveRandomItem(loop-player, 3)
+            else if {_r} is 2:
+                send title "&6Super Jump" with subtitle "&eJump higher than ever!" to loop-player
+                apply jump boost 4 to loop-player for 60 seconds
+            else if {_r} is 3:
+                send title "&aSpeed Rush" with subtitle "&bRun faster than the wind!" to loop-player
+                apply speed 2 to loop-player for 60 seconds
+            else if {_r} is 4:
+                send title "&cFull Heal" with subtitle "&4You've been fully healed!" to loop-player
+                set loop-player's health to loop-player's maximum health
+
+on drop:
+    set {_t} to player's target entity
+    if all:
+        player's world is world "50xrngrush"
+        {_t} is set
+        {_t} is a player
+        distance between player's location and {_t}'s location is less than or equal to 4
+    then:
+        if {_t} has enough space for event-item:
+            give {_t} event-item
+            set {_i} to parseItemName(event-item, true)
+
+            send "&8(&a+&8)&f Received &6%{_i}%&f from &e%player%" to {_t}
+            send "&8(&c-&8)&f Gave &6%{_i}%&f to &e%{_t}%" to player
+        else:
+            cancel event
+            send "&cPlayer doesn't have enough space." to player
+
+on damage:
+    victim's world is "50xrngrush"
+    if damage cause is void:
+        cancel event
+        wait 1 tick
+        teleport victim to location -2, 121, 0
+        set victim's velocity to vector 0, 0, 0
+        apply blindness to victim for 2.5 seconds
+        set metadata "noFall" of victim to true
+    else if damage cause is fall:
+        if metadata "noFall" of victim is true:
+            cancel event
+            set metadata "noFall" of victim to false
+
+on right click:
+    player's world is "50xrngrush"
+    priority(event-player) < 13
+    if any:
+        {@excludedItems} contains event-item
+        raw name of event-item contains "spawn_egg"
+    then:
+        remove all event-item from player's inventory
+        cancel event
+
+on command:
+    player's world is "50xrngrush"
+    command contains "vault":
+        cancel event
+    else if command is "effect":
+        set {_p} to player(2nd element of args)
+        {_p}'s world is "50xrngrush"
+        send "&l%smallcaps(name of {_p}'s world)% &7» &cUnable to give &e%{_p}%&c an effect!" to sender
+        cancel event

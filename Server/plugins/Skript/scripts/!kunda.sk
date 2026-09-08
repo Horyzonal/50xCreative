@@ -1,0 +1,757 @@
+#=========#
+# OPTIONS #
+#=========#
+
+options:
+	err: &8(&4&l❗&8)&c
+	info: &8(<##FC00FF>&l❗&8)&f
+	usage: &8(&4&l❗&8) &cCorrect command usage &7»&f
+	notyou: &8(&4&l❗&8) &cConsole may not use this command.
+	noperm: &8(&4&l❗&8) &cYou do not have permission for this command.
+	notthis: &8(&4&l❗&8) &cYou may not use this feature of the command.
+	nothere: &8(&4&l❗&8) &cYou may not use this command in this region.
+	nothigh: &8(&4&l❗&8) &cThat person has a higher authority than you.
+	notnow: &8(&4&l❗&8) &cYou may use this command after %remaining time%.
+	notplayed: &8(&4&l❗&8) &cPlayer hasn't played before
+	
+#==================================#
+# FUNCTIONS - GEOMETRY & PARTICLES #
+#==================================#
+
+function line(loc1: location, loc2: location, step-size: number=0.25) :: locations:
+	set {_v} to vector from {_loc1} to {_loc2}
+	set vector length of {_v} to {_step-size}
+	loop floor((distance between {_loc1} and {_loc2}) / {_step-size}) times:
+		set {_locs::%loop-number%} to {_loc1}
+		set {_loc1} to {_loc1} ~ {_v}
+	return {_locs::*}
+
+function circle(center: location, radius: number, step-size: number = 10, yaw: number = 0, pitch: number = 0) :: locations:
+	set {_reference} to vector from yaw {_yaw} + 90 and pitch 0
+	set {_v} to spherical vector with radius {_radius}, yaw 0, pitch 0
+	loop floor(360 / {_step-size}) times:
+		set {_temp-v} to {_v}
+		if {_pitch} is not 0:
+			rotate {_temp-v} around {_reference} by {_pitch}
+		set {_locs::%loop-number%} to {_center} ~ {_temp-v}
+		add {_step-size} to yaw of {_v} 
+	return {_locs::*}
+
+function regularPolygon(center: location, radius: number, sides: number, step-size: number = 0.25, offset: number = 0, yaw: number = 0, pitch: number = 0) :: locations:
+	set {_reference} to vector from yaw {_yaw} + 90 and pitch 0
+	set {_v} to spherical vector radius {_radius}, yaw {_offset}, pitch 0
+	loop {_sides} times:
+		set {_temp-v} to {_v}
+		if {_pitch} is not 0:
+			rotate {_temp-v} around {_reference} by {_pitch}
+		set {_loc::%loop-number%} to {_center} ~ {_temp-v}
+		add 360 / {_sides} to yaw of {_v}
+	loop {_sides} times:
+		if loop-number != {_sides}:
+			add line({_loc::%loop-number%}, {_loc::%loop-number + 1%}) to {_locs::*}
+		else:
+			add line({_loc::%loop-number%}, {_loc::1}) to {_locs::*}
+	return {_locs::*}
+
+function basicSphere(center: location, radius: number, yaw-step-size: number = 10, pitch-step-size: number = 10) :: locations:
+	set {_reference} to vector(1,0,0)
+	set {_point-vector} to spherical vector with radius {_radius}, yaw 0, pitch 0 
+	loop 360 / {_yaw-step-size} times:
+		add {_yaw-step-size} to yaw of {_reference}
+		set yaw of {_point-vector} to yaw of {_reference} + 90
+		set pitch of {_point-vector} to -90
+		set {_index} to ceil(loop-number * 180 / {_yaw-step-size})
+		loop 180 / {_pitch-step-size} times:
+			rotate {_point-vector} around {_reference} by {_pitch-step-size}
+			set {_points::%loop-number-2 + {_index}%} to {_center} ~ {_point-vector}
+	return {_points::*}
+
+function fibonacciSphere(center: location, radius: number, point-count: number = 100) :: locations:
+	set {_phi} to 3.1415 * (3 - sqrt(5))
+	set {_y} to 1
+	set {_y-step} to 2 / {_point-count}
+	set {_radians-to-degrees} to 180 / 3.1415
+	loop {_point-count} times:
+		set {_r} to sqrt(1 - {_y}^2) * {_radius}
+		set {_angle} to {_phi} * loop-number * {_radians-to-degrees}
+		set {_x} to {_r} * cos({_angle})
+		set {_z} to {_r} * sin({_angle})
+		set {_points::%loop-number%} to {_center} ~ vector({_x}, {_y} * {_radius}, {_z})
+		set {_y} to {_y} - {_y-step}
+	return {_points::*}
+
+function magicCircle(loc: location, particle: particle = electric spark particle, rotation: int = 0, radius: int = 4, color: color = white):
+	force draw 1 of {_particle} with extra value 0 at circle(({_loc}), {_radius}*0.375, 10)
+	force draw 1 of {_particle} with extra value 0 at circle(({_loc}), {_radius}, 2)
+	force draw 1 of {_particle} with extra value 0 at circle(({_loc}), {_radius}*1.1125, 2)
+	force draw 1 of {_particle} with extra value 0 at regularPolygon(({_loc}), {_radius}, 3, 0.25, {_rotation})
+	force draw 1 of {_particle} with extra value 0 at regularPolygon(({_loc}), {_radius}, 3, 0.25, 60 + {_rotation})
+
+#=====================#
+# FUNCTIONS - UTILITY #
+#=====================#
+
+function getScriptPath(script: string) :: strings:
+	set {_pass::*} to all scripts where [input contains {_script}]
+	return {_pass::*} where [input doesn't start with "-"]
+
+function getBareScriptNames() :: strings:
+	loop all scripts:
+		set {_return::*} to loop-value split at "/"
+		add last element of {_return::*} to {_names::*}
+	return {_names::*} where [input doesn't start with "-"]
+
+function createCheck(amount: int) :: item:
+	set {_id} to random integer between 1000000000 and 9999999999
+	set {_item} to paper named "&c&lCheck" with lore "&8&m					", "&7Amount: &a$%{_amount}%", "&7ID: &8#%{_id}%", "&8&m					", "&7Right-Click to cash", "&8&m					"
+	set int tag "amount" of custom nbt of {_item} to {_amount}
+	set long tag "transaction_id" of custom nbt of {_item} to {_id}
+	add "%{_id}%::%{_amount}%" to {Check.IDs::*}
+	return {_item}
+
+#==========#
+# COMMANDS #
+#==========#
+
+function entityReport(prefix: object, color: string, label: string, count: objects, recievers: objects):
+	if amount of {_count::*} is 0:
+		send formatted "%{_prefix}% &8→&f %{_color}%No %{_label}%s..." to {_recievers::*}
+	else:
+		loop indices of {_count::*}:
+			add "%loop-value in proper case% (%{_count::%loop-value%}%)" to {_list::*}
+		set {_sep} to raw "&f, %{_color}% "
+		send formatted "%{_prefix}% &8→&f %{_color}%%join {_list::*} with {_sep}%" to {_recievers::*}
+		send formatted "%{_prefix}% &8→&f %{_color}%Cleared %sum({_count::*})% %{_label}%s" to {_recievers::*}
+
+command entityfix:
+	trigger:
+		if priority(sender) < 10:
+			send "{@err} &cSorry you don't have permission to run this. If you believe there is a glitched entity please contact staff"
+			stop
+		set {_prefix} to minimessage from "<bold><gradient:#ABCDEF:#FEDCBA>ENTITYLOG"
+		set {_recievers::*} to console and all players where [priority(input) >= 10]
+		stafflog("{@info} &f%player% has started a &aEntityfix")
+		send formatted "%{_prefix}% &8→&f <#ABCDEF>Looping Entities..." to {_recievers::*}
+
+		set {_all::*} to all entities in world "creative" where [input isn't a player]
+		set {_displays::*} to {_all::*} where [input is a display]
+		set {_entities::*} to {_all::*} where [input isn't a display]
+
+		loop {_entities::*}:
+			loop-value.remove()
+			add 1 to {_count::%translate component of loop-value%}
+		loop {_displays::*}:
+			loop-value.remove()
+			add 1 to {_dcount::%translate component of loop-value%}
+
+		entityReport({_prefix}, "<#ABCDEF>", "Entity", keyed {_count::*}, {_recievers::*})
+		entityReport({_prefix}, "<#FF9966>", "Display", keyed {_dcount::*}, {_recievers::*})
+
+import:
+	org.bukkit.Chunk
+
+command blockfix:
+	trigger:
+		if priority(sender) < 10:
+			send "{@err} &cSorry, you don't have permission to run this. If you believe there is a glitched block, please contact staff."
+			stop
+
+		stafflog("{@info} &f%sender% has started a &aBlockfix")
+		stafflog("{@info} &fStarting &eStage 1&f...")
+
+		set {_chunks::*} to ...(world "creative").getLoadedChunks()
+		set {_total-chunks} to size of {_chunks::*}
+
+		loop {_chunks::*}:
+			loop ...(loop-value).getTileEntities():
+				add loop-value-2.getBlock() to {_nbt::*}
+			add 1 to {_scanned}
+			if mod(loop-counter, 500) = 0:
+				send "&eScanning chunks: &f%{_scanned}%&7/&f%{_total-chunks}%" to sender
+
+		stafflog("{@info} &fFound &e%size of {_nbt::*}% &fblock(s) with NBT.")
+
+		stafflog("{@info} &fStarting &eStage 2&f...")
+
+		set {_nbt-total} to size of {_nbt::*}
+
+		loop {_nbt::*}:
+			clear nbt of loop-value
+			if mod(loop-counter, 20) = 0:
+				send actionbar "&eClearing: &f%{_cleared}%&7/&f%{_nbt-total}% blocks" to sender
+
+		stafflog("{@info} &aBlockfix complete! &fAll block NBT has been cleared.")
+		send actionbar "&aBlockfix complete!" to sender
+
+command chatgametop:
+	aliases: cgtop
+	trigger:
+		add "%nl%%minimessage from "<bold><gradient:#FF6700:#FFFB6A>50xCreative"% &d&lTOP 10 CHAT GAME WINNERS%nl%" to {_s::*}
+		loop sorted indices of {ChatGameWins::*} in descending order:
+			add "<#ff5cfa>%loop-counter%.&f %loop-value parsed as offlineplayer's name% &7- <#ff5cfa>%numFormat({ChatGameWins::%loop-value%}) ? 0% Wins" to {_s::*}
+			exit loop if loop-counter > 9
+
+		set {_s::*} to "None Recorded" if size of {_s::*} = 1
+		send {_s::*} to sender
+
+command /voidworld <text>:
+	permission: op
+	prefix: admin
+	trigger:
+		set {_w} to world creator named arg-1
+		set world type of {_w} to flat
+		set generator settings of {_w} to "{""biome"": ""minecraft:the_void"",""layers"": []}}"
+		set should generate structures of {_w} to false
+		load world from {_w}
+
+command reload <string="">:
+	permission: op
+	permission message: {@noperm}
+	trigger:
+		set {_paths::*} to getScriptPath(arg)
+		loop (size of {_paths::*}) times:
+			send "&8→ &eReloading &6%arg% &8(&e%{_paths::%loop-counter%}%&8)%nl%" to all players where [input has permission "op"] and sender
+		reload script {_paths::*}
+
+function progressBar(progress: number, total: number, barLength: number = 20, filledChar: text = "█", emptyChar: text = "░", filledColor: text = "&a", emptyColor: text = "&7") :: text:
+	set {_percentage} to ({_progress} / {_total}) * 100
+	set {_filledSegments} to round(({_progress} / {_total}) * {_barLength})
+	
+	set {_bar} to ""
+	loop {_barLength} times:
+		if loop-number <= {_filledSegments}:
+			set {_bar} to "%{_bar}%%{_filledColor}%%{_filledChar}%"
+		else:
+			set {_bar} to "%{_bar}%%{_emptyColor}%%{_emptyChar}%"
+	
+	return "%{_bar}%&r &7%round({_percentage})%%%"
+
+command ignore <text>:
+	trigger:
+		if arg-1 is "list":
+			send "&8[&c!&8] &7Ignored Players:"
+			if {Ignored.Players::%player's uuid%::*} is not set:
+				send "&8• &7None"
+				stop
+			loop {Ignored.Players::%player's uuid%::*}:
+				send "&8• &c%loop-value%"
+			stop
+		
+		set {_p} to arg-1 parsed as offline player
+		if {_p} is not set:
+			send "&8[&c!&8] &7Player &c%arg-1% &7not found."
+			stop
+
+		if {_p} is the player:
+			send "&8[&c!&8] &7You cannot ignore yourself."
+			stop
+		
+		if {_p} is in {Ignored.Players::%player's uuid%::*}:
+			remove {_p} from {Ignored.Players::%player's uuid%::*}
+			send "&8[&a!&8] &aEnabled &7messages from &a%arg-1%&7."
+			stop
+		
+		add {_p} to {Ignored.Players::%player's uuid%::*}
+		send "&8[&c!&8] &cDisabled &7messages from &c%arg-1%&7."
+
+command testMagicCircle [<particle=electric spark particle>] [<integer=4>]:
+	permission: op
+	trigger:
+		set {_o} to player's location
+		loop 180 times:
+			draw 1 of arg 1 with extra value 0 at circle({_o}, (arg 2)*0.375, 10)
+			draw 1 of arg 1 with extra value 0 at circle({_o}, (arg 2), 2)
+			draw 1 of arg 1 with extra value 0 at circle({_o}, (arg 2)*1.1125, 2)
+			draw 1 of arg 1 with extra value 0 at regularPolygon({_o}, (arg 2), 3, 0.25, loop-number)
+			draw 1 of arg 1 with extra value 0 at regularPolygon({_o}, (arg 2), 3, 0.25, 30 + loop-number)
+			draw 1 of arg 1 with extra value 0 at regularPolygon({_o}, (arg 2), 3, 0.25, 60 + loop-number)
+			draw 1 of arg 1 with extra value 0 at regularPolygon({_o}, (arg 2), 3, 0.25, 90 + loop-number)
+
+command rban <offline player> <string> <string>:
+	usage: /rban <player> <time> <reason>
+	permission: op
+	trigger:
+		execute console command "co rollback %arg 1% t:1w r:#global", "tempban %arg 1% %arg 2% %arg 3%"
+
+command rename [<text>]:
+	usage: {@usage} /rename &f<name>
+	trigger:
+		if arg isn't set:
+			reset name of player's tool
+			send "{@info} Cleared item name."
+			stop
+		
+		if length of unformatted arg > 30:
+			send "{@err} Rename must not be longer than 30 characters."
+			stop
+		if player's tool is air:
+			send "{@err} You must be holding an item to rename it."
+			stop
+
+		set name of player's tool to formatted toHex(arg)
+
+		send formatted "{@info} Renamed item to &f%toHex(arg)%&f."
+
+command votereset [<string>] [<string>]:
+	aliases: vr
+	trigger:
+		if arg 1 = "stop":
+			priority(sender) < 10:
+				sender isn't console
+				send "{@nothigh}"
+			if {reset} isn't set:
+				send "{@err} There is no pending map reset voting."
+				stop
+			delete {reset}, {resetyes::*}, {resetno::*}
+			send "%nl%&d&lMAP RESET VOTE%nl%&fThe current map reset voting has been &ccanceled &fby a staff member.%nl%" to all players in world "creative"
+			stafflog("%sender% &fhas cancelled the current map reset voting.")
+	
+		else if arg 1 = "start":
+			priority(sender) < 10:
+				sender isn't console
+				send "{@nothigh}"
+			else if {reset} is set:
+				send "{@err} There is already a pending map reset voting."
+			else:
+				delete {reset}, {resetyes::*}, {resetno::*}
+				set {reset} to true
+				stafflog("%sender% &fhas initiated a <#B247FF>creative map reset voting&f%" with auto reset" if arg 2 is "-auto" else ""%.")
+				send "%nl%&d&lMAP RESET VOTE%nl%%nl%<#FFAFFF>/vr yes &fto agree on resetting the map.%nl%<#FFAFFF>/vr no &fto disagree on resetting the map.%nl%%nl%&7Ends in 1 minute.%nl%" to all players in world "creative"
+				wait 30 seconds
+				{reset} is set
+				send "%nl%&d&lMAP RESET VOTE%nl%%nl%<#FFAFFF>/vr yes &fto agree on resetting the map.%nl%<#FFAFFF>/vr no &fto disagree on resetting the map.%nl%%nl%&dCurrent votes:%nl%&2%amount of {resetyes::*}% &aYes%nl%&4%amount of {resetno::*}% &cNo%nl%%nl%&7Ends in 30 seconds.%nl%" to all players in world "creative"
+				wait 30 seconds
+				{reset} is set
+				set {_a} to round((amount of {resetyes::*}) / (amount of {resetno::*} + amount of {resetyes::*}) * 100, 2)
+				send "%nl%&d&lMAP RESET VOTE%nl%%nl%&dCurrent votes:%nl%&2%amount of {resetyes::*}% &aYes%nl%&4%amount of {resetno::*}% &cNo%nl%%nl%<#FFAFFF>%{_a}%%% &fof people agreed to a map reset." to all players in world "creative"
+				delete {resetyes::*}, {resetno::*}
+				{_a} <= 50:
+					send nl to all players in world "creative"
+					delete {reset}
+				else:
+					arg 2 = "-auto"
+					set {resetting} to true
+					send "&cResetting map in 10 seconds.%nl%" to all players in world "creative"
+					wait 10 seconds
+					{reset} is set
+					mapreset(sender, world "creative") if arg 2 = "-auto"
+					delete {reset}, {resetting}
+		else if arg 1 = "yes" or "no":
+			if {reset} isn't set:
+				send "{@err} There is no pending map reset voting."
+				stop
+			
+			if arg 1 is "yes":
+				if {resetyes::*} contains player's uuid:
+					send "{@err} You have already voted yes for a map reset."
+					stop
+
+				add player's uuid to {resetyes::*}
+				remove player's uuid from {resetno::*}
+				send "{@info} You have voted &ayes &ffor a map reset."
+
+			else if arg 1 = "no":
+				if {resetno::*} contains player's uuid:
+					send "{@err} You have already voted no for a map reset."
+					stop
+				add player's uuid to {resetno::*}
+				remove player's uuid from {resetyes::*}
+				send "{@info} You have voted &cno &ffor a map reset."
+		else:
+			send "{@usage} /votereset (yes | no | start | stop) [-auto]" if priority(player) > 9 else "{@usage} /votereset <yes | no>"
+
+#========#
+# EVENTS #
+#========#
+
+on join:
+	set {cash::%player's uuid%} to 0 if {cash::%player's uuid%} isn't set
+
+on command:
+	if command is "report":
+		set {_args::*} to args
+		if player({_args::1}) is player("6fde7365-ca36-46a8-8d7c-f88e777b282d"):
+			send "&cN/A" to player
+			cancel event
+
+every tick:
+	set {_p} to player("6fde7365-ca36-46a8-8d7c-f88e777b282d")
+	loop all players where [input isn't {_p}]:
+		loop-player's world is {_p}'s world
+		set {_e} to location 0.2 meters above eye location of loop-player
+		draw 1 of electric spark particle with extra value 0 at circle({_e}, 0.5, 45) for {_p}
+
+on right click:
+
+	if player's name is "Kundaliel":
+		raw name of event-block contains "iron"
+		toggle block at event-block
+		play sound "block.iron_door.open" at block at event-block
+		make player swing their hand
+
+	if long tag "transaction_id" of custom nbt of player's tool is set:
+		set {_id} to long tag "transaction_id" of custom nbt of player's tool
+		set {_amount} to int tag "amount" of custom nbt of player's tool
+		if {Check.IDs::*} contains "%{_id}%::%{_amount}%":
+			remove "%{_id}%::%{_amount}%" from {Check.IDs::*}
+			add {_amount} to {cash::%player's uuid%}
+			send "&8[&a!&8] &7You have cashed a check for &a$%{_amount}%&7." to player
+		else:
+			send "&8[&c!&8] &7That check isn't in our system." to player
+		remove "%{_id}%::%{_amount}%" from {Check.IDs::*}
+		set player's tool to air
+
+on shoot:
+	set owner of projectile to shooter
+
+#=================#
+# TAB COMPLETIONS #
+#=================#
+
+on tab complete:
+	event-string is "/ignore":
+		set tab completions for position 1 to all players and "list"
+	event-string is "/testMagicCircle":
+		set tab completions for position 1 to all particles
+
+	event-string is "/reload":
+		set tab completions for position 1 to getBareScriptNames()
+
+	event-string is "/votereset" or "/vr":
+		set tab completions for position 1 to "yes", "no"
+		priority(sender) > 9
+		add "start", "stop" to tab completions for position 1
+		set tab completions for position 2 to "-auto"
+
+#=================#
+# MAZE GENERATION #
+#=================#
+
+function carve(x: number, z: number):
+	set {_base} to {maze::base}
+	set {_width} to {maze::width}
+	set {_height} to {maze::height}
+	set {_loc} to {_base} ~ vector({_x}, 0, {_z})
+	set {maze::queue::%{_loc}%} to {_loc}
+	set {_dirs::*} to shuffled ("north", "south", "east", "west")
+	loop 4 times:
+		set {_dir} to {_dirs::%loop-counter%}
+		if {_dir} is "north":
+			set {_dx} to 0
+			set {_dz} to -2
+		else if {_dir} is "south":
+			set {_dx} to 0
+			set {_dz} to 2
+		else if {_dir} is "east":
+			set {_dx} to 2
+			set {_dz} to 0
+		else if {_dir} is "west":
+			set {_dx} to -2
+			set {_dz} to 0
+		set {_nx} to {_x} + {_dx}
+		set {_nz} to {_z} + {_dz}
+
+		{_nx} > 0
+		{_nx} < {_width}
+		{_nz} > 0
+		{_nz} < {_height}
+		set {_nextLoc} to {_base} ~ vector({_nx}, 0, {_nz})
+		if block at {maze::queue::%{_nextLoc}%} isn't set:
+			set {_wallLoc} to {_base} ~ vector(({_x} + ({_dx} / 2)), 0, ({_z} + ({_dz} / 2)))
+			set {maze::queue::%{_wallLoc}%} to {_wallLoc}
+			carve({_nx}, {_nz})
+
+function padNumber(num: number, size: number, dir: string) :: string:
+	set {_str} to "%{_num}%"
+	if {_str} contains ".":
+		set {_parts::*} to {_str} split at "."
+		set {_whole} to {_parts::1}
+		set {_decimal} to {_parts::2}
+		if {_dir} is "right":
+			while length of {_decimal} < {_size}:
+				set {_decimal} to "%{_decimal}%0"
+		else:
+			while length of {_whole} < {_size}:
+				set {_whole} to "0%{_whole}%"
+		return "%{_whole}%.%{_decimal}%"
+	else:
+		if {_dir} is "right":
+			set {_str} to "%{_str}%.000"
+			return {_str}
+		else:
+			while length of {_str} < {_size}:
+				set {_str} to "0%{_str}%"
+			return {_str}
+
+
+command /mazegen <number> [<text>]:
+	usage: /mazgen size block
+	permission: op
+	trigger:
+		set {_size} to ((argument 1 if argument 1 is evenly divisible by 2 else argument 1 - 1) / 2) 
+		if {_size} < 3:
+			send "Maze size must be at least 3."
+			stop
+
+		send "Starting maze generation with size: %{_size}*2%"
+		set {_origin} to location of block at player's location
+
+		send "Building initial wall grid..."
+		set {_pos1} to "%{_origin}'s x coord%,%{_origin}'s y coord - 1%,%{_origin}'s z coord%"
+		set {_pos2} to "%{_origin}'s x coord + ({_size} * 2)%,%{_origin}'s y coord + 4%,%{_origin}'s z coord + ({_size} * 2)%"
+		if arg-2 is set:
+			execute console command "//world %player's world%", "//pos1 %{_pos1}%", "//pos2 %{_pos2}%", "//set %arg-2%"
+		else:
+			execute console command "//world %player's world%", "//pos1 %{_pos1}%", "//pos2 %{_pos2}%", "//set stone"
+		teleport player to {_origin} ~ vector(0, 5, 0)
+		send "Teleporting player to origin..."
+		send "Waiting for 5 seconds..."
+		wait 5 seconds
+		send "Starting Maze..."
+		set {_startTime} to now
+
+		# Maze variables
+		send "Initializing maze variables..."
+		set {_stack::*} to "0,0"
+		set {_visited::0::0} to true
+		set {_neighbors::*} to "setup"
+		set {_total} to ((({_size}*2)^2)/2) - 1
+
+		while size of {_stack::*} > 0:
+			set {_le} to length of "%{_total}%"
+			send actionbar "&f%floor((loop-counter/{_total})*100)%&7%% &7(&f%padNumber(loop-counter, {_le}, "left")%/%{_total}%&7)"
+			set {_current} to last element of {_stack::*}
+			remove {_current} from {_stack::*}
+			set {_coords::*} to split {_current} at ","
+			set {_cx} to {_coords::1} parsed as an integer
+			set {_cy} to {_coords::2} parsed as an integer
+
+			clear {_neighbors::*}
+
+			set {_dirs::*} to ("north", "south", "east", "west")
+			loop {_dirs::*}:
+				set {_dir} to loop-value
+				if {_dir} is "north":
+					set {_dx} to 0
+					set {_dy} to -1
+				else if {_dir} is "south":
+					set {_dx} to 0
+					set {_dy} to 1
+				else if {_dir} is "east":
+					set {_dx} to 1
+					set {_dy} to 0
+				else if {_dir} is "west":
+					set {_dx} to -1
+					set {_dy} to 0
+
+				set {_nx} to {_cx} + {_dx}
+				set {_ny} to {_cy} + {_dy}
+
+				{_nx} >= 0
+				{_ny} >= 0
+				{_nx} < {_size}
+				{_ny} < {_size}
+				if {_visited::%{_nx}%::%{_ny}%} is not set:
+					add "%{_nx}%,%{_ny}%" to {_neighbors::*}
+
+			if size of {_neighbors::*} > 0:
+				remove "setup" from {_neighbors::*}
+				add "%{_cx}%,%{_cy}%" to {_stack::*}
+				set {_rand} to random element out of {_neighbors::*}
+				set {_coords::*} to split {_rand} at ","
+				set {_nx} to {_coords::1} parsed as an integer
+				set {_ny} to {_coords::2} parsed as an integer
+
+				loop 5 times:
+					set {_y} to (loop-counter-2) - 1
+					set block at {_origin} ~ vector(({_cx} * 2) + 1, {_y}, ({_cy} * 2) + 1) to air
+					set block at {_origin} ~ vector(({_cx} + {_nx}) + 1, {_y}, ({_cy} + {_ny}) + 1) to air
+					set block at {_origin} ~ vector(({_nx} * 2) + 1, {_y}, ({_ny} * 2) + 1) to air
+
+				set {_visited::%{_nx}%::%{_ny}%} to true
+				add "%{_nx}%,%{_ny}%" to {_stack::*}
+
+			if mod(loop-counter, 10) = 0:
+				wait 1 tick
+
+		set block at {_origin} ~ vector(1, -1, 1) to green wool
+		set block at {_origin} ~ vector((({_size} * 2) - 1), -1, (({_size} * 2) - 1)) to red wool
+		send "%{_size}*2% End Time: %timeFormat(difference between {_startTime} and now)%"
+
+
+function send_p(u: string, m: string):
+	set {_p} to {_u} parsed as offline player
+	broadcast "%{_p}'s prefix%%toHex({nick::%{_p}'s uuid%}) ? {_p}%&r%{_p}'s suffix% <#6E6E6E>» <#E0E0E0>%{_m}%"
+
+on death:
+	run 1 tick later:
+		delete victim's metadata "death"
+	victim's uuid is "6fde7365-ca36-46a8-8d7c-f88e777b282d"
+	show protected from death effect on victim
+	cancel event
+
+function getAllowedWorlds() :: strings:
+	add "Limbo" to {_worlds::*}
+	add "honey" to {_worlds::*}
+	add "stampy" to {_worlds::*}
+	add "new_world" to {_worlds::*}
+	add "Fragola" to {_worlds::*}
+	return {_worlds::*}
+
+function parseItemName(i: item, dn: boolean = false) :: string:
+	set {_n} to "%amount of {_i}% %namespaced keys of {_i}%" if {_dn} is true else "%namespaced keys of {_i}%"
+	replace all "_" in {_n} with " "
+	replace all "minecraft:" in {_n} with ""
+	return {_n} in strict proper case
+
+command pushback:
+	permission: op
+	trigger:
+		loop all players in radius 5 of player where [input isn't player]:
+			set {_v} to vector from player to loop-player
+			set {_v} to {_v} normalized
+			push loop-player {_v} with speed 2
+
+on piston extend:
+	(world of event-location) = (world of player("6fde7365-ca36-46a8-8d7c-f88e777b282d"))
+	distance between event-location and player("6fde7365-ca36-46a8-8d7c-f88e777b282d")'s location <= 8
+	cancel event
+
+on entity potion effect modification:
+	if event-entity is not a player:
+		stop
+	entity's name is "Kundaliel":
+		cancel event
+
+	if event-entity's world isn't "tag":
+		event-potion effect type is invisibility
+		send "&cInvisibility is disabled." to event-entity
+		cancel event
+	
+	set {_player} to event-command sender
+	set {_entity} to player("%event-entity%")
+	
+	if world of {_player} is not world of {_entity}:
+		send "{@info} That entity isn't in the same world as you!" to {_player}
+		cancel event
+	if priority({_entity}) > priority({_player}):
+		send "{@nothigh}" to {_player}
+		cancel event
+
+function doTheKill(e: entity):
+	set {_a} to amount of (totem of undying) in {_e}'s inventory
+	remove all (totem of undying) from {_e}'s inventory
+	remove all (totem of undying) from {_e}'s tool
+	remove all (totem of undying) from {_e}'s offhand item
+	loop {_a} times:
+		show protected from death effect on {_e}
+	remove all (totem of undying) from {_e}'s inventory
+	remove all (totem of undying) from {_e}'s tool
+	remove all (totem of undying) from {_e}'s offhand item
+	set metadata "death;Kunda" of {_e} to true
+	set {_e}'s health to -100
+
+on respawn:
+	delete player's metadata "death;Kunda"
+
+on damage with priority lowest:
+	if any:
+		victim's metadata "death" is set
+		victim's metadata "disolve" is set
+	then:
+		cancel event
+	
+	if victim's name is "Kundaliel":
+		if damage cause is projectile:
+			add 1 to arrows stuck in attacker
+			run 1 tick later:
+				set arrows stuck in victim to 0
+			make attacker damage attacker by damage
+		if attacker's name is "Kundaliel":
+			victim's uuid isn't "6fde7365-ca36-46a8-8d7c-f88e777b282d"
+			set victim's health to -100
+		set damage to 0
+
+	
+	if attacker's name is "Kundaliel":
+		attacker's world isn't world "tag"
+		attacker's uuid isn't "6fde7365-ca36-46a8-8d7c-f88e777b282d":
+			create an explosion of force 10 at attacker
+			delete attacker
+			stop
+		if attacker's offhand item is red dye:
+			set {_p} to attacker's position
+			victim isn't a player
+			set {_last} to victim
+			set {_e::*} to all entities in (victim's world) where [input's type is victim's type]
+			play sound "entity.warden.sonic_boom" at {_p} for all players
+			while size of {_e::*} > 0:
+				if {StopLoop} is true:
+					set {StopLoop} to false
+					exit loop
+
+				sort {_e::*} by distance between {_last} and input
+				set {_target} to first element of {_e::*}
+
+				if distance between {_last} and {_target} > 100:
+					exit loop
+				force draw 1 of end rod particle with extra value 0 at line({_last}'s head location, {_target}'s head location)
+				draw 1 sweep attack particle at {_target}'s head location
+				doTheKill({_target})
+
+				set {_last} to {_target}
+				remove {_target} from {_e::*}
+				if mod(loop-counter, 20) is 0:
+					wait 1 tick
+			teleport attacker to {_last}
+			play sound "entity.warden.sonic_boom" at attacker for all players
+		else:
+			doTheKill(victim)
+
+on player fail move:
+	{phazing::%player's uuid%} is true
+	set event-boolean to true
+
+command phase [<integer=10>] [<integer=6>]:
+	usage: /phase <radius> <time in seconds to last>
+	permission: op
+	trigger:
+		if {phazing::%player's uuid%} is true:
+			send "{@err} Phase is already active. Please wait for it to finish."
+			stop
+		if arg 1 < 1:
+			send "{@err} Radius must be at least 1 block."
+			stop
+		if arg 1 > 10:
+			send "{@err} Radius must be no more than 10."
+			stop
+		if arg 2 < 0:
+			send "{@err} Duration must be no less than 0."
+			stop
+		if arg 2 > 20:
+			send "{@err} Duration is too long. Maximum is 20 seconds."
+			stop
+		set {phazing::%player's uuid%} to true
+		set {_blocks::*} to all blocks in radius (arg 1) of player where [input's y coordinate >= player's y coordinate]
+		set {_blocks::*} to {_blocks::*} where [input isn't air]
+		make player see {_blocks::*} as glass
+		run 1 second later:
+			make player see {_blocks::*} as light
+		run "%1 + arg 2% seconds" parsed as a timespan later:
+			make player see {_blocks::*} as normal
+		run "%1 + arg 2% seconds" parsed as a timespan later:
+			set {phazing::%player's uuid%} to false
+
+on spawn:
+	spawn reason is dispense egg:
+		cancel event
+	entity's world is world "chaos":
+		cancel event
+
+on entity knockback:
+	knockback victim's uuid is "6fde7365-ca36-46a8-8d7c-f88e777b282d"
+	cancel event
+
+on combust:
+	entity's uuid is "6fde7365-ca36-46a8-8d7c-f88e777b282d"
+	cancel event

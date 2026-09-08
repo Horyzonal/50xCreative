@@ -1,0 +1,164 @@
+{
+  "type": "imageframe:url_static",
+  "index": 19,
+  "name": "50xNews",
+  "url": "https://cdn.discordapp.com/attachments/1503125428192411708/1516161345580437596/50xNews1.1.png?ex\u003d6a31a2c9\u0026is\u003d6a305149\u0026hm\u003d8f82ec15d31fbeeed6e5ba4ecddf822d2064f42f7fc3c44d0dc31f331dd344ad\u0026",
+  "width": 5,
+  "height": 6,
+  "ditheringType": "nearest-color",
+  "creator": "c43bf9f8-3a2d-47ac-a926-aba5050d1d1e",
+  "hasAccess": {},
+  "creationTime": 1781551534150,
+  "mapdata": [
+    {
+      "mapid": 666,
+      "image": "0.png",
+      "markers": []
+    },
+    {
+      "mapid": 667,
+      "image": "1.png",
+      "markers": []
+    },
+    {
+      "mapid": 668,
+      "image": "2.png",
+      "markers": []
+    },
+    {
+      "mapid": 669,
+      "image": "3.png",
+      "markers": []
+    },
+    {
+      "mapid": 670,
+      "image": "4.png",
+      "markers": []
+    },
+    {
+      "mapid": 671,
+      "image": "5.png",
+      "markers": []
+    },
+    {
+      "mapid": 672,
+      "image": "6.png",
+      "markers": []
+    },
+    {
+      "mapid": 673,
+      "image": "7.png",
+      "markers": []
+    },
+    {
+      "mapid": 674,
+      "image": "8.png",
+      "markers": []
+    },
+    {
+      "mapid": 675,
+      "image": "9.png",
+      "markers": []
+    },
+    {
+      "mapid": 676,
+      "image": "10.png",
+      "markers": []
+    },
+    {
+      "mapid": 677,
+      "image": "11.png",
+      "markers": []
+    },
+    {
+      "mapid": 678,
+      "image": "12.png",
+      "markers": []
+    },
+    {
+      "mapid": 679,
+      "image": "13.png",
+      "markers": []
+    },
+    {
+      "mapid": 680,
+      "image": "14.png",
+      "markers": []
+    },
+    {
+      "mapid": 681,
+      "image": "15.png",
+      "markers": []
+    },
+    {
+      "mapid": 682,
+      "image": "16.png",
+      "markers": []
+    },
+    {
+      "mapid": 683,
+      "image": "17.png",
+      "markers": []
+    },
+    {
+      "mapid": 684,
+      "image": "18.png",
+      "markers": []
+    },
+    {
+      "mapid": 685,
+      "image": "19.png",
+      "markers": []
+    },
+    {
+      "mapid": 686,
+      "image": "20.png",
+      "markers": []
+    },
+    {
+      "mapid": 687,
+      "image": "21.png",
+      "markers": []
+    },
+    {
+      "mapid": 688,
+      "image": "22.png",
+      "markers": []
+    },
+    {
+      "mapid": 689,
+      "image": "23.png",
+      "markers": []
+    },
+    {
+      "mapid": 690,
+      "image": "24.png",
+      "markers": []
+    },
+    {
+      "mapid": 691,
+      "image": "25.png",
+      "markers": []
+    },
+    {
+      "mapid": 692,
+      "image": "26.png",
+      "markers": []
+    },
+    {
+      "mapid": 693,
+      "image": "27.png",
+      "markers": []
+    },
+    {
+      "mapid": 694,
+      "image": "28.png",
+      "markers": []
+    },
+    {
+      "mapid": 695,
+      "image": "29.png",
+      "markers": []
+    }
+  ]
+}

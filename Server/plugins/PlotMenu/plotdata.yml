@@ -1,0 +1,23 @@
+plots:
+    plots;20;20:
+        visit_disabled: false
+    plots;8695;8694:
+        icon: chest
+    plots;47;-11:
+        icon: lime wool
+    plots;-10;4:
+        icon: red banner
+    plots;100;100:
+        icon: nether star
+    plots;260870;260870:
+        icon: barrier
+    plots;65536;65535:
+        icon: redstone
+    plots;-29;9:
+        icon: iron bars
+    plots;3;-31:
+        icon: dark prismarine
+
+reports: {}
+
+report-ids: {}

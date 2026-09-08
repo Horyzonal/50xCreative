@@ -1,0 +1,442 @@
+import:
+    com.plotsquared.core.PlotSquared
+    com.plotsquared.core.player.PlotPlayer
+    com.plotsquared.core.plot.PlotId
+    java.util.ArrayList
+    java.util.Arrays
+    java.lang.String
+    java.lang.Double
+    com.plotsquared.core.util.PlayerManager
+
+options:
+    plotdata:    plugins/PlotMenu/plotdata.yml
+    playerdata:  plugins/PlotMenu/playerdata/
+    prefix:      &8[&b&lPlotMenu&8] &7
+    ReportChannelID: "1255906717636628542"
+    ReportRoleID: "1130064276372062290"
+
+on script load:
+    load yaml "{@plotdata}" as "plotdata"
+
+on script unload:
+    save yaml "plotdata"
+    unload yaml "plotdata"
+
+on join:
+    load yaml "{@playerdata}%uuid of player%.yml" as "pd-%uuid of player%"
+
+on quit:
+    save yaml "pd-%uuid of player%"
+    unload yaml "pd-%uuid of player%"
+
+    
+function getPlotKey(plot: object) :: text:
+    return "%{_plot}.getWorldName()%;%{_plot}.getId().toString()%"
+
+function getPlotFromKey(key: text) :: object:
+    set {_parts::*} to {_key} split at ";"
+    set {_world} to {_parts::1}
+    set {_idStr} to "%{_parts::2}%;%{_parts::3}%"
+    set {_area} to PlotSquared.get().getPlotAreaManager().getPlotAreaByString({_world})
+    if {_area} is not set:
+        return false
+    set {_id} to PlotId.fromString({_idStr})
+    if {_id} is not set:
+        return false
+    return {_area}.getPlotAbs({_id})
+
+function getAvgRating(plot: object) :: number:
+    return {_plot}.getAverageRating()
+
+function getRatingCount(plot: object) :: integer:
+    set {_ratings} to {_plot}.getRatings()
+    if {_ratings} is not set:
+        return 0
+    return {_ratings}.size()
+
+function getOwnerName(plot: object) :: text:
+    set {_owner} to {_plot}.getOwner()
+    return PlayerManager.resolveName({_owner}, false).getComponent(null)
+
+function starDisplay(avg: number) :: text:
+    if {_avg} is 0:
+        return "&7☆☆☆☆☆"
+    set {_filled} to round({_avg} / 2)
+    set {_out} to ""
+    loop 5 times:
+        if loop-number <= {_filled}:
+            set {_out} to "%{_out}%&e★"
+        else:
+            set {_out} to "%{_out}%&7☆"
+    return {_out}
+
+function visitsDisabled(key: text) :: boolean:
+    if yaml value "plots.%{_key}%.visit_disabled" from "plotdata" is true:
+        return true
+    return false
+
+function toggleVisits(key: text, state: boolean):
+    set yaml value "plots.%{_key}%.visit_disabled" from "plotdata" to {_state}
+    save yaml "plotdata"
+
+function isFav(uid: text, key: text) :: boolean:
+    set {_favs::*} to yaml list "favorites" from "pd-%{_uid}%"
+    loop {_favs::*}:
+        if loop-value = {_key}:
+            return true
+    return false
+
+function toggleFav(uid: text, key: text) :: boolean:
+    set {_favs::*} to yaml list "favorites" from "pd-%{_uid}%"
+    if isFav({_uid}, {_key}) is true:
+        delete {_new::*}
+        loop {_favs::*}:
+            if loop-value != {_key}:
+                add loop-value to {_new::*}
+        set yaml list "favorites" from "pd-%{_uid}%" to {_new::*}
+        save yaml "pd-%{_uid}%"
+        return false
+    else:
+        add {_key} to {_favs::*}
+        set yaml list "favorites" from "pd-%{_uid}%" to {_favs::*}
+        save yaml "pd-%{_uid}%"
+        return true
+
+
+function clampZero(o: object) :: object:
+    if Double.isNaN({_o}) is true:
+        return 0
+    return {_o}
+
+function getRate(o: object) :: object:
+    return clampZero({_o}.getAverageRating()) * clampZero({_o}.getRatings().values().size())
+
+function getAllPlots() :: objects:
+    set {_areas} to PlotSquared.get().getPlotAreaManager().getAllPlotAreas()
+    loop ...Arrays.asList({_areas}):
+        add ...loop-value.getBasePlots() to {_plots::*}
+    
+    return {_plots::*}
+
+function sortedPlots(s: integer, e: integer) :: texts:
+
+    set {_plots::*} to getAllPlots()
+
+    sort {_plots::*} in descending order by getRate(input)
+    loop {_plots::*}:
+        if loop-counter < {_s}:
+            continue
+        if loop-counter > {_e}:
+            exit loop
+        set {_plot} to loop-value
+        add getPlotKey({_plot}) to {_list::*}
+
+    return {_list::*}
+
+
+function openBrowseMenu(p: player, page: integer):
+    set {_uid} to "%uuid of {_p}%"
+    set {_perPage} to 45
+    set {_total} to size of getAllPlots()
+    set {_maxPage} to max(1, ceil({_total} / {_perPage}))
+
+    if {_page} < 1:
+        set {_page} to 1
+    if {_page} > {_maxPage}:
+        set {_page} to {_maxPage}
+
+    create gui with virtual chest inventory with 6 rows named "&8&lPlot Browser &8(Page %{_page}%/%{_maxPage}%)":
+
+        loop integers from 45 to 53:
+            format gui slot loop-integer with gray stained glass pane
+
+        if {_page} > 1:
+            format gui slot 45 with arrow named "&aPrevious Page" with lore "&7Page %{_page} - 1%":
+                openBrowseMenu({_p}, {_page} - 1)
+
+        if {_page} < {_maxPage}:
+            format gui slot 53 with arrow named "&aNext Page" with lore "&7Page %{_page} + 1%":
+                openBrowseMenu({_p}, {_page} + 1)
+
+        format gui slot 49 with nether star named "&d&lMy Favorites" with lore "&7Click to view your favorited plots":
+            openFavoritesMenu({_p})
+
+        set {_start} to ({_page} - 1) * {_perPage}
+        set {_sorted::*} to sortedPlots({_start}, {_start}+45)
+        loop {_perPage} times:
+            set {_slot} to loop-number - 1
+            if {_start}+loop-counter <= {_total}:
+                set {_key} to {_sorted::%loop-counter%}
+                set {_plot} to getPlotFromKey({_key})
+                if {_plot} is set:
+                    set {_name} to {_plot}.toString()
+                    set {_avg} to getAvgRating({_plot})
+                    set {_count} to getRatingCount({_plot})
+                    set {_owner} to getOwnerName({_plot})
+                    set {_stars} to starDisplay({_avg})
+
+                    set {_visitLine} to "&aVisits: &2Open"
+                    if visitsDisabled({_key}) is true:
+                        set {_visitLine} to "&cVisits: &4Closed"
+
+                    set {_favLine} to "&7Shift+Click to &afavorite"
+                    if isFav({_uid}, {_key}) is true:
+                        set {_favLine} to "&e★ Favorited &8(Shift+Click to remove)"
+
+                    set {_lore::1} to "&7Owner: &f%{_owner}%"
+                    set {_lore::2} to "&7Rating: %{_stars}% &8(&f%{_count}% votes&8)"
+                    set {_lore::3} to {_visitLine}
+                    set {_lore::4} to {_favLine}
+                    set {_lore::5} to "&8Left: &7Visit  &8Right: &7Report  &8Shift+Left: &7Favorite"
+
+                    format gui slot {_slot} with getPlotIcon({_key}) named "&a%{_name}%" with lore {_lore::*}:
+                        if event-clicktype is left mouse button:
+                            if visitsDisabled({_key}) is true:
+                                send "{@prefix}&cThis plot has visits disabled." to {_p}
+                            else:
+                                {_plot}.teleportPlayer(PlotPlayer.from({_p}), null, null)
+                                close {_p}'s inventory
+                                send "{@prefix}&aTeleporting to &f%{_key}%&a!" to {_p}
+                        if event-clicktype is right mouse button:
+                            close {_p}'s inventory
+                            send "{@prefix}&7To report this plot, stand on it and run: &f/plotmenu report <reason>" to {_p}
+                        if event-clicktype is shift+lmb:
+                            if toggleFav({_uid}, {_key}) is true:
+                                send "{@prefix}&aAdded &f%{_key}%&a to favorites!" to {_p}
+                            else:
+                                send "{@prefix}&7Removed &f%{_key}%&7 from favorites." to {_p}
+                            openBrowseMenu({_p}, {_page})
+
+    open last gui to {_p}
+
+function openFavoritesMenu(p: player):
+    set {_uid} to "%uuid of {_p}%"
+    set {_favs::*} to yaml list "favorites" from "pd-%{_uid}%"
+
+    create gui with virtual chest inventory with 6 rows named "&8&lMy Favorites":
+
+        loop integers from 45 to 53:
+            format gui slot loop-integer with gray stained glass pane
+
+        format gui slot 49 with arrow named "&7Back to Browse":
+            openBrowseMenu({_p}, 1)
+
+        set {_slot} to 0
+        loop {_favs::*}:
+            if {_slot} < 45:
+                set {_key} to loop-value
+                set {_plot} to getPlotFromKey({_key})
+                if {_plot} is set:
+                    set {_name} to {_plot}.toString()
+                    set {_avg} to getAvgRating({_plot})
+                    set {_count} to getRatingCount({_plot})
+                    set {_owner} to getOwnerName({_plot})
+                    set {_stars} to starDisplay({_avg})
+
+                    set {_visitLine} to "&aVisits: &2Open"
+                    if visitsDisabled({_key}) is true:
+                        set {_visitLine} to "&cVisits: &4Closed"
+
+                    set {_lore::1} to "&7Owner: &f%{_owner}%"
+                    set {_lore::2} to "&7Rating: %{_stars}% &8(&f%{_count}% votes&8)"
+                    set {_lore::3} to {_visitLine}
+                    set {_lore::4} to "&8Left: &7Visit  &8Right: &7Unfavorite"
+
+                    format gui slot {_slot} with getPlotIcon({_key}) named "&a%{_name}%" with lore {_lore::*}:
+                        if event-clicktype is left mouse button:
+                            if visitsDisabled({_key}) is true:
+                                send "{@prefix}&cThis plot has visits disabled." to {_p}
+                            else:
+                                {_plot}.teleportPlayer(PlotPlayer.from({_p}), null, null)
+                                close {_p}'s inventory
+                                send "{@prefix}&aTeleporting to &f%{_key}%&a!" to {_p}
+                        if event-clicktype is right mouse button:
+                            toggleFav({_uid}, {_key})
+                            send "{@prefix}&7Removed from favorites." to {_p}
+                            openFavoritesMenu({_p})
+
+                add 1 to {_slot}
+
+    open last gui to {_p}
+
+function openReportsMenu(p: player):
+    create gui with virtual chest inventory with 6 rows named "&8&lPlot Reports":
+
+        loop integers from 45 to 53:
+            format gui slot loop-integer with gray stained glass pane
+
+        set {_repKeys::*} to yaml list "report-index" from "plotdata"
+        set {_slot} to 0
+        loop {_repKeys::*}:
+            if {_slot} < 45:
+                set {_name} to {_plot}.toString()
+                set {_key} to loop-value
+                set {_subIds::*} to yaml list "report-ids.%{_key}%" from "plotdata"
+                set {_count} to size of {_subIds::*}
+
+                set {_lore::1} to "&7Plot: &f%{_key}%"
+                set {_lore::2} to "&cTotal reports: &f%{_count}%"
+                set {_lore::3} to "&7Left: &fView details  &8Right: &4Delete all reports"
+
+                format gui slot {_slot} with red wool named "&c%{_name}%" with lore {_lore::*}:
+                    if event-clicktype is right mouse button:
+                        delete yaml value "reports.%{_key}%" from "plotdata"
+                        delete yaml value "report-ids.%{_key}%" from "plotdata"
+
+                        set {_index::*} to yaml list "report-index" from "plotdata"
+                        delete {_new::*}
+                        loop {_index::*}:
+                            if loop-value != {_key}:
+                                add loop-value to {_new::*}
+                        set yaml list "report-index" from "plotdata" to {_new::*}
+                        save yaml "plotdata"
+
+                        send "{@prefix}&aCleared all reports for &f%{_key}%&a." to {_p}
+                        openReportsMenu({_p})
+                    else:
+                        close {_p}'s inventory
+                        send "{@prefix}&cReports for &f%{_key}%&c:" to {_p}
+                        set {_repKey} to {_key}
+                        set {_ids::*} to yaml list "report-ids.%{_repKey}%" from "plotdata"
+                        loop {_ids::*}:
+                            set {_reason} to yaml value "reports.%{_repKey}%.%loop-value%.reason" from "plotdata"
+                            set {_reporter} to yaml value "reports.%{_repKey}%.%loop-value%.reporter" from "plotdata"
+                            send "  &8- &7%{_reporter}%&8: &f%{_reason}%" to {_p}
+
+                add 1 to {_slot}
+
+    open last gui to {_p}
+
+command /plotmenu [<text>] [<text>]:
+    permission: plotmenu.use
+    permission message: &cYou don't have permission to use PlotMenu.
+    trigger:
+        if arg 1 is not set:
+            openBrowseMenu(player, 1)
+        else if arg 1 = "favorites":
+            openFavoritesMenu(player)
+        else if arg 1 = "report":
+            if arg 2 is not set:
+                send "{@prefix}&cUsage: /plotmenu report <reason>" to player
+                stop
+            set {_pp} to PlotPlayer.from(player)
+            set {_plot} to {_pp}.getCurrentPlot()
+            if {_plot} is not set:
+                send "{@prefix}&cYou must be standing on a plot." to player
+                stop
+            if {_plot}.isOwner(uuid of player) is true:
+                send "{@prefix}&cYou can't report yourself." to player
+                stop
+
+            set {_key} to getPlotKey({_plot})
+            set {_uid} to "%uuid of player%"
+            set {_id} to "%uuid of player%-%now%"
+            set {_reason} to arg 2
+
+            set yaml value "reports.%{_key}%.%{_id}%.reason" from "plotdata" to {_reason}
+            set yaml value "reports.%{_key}%.%{_id}%.reporter" from "plotdata" to name of player
+            set yaml value "reports.%{_key}%.%{_id}%.uuid" from "plotdata" to {_uid}
+
+            set {_index::*} to yaml list "report-index" from "plotdata"
+            set {_alreadyIndexed} to false
+            loop {_index::*}:
+                if loop-value = {_key}:
+                    set {_alreadyIndexed} to true
+            if {_alreadyIndexed} is false:
+                add {_key} to {_index::*}
+                set yaml list "report-index" from "plotdata" to {_index::*}
+
+            set {_ids::*} to yaml list "report-ids.%{_key}%" from "plotdata"
+            add {_id} to {_ids::*}
+            set yaml list "report-ids.%{_key}%" from "plotdata" to {_ids::*}
+
+            save yaml "plotdata"
+
+            send "{@prefix}&aReport submitted. Moderators have been notified." to player
+            create a new message and store it in {_msg}:
+                set the content of the message to "_ _%nl%%mention tag of role with id {@ReportRoleID}%%nl%_ _"
+                make embed and store it in {_embed}:
+                    set title of embed to "Plot Report: %{_key}%"
+                    set embed color of embed to red
+                    add inline field named "Reported by" with value name of player to fields of embed
+                    add inline field named "Reason" with value "%{_reason}%" to fields of embed
+                    set footer of embed to "%{_key}%"
+                add {_embed} to the embeds of the message
+            post {_msg} to text channel with id {@ReportChannelID}
+
+            send "{@prefix}&c%name of player% reported plot &f%{_key}%&c: &7%{_reason}%" to all players where [input has permission "plotmenu.staff"]
+            
+        else if arg 1 = "icon":
+            set {_pp} to PlotPlayer.from(player)
+            set {_plot} to {_pp}.getCurrentPlot()
+            if {_plot} is not set:
+                send "{@prefix}&cYou must be standing on your plot." to player
+                stop
+            if {_plot}.isOwner(uuid of player) is false:
+                send "{@prefix}&cYou don't own this plot." to player
+                stop
+            if player's tool is air:
+                send "{@prefix}&cYou must be holding an item." to player
+                stop
+            set {_key} to getPlotKey({_plot})
+            set yaml value "plots.%{_key}%.icon" from "plotdata" to "%type of player's tool%"
+            save yaml "plotdata"
+            send "{@prefix}&aPlot icon set to &f%type of player's tool%&a!" to player
+        else if arg 1 = "visit":
+            set {_pp} to PlotPlayer.from(player)
+            set {_plot} to {_pp}.getCurrentPlot()
+            if {_plot} is not set:
+                send "{@prefix}&cYou must be standing on your plot." to player
+                stop
+            if {_plot}.isOwner(uuid of player) is false:
+                send "{@prefix}&cYou don't own this plot." to player
+                stop
+            set {_key} to getPlotKey({_plot})
+            if visitsDisabled({_key}) is true:
+                toggleVisits({_key}, false)
+                send "{@prefix}&aVisits are now &2enabled &afor your plot." to player
+            else:
+                toggleVisits({_key}, true)
+                send "{@prefix}&cVisits are now &4disabled &cfor your plot." to player
+        else if arg 1 = "reports":
+            if player has permission "plotmenu.staff":
+                openReportsMenu(player)
+            else:
+                send "&cModerators only." to player
+        else:
+            sendHelp(player)
+
+function getPlotIcon(key: text) :: item:
+    set {_icon} to yaml value "plots.%{_key}%.icon" from "plotdata"
+    if {_icon} is set:
+        return {_icon} parsed as item
+    return grass block
+
+on tab complete:
+    event-string is "/plotmenu"
+
+    if player has permission "plotmenu.staff":
+        set tab completions for position 1 to "favorites", "icon", "visit", "reports", "report"
+    else:
+        set tab completions for position 1 to "favorites", "icon", "visit", "report"
+
+    if tab arg-1 is "report":
+        if player doesn't have permission "plotmenu.use":
+            stop
+        set tab completions for position 2 to "<reason>"
+
+
+function sendHelp(p: player):
+    send "" to {_p}
+    send "&8&m                    &8[ &b&lPlotMenu Help &8]&m                    " to {_p}
+    send "" to {_p}
+    send "&b/plotmenu &7- Open the plot browser" to {_p}
+    send "&b/plotmenu favorites &7- View your favorited plots" to {_p}
+    send "&b/plotmenu report &f<reason> &7- Report the plot you're standing on" to {_p}
+    send "&b/plotmenu icon &7- Set your plot's icon to your held item" to {_p}
+    send "&b/plotmenu visit &7- Toggle visits on/off for your plot" to {_p}
+    if {_p} has permission "plotmenu.staff":
+        send "&b/plotmenu reports &7- View all plot reports &8(staff)" to {_p}
+    send "" to {_p}
+    send "&8&m                                                    " to {_p}
+    send "" to {_p}

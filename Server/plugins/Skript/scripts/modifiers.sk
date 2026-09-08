@@ -1,0 +1,311 @@
+using script reflection
+
+# #### #
+# INIT #
+# #### #
+
+options:
+	err: &8(&4&l❗&8)&c
+	info: &8(<##FC00FF>&l❗&8)&f
+	usage: &8(&4&l❗&8) &cCorrect command usage &7»&f
+	notyou: &8(&4&l❗&8) &cConsole may not use this command.
+	noperm: &8(&4&l❗&8) &cYou do not have permission for this command.
+	notthis: &8(&4&l❗&8) &cYou may not use this feature of the command.
+	nothere: &8(&4&l❗&8) &cYou may not use this command in this region.
+	nothigh: &8(&4&l❗&8) &cThat person has a higher authority than you.
+	issame: &8(&4&l❗&8) &cThat person has a the same authority as you.
+	notnow: &8(&4&l❗&8) &cYou may use this command after %remaining time%.
+	notplayed: &8(&4&l❗&8) &cPlayer hasn't played before
+	leetSpeakVocab: "A:4", "B:8", "E:3", "G:6", "H:#", "L:1", "O:0", "S:5", "T:7", "X:%%", "Z:2"
+
+on load:
+	set {ml::*} to "furSpeak", "unFace", "Misspell", "leetSpeak", "altCase", "Reverse", "chickenJockey", "VS", "EA", "wingdings", "filterLetters", "bestFilter"
+	set {normal::*} to split "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,;:-+*/=@#$%%&'()<>[]{}~^_`:♊""" at ""
+	set {wingdings::*} to split "✌:👌:👍:👎:☜:☞:☝:☟:✋:☺:😐:☹:💣:☠:⚐:🏱:✈:☼:💧:❄:🕆:✞:🕈:✠:✡:☪:📁:📂:📄:🗏:🗐:🗄:⌛:🖮:🖰:🖲:✏:✍:📬:📪:🖴:🖳:📫:🖃:🖂:📭:🖬:@:✁:👓:🕭:🕮:🕯:🕿:✆:🖫:✇:☯:☸:❀:❝:❞:♈:♉:♊:🖳:♊:✂" at ":"
+
+# ######### #
+# FUNCTIONS #
+# ######### #
+
+function isAscaii(m: string) :: boolean:
+	set {_l::*} to {_m} split at ""
+	loop {_l::*}:
+		loop-value isn't ""
+		if (loop-value's codepoint) isn't between 0 and 127:
+			return false
+	return true
+
+function bestFilter(m: string) :: text:
+	set {_l::*} to {_m} split at " "
+	loop {_l::*}:
+		add "%first character of loop-value%%last character of loop-value%" to {_s::*}
+	return join {_s::*} with " "
+
+function filterLetters(text: text) :: text:
+    set {_chars::*} to split {_text} at ""
+    loop {_chars::*}:
+        if loop-value doesn't match "[a-zA-Z0-9 ]":
+            set {_chars::%loop-index%} to ""
+    return lowercase (join {_chars::*} with "")
+
+function furSpeak(m: string) :: string:
+	set {_loop::*} to {_m} split at ""
+	set {_l} to length of {_m}
+	if isAscaii({_m}) isn't true:
+		return "U%"w" repeated {_l} times%U"
+	replace all lowercase "l" and lowercase "r" in {_m} with lowercase "w" with case sensitivity
+	replace all uppercase "L" and uppercase "R" in {_m} with uppercase "W" with case sensitivity
+	replace all lowercase "no" in {_m} with lowercase "nyo" with case sensitivity
+	replace all uppercase "no" in {_m} with uppercase "nyo" with case sensitivity
+	replace all "No" in {_m} with "Nyo" with case sensitivity
+	replace all "nO" in {_m} with "nYO" with case sensitivity
+	set {_l::*} to {_m} split at " "
+	loop {_l::*}:
+		chance of 7.5%:
+			set {_n} to random number between 1 and 5
+			set {_temp::*} to loop-value split at ""
+			stop if isAscaii({_temp::1}) isn't true
+			set {_sttr} to join ("%{_temp::1}%-" repeated {_n} times) with ""
+			set {_temp::1} to "%{_sttr}%%{_temp::1}%"
+			add (join {_temp::*} with "") to {_w::*}
+		else:
+			add loop-value to {_w::*}
+	set {_r} to join {_w::*} with " "
+	return "%{_r}%"
+
+function unFace(m: string) :: string:
+	replace all ":D", ":\", ":/", ":3", ":O", ">w<", ":C", ":]", ":)", ":(", ":<", ":>", ":D", "D:", ":[", and ":p" with "" in {_m}
+	replace all "hai" with "hi" in {_m} with case sensitivity
+	replace all "HAI" with "HI" in {_m} with case sensitivity
+	replace all "Hai" with "Hi" in {_m} with case sensitivity
+	regex replace "nu+" with "no" in {_m}
+	set {_l::*} to {_m} split at " "
+	loop {_l::*}:
+		if loop-value is "kay":
+			set {_l::%loop-iteration - 1%} to "Okay"
+		if loop-value is "tho":
+			set {_l::%loop-iteration - 1%} to "though"
+	return "&f%join {_l::*} with " "%"
+
+function Misspell(m: string) :: string:
+	set {_w::*} to {_m} split at " "
+	loop {_w::*}:
+		chance of 10%:
+			set {_recur} to 1
+			chance of 5%:
+				set {_recur} to random integer between 1 and length of loop-value
+			loop {_recur} times:
+				set {_temp::*} to split {_w::%loop-counter-1%} at ""
+				set {_i} to random integer between 1 and (number of {_temp::*})
+				set {_i2} to random integer between 1 and (number of {_temp::*})
+				set {_temp::%{_i}%} to {_temp::%{_i2}%}
+				set {_w::%loop-counter-1%} to join {_temp::*} with ""
+	return join {_w::*} with " "
+
+function leetSpeak(m: string) :: string:
+	set {_m} to uppercase {_m}
+	loop {@leetSpeakVocab}:
+		set {_rp::*} to split loop-value at ":"
+		replace all {_rp::1} with {_rp::2} in {_m}
+	return {_m}
+
+function wingdings(m: string) :: string:
+	set {_m::*} to split {_m} at ""
+	loop {_m::*}:
+		set {_index} to index of loop-value in {normal::*}
+		replace all loop-value with {wingdings::%{_index}%} in {_m}
+	return {_m}
+
+function unwingdings(m: string) :: string:
+	set {_m::*} to split {_m} at ""
+	loop {_m::*}:
+		set {_index} to index of loop-value in {wingdings::*}
+		replace all loop-value with {normal::%{_index}%} in {_m}
+	return {_m}
+
+function altCase(m: string) :: string:
+	set {_m::*} to split {_m} at ""
+	loop {_m::*}:
+		mod(loop-counter, 2) is 1:
+			set {_m::%loop-counter%} to loop-value in uppercase
+		else:
+			set {_m::%loop-counter%} to loop-value in lowercase
+	return join {_m::*} with ""
+
+function Reverse(m:string) :: string:
+	set {_m::*} to split {_m} at ""
+	loop {_m::*}:
+		add {_m::%(amount of {_m::*}) - loop-counter%} to {_r::*}
+	return join {_r::*} with ""
+
+function chickenJockey(m: string) :: string:
+	return "Chicken Jockey"
+
+function VS(m: string) :: string:
+	replace all "ate" with "8" in {_m}
+	replace all "b" with "8" in {_m}
+	regex replace "!+" with "!!!!!!!!" in {_m}
+	regex replace "?+" with "????????" in {_m}
+	regex replace ":+" with "::::" in {_m}
+	return {_m}
+
+function EA(m: string) :: string:
+	replace all "w" with "ww" in {_m}
+	replace all "v" with "vv" in {_m}
+	replace all "ing" with "in" in {_m}
+	return {_m}
+
+# ###### #
+# MODIFY #
+# ###### #
+
+
+function chatEvent(p: player, m: string) :: string:
+	loop {ml::*}:
+		{m::%loop-value%::%{_p}'s uuid%} is true
+		set {_f} to the function loop-value
+		set {_m} to the result of {_f} with arguments {_m}
+	return {_m}
+
+function toggleCustomChat():
+	set {CustomChat} to whether {CustomChat} is false
+	adminlog("Toggled custom chat to %{CustomChat}%")
+
+###
+function customChat(p: player, m: string) :: boolean:
+	if all:
+		({nick::%{_p}'s uuid%} parsed as offline player) has played before
+		({nick::%{_p}'s uuid%} parsed as offline player)'s uuid is {nick::%{_p}'s uuid%}
+	then:
+		set {_p} to {nick::%{_p}'s uuid%} parsed as offline player
+	
+	length of {cf::%{_p}'s uuid%} > 2:
+		set {_m} to minimessage from "%{cf::%{_p}'s uuid%} ? "<#E0E0E0>"%%{_m}%"
+	else:
+		set {_m} to "%{cf::%{_p}'s uuid%} ? "<#E0E0E0>"%%{_m}%"
+	
+	send formatted "%toHex({_p}'s prefix) ? ""%%"&f*" if {nick::%{_p}'s uuid%} is set else ""%%"" if priority({_p}) > 1 else "<#b4bcbc>"%%toHex({nick::%{_p}'s uuid%}) ? {_p}%&f%toHex({_p}'s suffix) ? ""%<reset> <#6E6E6E>→ <#E0E0E0>%toHex({_m})%" to console
+	send formatted "<ttp:<#FF8F00>&l%{_p}%%nl%<#DA2FFF>&l┊ &fCash: &a$%{cash::%{_p}'s uuid%} ? 0%%nl%%nl%<#FF8F00>&lStats%nl%<#DA2FFF>&l┊ &fJoined: <#E674FF>%{_p}'s first login%%nl%&7(Click to message %{_p}%)><sgt:/msg %{_p}%>%toHex({_p}'s prefix) ? ""%%"&f*" if {nick::%{_p}'s uuid%} is set else ""%%"" if priority({_p}) > 1 else "<#b4bcbc>"%%toHex({nick::%{_p}'s uuid%}) ? {_p}%&f%toHex({_p}'s suffix) ? ""%<reset> <#6E6E6E>→ <#E0E0E0>%toHex({_m})%" to all players where [input's name doesn't contain "ruth"]
+	send formatted "<ttp:<#FF8F00>&l%{_p}%%nl%<#DA2FFF>&l┊ &fCash: &a$%{cash::%{_p}'s uuid%} ? 0%%nl%%nl%<#FF8F00>&lStats%nl%<#DA2FFF>&l┊ &fJoined: <#E674FF>%{_p}'s first login%%nl%&7(Click to message %{_p}%)><sgt:/msg %{_p}%>%toHex({_p}'s prefix) ? ""%<reset> <#6E6E6E>→ <#E0E0E0>%toHex({_m})%" to all players where [input's name contains "ruth"]
+	DCChatLog({_p}, {_m})
+###
+
+function customChat(p: player, m: string) :: boolean:
+	DCChatLog({_p}, {_m})
+	set {_pr} to {_p}'s prefix
+	regex replace ".*\[" with "" in {_pr}
+	set {_color} to first string color code of {_pr} ? raw "&f"
+	length of {cf::%{_p}'s uuid%} > 2:
+		set {_m} to minimessage from "%{cf::%{_p}'s uuid%} ? "<#E0E0E0>"%%{_m}%"
+	else:
+		set {_m} to "%{cf::%{_p}'s uuid%} ? "<#E0E0E0>"%%{_m}%"
+	broadcast formatted "<ttp:<#FF8F00>&l%{_p}%%nl%<#DA2FFF>&l┊ &fCash: &a$%{cash::%{_p}'s uuid%} ? 0%%nl%%nl%<#FF8F00>&lStats%nl%<#DA2FFF>&l┊ &fJoined: <#E674FF>%{_p}'s first login%%nl%&7(Click to message %{_p}%)><sgt:/msg %{_p}%>%{_color}%<%{nick::%{_p}'s uuid%} ? {_p}%%{_color}%><reset>&r %{_m}%"
+
+function shorten(m: string) :: string:
+	{_m} isn't set:
+		return {_m}
+	length of uncolored {_m} <= 25:
+		return {_m}
+	return "Unknown"
+
+
+on command "yell" or "shout":
+	set {_p} to sender
+	set {_m} to join args with " "
+	loop {ml::*}:
+		{m::%loop-value%::%{_p}'s uuid%} is true
+		set {_f} to the function loop-value
+		set {_m} to the result of {_f} with arguments {_m}
+		set {_change} to true
+	if {_change} isn't true:
+		stop
+	broadcast "", "&6[YELL] &e%sender%: &f%{_m}%", ""
+	cancel event
+
+# ######## #
+# COMMANDS #
+# ######## #
+
+on tab complete:
+	event-string is "/setmodifier" or "/sm":
+		set tab completions for position 1 to {ml::*}
+		set tab completions for position 2 to all players
+		set tab completions for position 3 to true, and false
+
+command setmodifier <string> <offline player> [<boolean>]:
+	permission: admin.sm
+	aliases: sm
+	executable by: console
+	trigger:
+		set {_o} to arg 3 ? ((whether {m::%arg 1%::%arg 2's uuid%} is false) if {m::%arg 1%::%arg 2's uuid%} is set else true)
+		arg 2 has played before:
+			priority(sender) < priority(arg 2):
+				arg 2 isn't the sender
+				send "{@nothigh}"
+				stop
+			{ml::*} contains arg 1:
+				set {m::%arg 1%::%arg 2's uuid%} to {_o}
+				adminlog("&f%sender% has set %arg 1% for %arg 2% to %{_o}%")
+			else:
+				send "{@err} Invalid Option."
+		else:
+			send "{@notplayed}"
+
+command viewmodifiers <offline player>:
+	permission: admin.vm
+	aliases: vm
+	executable by: console
+	trigger:
+		arg has played before:
+			sender is a player:
+				create a gui with virtual chest inventory with 3 rows named "&e%arg%&f's Modifiers":
+					make gui slot (all integers between 0 and 8) to gray stained glass pane
+					make gui slot 4 to arg's skull
+					loop {ml::*}:
+						{m::%loop-value%::%arg's uuid%} is true:
+							make gui slot 8 + loop-counter to lime stained glass pane named "&f%loop-value in proper case%"
+						else:
+							make gui slot 8 + loop-counter to red stained glass pane named "&f%loop-value in proper case%"
+				open the last gui for player
+			else:
+				loop {ml::*}:
+					add "&f%loop-value in proper case%: %{m::%loop-value%::%arg's uuid%} ? false%" to {_s::*}
+				send "&e%arg%&f's Modifiers: %join {_s::*} with ", "%"
+
+command viewservermodifiers:
+	permission: admin.vsm
+	aliases: vsm
+	executable by: console
+	trigger:
+		sender is a player:
+			create a gui with virtual chest inventory with 6 rows named "&eServer Modifiers":
+				loop all players:
+					loop {ml::*}:
+						add "&f&l%loop-value-2%:&r &aTrue&f" if {m::%loop-value-2%::%loop-player's uuid%} is true else "&f&l%loop-value-2%:&r &cFalse&f" to {_l::%loop-player%::*}
+					make gui slot loop-counter - 1 to loop-player's skull with lore {_l::%loop-player%::*}
+			open the last gui for player
+		else:
+			loop all players:
+				loop {ml::*}:
+					add "&f&l%loop-value-2%:&r &aTrue&f" if {m::%loop-value-2%::%loop-player's uuid%} is true else "&f&l%loop-value-2%:&r &cFalse&f" to {_l::%loop-player%::*}
+				add "%loop-player%(%join {_l::%loop-player%::*} with ", "%)" to {_r::*}
+			send {_r::*}
+
+
+###########
+# ACTIONS #
+###########
+
+on right click:
+	event-entity is a player
+	event-entity isn't player
+	{m::furspeak::%event-entity's uuid%} is true:
+		make player swing their hand
+		force draw (5 heart particles) with offset vector(0.2,0.4,0.2) with extra value 0 at (location 1 above event-entity)
+		play sound "entity.cat.pur" to all players in radius 3 of event-entity at event-entity
+
+on join:
+	while player is online:
+		wait 1 tick
+		{m::furspeak::%player's target entity's uuid%} is true:
+			send action bar component minimessage from "&fPress <key:key.use> to pet %player's target entity%"

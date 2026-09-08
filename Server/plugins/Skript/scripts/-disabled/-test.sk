@@ -1,0 +1,331 @@
+command test <integer>:
+    trigger:
+        set {exp::%player's uuid%} to getExpForLevel(arg)
+        send "%arg%'s Exp Cost: %{exp::%player's uuid%}%"
+
+function pow(i: number, b: number) :: number:
+    return {_i}^{_b}
+
+function getExpForLevel(n: number) :: number:
+    if {_n} <= 500:
+        set {_sum} to 0
+        loop integers from 0 to {_n} - 1:
+            add ceil(100 * (loop-value^1.5)) to {_sum}
+        return {_sum}
+    else:
+        return round(40 * ({_n}^2.5))
+
+command void:
+	trigger:
+		connect player to server "void"
+
+
+on join:
+	if player = "BlobbyBlobbyPeng":
+		loop 10 times:
+			wait 1 second
+			send "&4[!] [!] [!] &cI have issued a refund for your rank, please create a discord server, and ping egono."
+
+# ####### #
+# NO NBTS #
+# ####### #
+
+on right click:
+	{x::NBTS::%player%} is true
+	player's world isn't "lobby"
+	clear nbt of event-item
+
+on place:
+	{x::NBTS::%player%} is true
+	player's world isn't "lobby"
+	clear nbt of event-block
+
+on place:
+	player's world isn't "lobby"
+	inventory of event-block is set
+	loop inventory of event-block:
+		loop-value isn't air
+		raw name of loop-value doesn't contain "banner"
+		clear nbt of loop-value
+
+on dispense:
+	event-item isn't a projectile
+	cancel event
+
+on left click:
+	{x::NBTS::%player%} is true
+	clear nbt of event-item
+
+on tool change:
+	{x::NBTS::%player%} is true
+	clear nbt of event-item
+
+on inventory open:
+	{x::NBTS::%event-player%} is true
+	loop event-player's inventory:
+		clear nbt of loop-value
+
+on inventory close:
+	{x::NBTS::%event-player%} is true
+	loop event-player's inventory:
+		clear nbt of loop-value
+
+on tab complete:
+	event-string is "/addnbtban":
+		set tab completions for position 1 to all players
+	event-string is "/removenbtban":
+		set tab completions for position 1 to indices of {x::NBTS::*}
+
+command addnbtban <string>:
+	permission: op
+	trigger:
+		set {_p} to arg parsed as offline player
+		{_p} has played before:
+			{x::NBTS::%{_p}%} isn't true:
+				set {x::NBTS::%{_p}%} to true
+				send "{@info} Banned %{_p}% from using nbts."
+			else:
+				send "{@err} %{_p}% is already banned from using nbts."
+		else:
+			send "{@err} %{_p}% doesn't exist or didn't join the server before."
+
+command removenbtban <string>:
+	permission: op
+	trigger:
+		set {_p} to arg parsed as offline player
+		{_p} has played before:
+			{x::NBTS::%{_p}%} is set:
+				delete {x::NBTS::%{_p}%}
+				send "{@info} Unbanned %{_p}% from using nbts."
+			else:
+				send "{@err} %{_p}% isn't banned from using nbts."
+		else:
+			send "{@notplayed}"
+
+on command "effect" or "minecraft:effect":
+	set {_m::*} to args
+	if priority(sender) < priority({_m::2} parsed as player):
+		send "{@nothigh}" to sender
+		cancel event
+
+on spawn:
+	event-spawn reason is spawn egg
+	set {_l} to event-location
+	delete nbt of event-entity
+	teleport event-entity to {_l}
+
+command become [<player>]:
+	permission: op
+	trigger:
+		arg is set:
+			set {target::%player%} to arg
+		else:
+			delete {target::%player%}
+
+
+
+
+command givedrugs:
+	permission: op
+	trigger:
+		give {fentanilbrick} to player
+		give {fentanilcar} to player
+		give {weedbrick} to player
+		give {weeder} to player
+
+on left click:
+	if player's held item is {fentanilbrick} or {weedbrick}:
+		cancel event
+		remove event-item from player's inventory
+		send "{@info} Breaking it down.." to player
+		wait 2 seconds
+		loop 2 times:
+			play sound "block.azalea.break" with pitch 0.2 to player
+			wait 5 ticks
+		if event-item is {fentanilbrick}:
+			give {fentanilcars} to player
+		if event-item is {weedbrick}:
+			give {weeders} to player
+
+on left click:
+	if player's held item is {fentanilcars} or {weeders}:
+		cancel event
+		remove event-item from player's inventory
+		send "{@info} Compressing.." to player
+		wait 2 seconds
+		loop 2 times:
+			play sound "block.ancient_debris.fall" with pitch 1.3 to player
+			wait 5 ticks
+		if event-item is {fentanilcars}:
+			give {fentanilbrick} to player
+		if event-item is {weeders}:
+			give {weedbrick} to player
+
+
+on right click:
+	if player's held item is {fentanilcar}:
+		set {startaddiction::%player's uuid%} to false
+		remove slowness from the player
+		remove nausea from the player
+		send "{@err} You smoked carfentanil." to player
+		set {addictionactionbar::%player's uuid%} to "Addiction: &r&8[&r||||||||||||||||||||&8] &c0%%"
+		set {addiction::%player's uuid%} to 0
+		remove event-item from player's inventory
+		remove slowness from the player
+		loop 15 times:
+			play sound "block.candle.extinguish" with pitch 0.2 to player
+			wait 5 tick
+			play sound "block.candle.extinguish" with pitch 0.2 to player
+			draw 3 of flame particle at player
+			draw 5 of dust particle using dustOption(red, 1) at player for player
+		apply slowness 5 without any particles whilst hiding the potion icon to the player for 1 minute
+		apply darkness 1 without any particles whilst hiding the potion icon to the player for 1 minute
+		apply nausea 225 without any particles whilst hiding the potion icon to the player for 1 minute
+		loop 40 times:
+			execute console command "attribute %player% minecraft:scale base set 0.1"
+			play sound "ui.toast.challenge_complete" with pitch 1.6 to player
+			apply darkness 1 without any particles whilst hiding the potion icon to the player for 1 minute
+			apply speed 225 without any particles whilst hiding the potion icon to the player for 1 minute
+			wait 0.2 seconds
+			remove speed from the player
+			apply slowness 5 without any particles whilst hiding the potion icon to the player for 1 minute
+			play sound "ui.toast.challenge_complete" with pitch 0.2 to player
+			execute console command "attribute %player% minecraft:scale base set 4"
+			wait 0.3 seconds
+			remove darkness from the player
+			execute console command "attribute %player% minecraft:scale base set 1"
+			wait 0.1 seconds
+			play sound "ui.toast.challenge_complete" with pitch 1 to player
+		remove slowness from the player
+		remove nausea from the player
+		send "{@err} You got addicted to carfentanil." to player
+		set {startaddiction::%player's uuid%} to true
+
+
+on right click:
+	if player's held item is {weeder}:
+		remove slowness from the player
+		remove nausea from the player
+		send "{@err} You smoked &aweed&c." to player
+		remove event-item from player's inventory
+		loop 15 times:
+			play sound "block.candle.extinguish" with pitch 0.2 to player
+			wait 5 tick
+			play sound "block.candle.extinguish" with pitch 0.2 to player
+			draw 3 of flame particle at player
+			draw 5 of dust particle using dustOption(red, 1) at player for player
+		apply slowness 2 without any particles whilst hiding the potion icon to the player for 60 seconds
+		apply nausea 1 without any particles whilst hiding the potion icon to the player for 60 seconds
+		loop 6 times:
+			apply levitation 1 without any particles whilst hiding the potion icon to the player for 2 seconds
+			wait 3 seconds
+			apply levitation 1 without any particles whilst hiding the potion icon to the player for 1 seconds
+			wait 2 seconds
+		remove slowness from the player
+		remove nausea from the player
+		send "{@info} Now you are &achill&r." to player
+		apply slowness 1 without any particles whilst hiding the potion icon to the player for 1 minute
+
+every 20 seconds:
+	loop all players:
+		if {addiction::%loop-player's uuid%} is set:
+			{startaddiction::%loop-player's uuid%} is true
+			add 1 to {addiction::%loop-player's uuid%}
+			if {addiction::%loop-player's uuid%} = 1:
+				set {addictionactionbar::%loop-player's uuid%} to "Addiction: &r&8[&c||&r||||||||||||||||||&8] &c10%%"
+			if {addiction::%loop-player's uuid%} = 2:
+				set {addictionactionbar::%loop-player's uuid%} to "Addiction: &r&8[&c||||&r||||||||||||||||&8] &c20%%"
+				send "{@err} You feel the dopamine dying off, but it doesn't change anything.." to loop-player
+			if {addiction::%loop-player's uuid%} = 3:
+				set {addictionactionbar::%loop-player's uuid%} to "Addiction: &r&8[&c||||||&r||||||||||||||&8] &c30%%"
+				send "{@err} You start to see things clearly." to loop-player
+			if {addiction::%loop-player's uuid%} = 4:
+				set {addictionactionbar::%loop-player's uuid%} to "Addiction: &r&8[&c||||||||&r||||||||||||&8] &c40%%"
+				send "{@err} You have gotten a massive headache. That marks the starting point of your withdrawal." to loop-player
+			if {addiction::%loop-player's uuid%} = 5:
+				set {addictionactionbar::%loop-player's uuid%} to "Addiction: &r&8[&c||||||||||&r||||||||||&8] &c50%%"
+				send "{@err} You started to feel sick." to loop-player
+				apply nausea without any particles whilst hiding the potion icon to the loop-player for 1 minute
+			if {addiction::%loop-player's uuid%} = 6:
+				set {addictionactionbar::%loop-player's uuid%} to "Addiction: &r&8[&c||||||||||||&r||||||||&8] &c60%%"
+				send "{@err} You started to feel even more sick." to loop-player
+				apply nausea 2 without any particles whilst hiding the potion icon to the loop-player for 1 minute
+			if {addiction::%loop-player's uuid%} = 7:
+				set {addictionactionbar::%loop-player's uuid%} to "Addiction: &r&8[&4||||||||||||||&r||||||&8] &470%%"
+				send "{@err} You have trouble breathing now." to loop-player
+				apply nausea 3 without any particles whilst hiding the potion icon to the loop-player for 1 minute
+				apply slowness 1 without any particles whilst hiding the potion icon to the loop-player for 1 minute
+			if {addiction::%loop-player's uuid%} = 8:
+				set {addictionactionbar::%loop-player's uuid%} to "Addiction: &r&8[&4||||||||||||||||&r||||&8] &480%%"
+				send "{@err} You can't run anymore." to loop-player
+				apply nausea 5 without any particles whilst hiding the potion icon to the loop-player for 1 minute
+				apply slowness 3 without any particles whilst hiding the potion icon to the loop-player for 1 minute
+			if {addiction::%loop-player's uuid%} = 9:
+				set {addictionactionbar::%loop-player's uuid%} to "Addiction: &r&8[&4||||||||||||||||||&r||&8] &490%%"
+				send "{@err} &rSMOKE, NOW!" to loop-player
+				apply nausea 225 without any particles whilst hiding the potion icon to the loop-player for 1 minute
+				apply slowness 225 without any particles whilst hiding the potion icon to the loop-player for 1 minute
+				apply darkness 225 without any particles whilst hiding the potion icon to the loop-player for 1 minute
+			if {addiction::%loop-player's uuid%} = 10:
+				remove slowness from loop-player
+				remove nausea from loop-player
+				kill loop-player
+				send "{@err} You tried to win over your addiction, but you died. Atleast you are not addicted anymore." to loop-player
+				delete {addiction::%loop-player's uuid%}
+				delete {startaddiction::%loop-player's uuid%}
+
+
+every 20 ticks:
+	loop all players:
+		if {addiction::%loop-player's uuid%} is set:
+			{startaddiction::%loop-player's uuid%} is true
+			send action bar "%{addictionactionbar::%loop-player's uuid%}%" to loop-player
+
+on leave:
+	delete {addiction::%player's uuid%}
+	delete {startaddiction::%player's uuid%}
+	delete {addictionactionbar::%player's uuid%}
+
+#command createcarfent:
+#	trigger:
+#		if {statusofcooking::%player's uuid%} is true:
+#			send "{@info} You already have something cooking up."
+#			stop
+#		if player's held item is a resin brick with name "&cC₂₂&bH₂₈&aN₂&3O":
+#			set {statusofcooking::%player's uuid%} to true
+#			remove player's held item from player's inventory
+#			send "{@info} Product will be ready in 5 minutes."
+#			wait 4 minutes
+#			send "{@err} 1 minute left until product has finished cooking."
+#			wait 1 minute
+#			send "{@info} Process finished."
+#			give 3 of {fentanilbrick} to player
+#			set {statusofcooking::%player's uuid%} to false 
+#		else:
+#			send "{@err} You do not have the required items."
+			
+
+command antiodedrug:
+	permission: op
+	trigger:
+		give player armor stand named "&r&bNarcan" with lore "&8Right click to stop addiction/overdose today!"
+
+on right click:
+	if player's held item is armor stand named "&r&bNarcan" with lore "&8Right click to stop addiction/overdose today!":
+		cancel event
+		loop 2 times:
+			play sound "block.beacon.power_select" with pitch 1.5 to player
+			wait 10 ticks
+		remove player's held item from player's inventory
+		execute console command "effect clear %player%"
+		delete {addiction::%player's uuid%}
+		delete {startaddiction::%player's uuid%}
+		delete {addictionactionbar::%player's uuid%}
+		send "{@err} You have stopped your addiction. Please do not smoke again." to player
+
+command solve:
+	permission: op
+	trigger:
+		set {_x} to -21
+		loop 41 times:
+			make player say "%loop-value + {_x}%"

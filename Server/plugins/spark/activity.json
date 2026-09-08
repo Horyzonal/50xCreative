@@ -1,0 +1,80 @@
+[
+  {
+    "user": {
+      "type": "player",
+      "name": "LeopardGamer",
+      "uniqueId": "226d3d5e-e727-4a58-b75d-8af9344f0118"
+    },
+    "time": 1782761695743,
+    "type": "Profiler (live)",
+    "data": {
+      "type": "url",
+      "value": "https://spark.lucko.me/o8f2Jfc4lA"
+    }
+  },
+  {
+    "user": {
+      "type": "player",
+      "name": "FragolaMoon",
+      "uniqueId": "26dc0ca0-7aaa-467a-b008-044c30c2177e"
+    },
+    "time": 1779566324309,
+    "type": "Profiler",
+    "data": {
+      "type": "url",
+      "value": "https://spark.lucko.me/sdxt2fUPxy"
+    }
+  },
+  {
+    "user": {
+      "type": "player",
+      "name": "FragolaMoon",
+      "uniqueId": "26dc0ca0-7aaa-467a-b008-044c30c2177e"
+    },
+    "time": 1779566276333,
+    "type": "Profiler (live)",
+    "data": {
+      "type": "url",
+      "value": "https://spark.lucko.me/vU9mlbV1Wp"
+    }
+  },
+  {
+    "user": {
+      "type": "player",
+      "name": "siqns",
+      "uniqueId": "c285d803-6b6a-409e-a8c3-a0276e028eac"
+    },
+    "time": 1779521682350,
+    "type": "Profiler (live)",
+    "data": {
+      "type": "url",
+      "value": "https://spark.lucko.me/fttqt0AR6k"
+    }
+  },
+  {
+    "user": {
+      "type": "player",
+      "name": "siqns",
+      "uniqueId": "c285d803-6b6a-409e-a8c3-a0276e028eac"
+    },
+    "time": 1779435339397,
+    "type": "Profiler (live)",
+    "data": {
+      "type": "url",
+      "value": "https://spark.lucko.me/9l7sF1MaKs"
+    }
+  },
+  {
+    "user": {
+      "type": "player",
+      "name": "siqns",
+      "uniqueId": "c285d803-6b6a-409e-a8c3-a0276e028eac"
+    },
+    "time": 1758946409284,
+    "type": "Heap dump",
+    "data": {
+      "type": "file",
+      "value": "plugins/spark/heap-2025-09-27_04.13.26.hprof"
+    }
+  }
+]

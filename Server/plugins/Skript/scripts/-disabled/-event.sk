@@ -1,0 +1,26 @@
+import:
+    org.bukkit.event.entity.EntityPotionEffectEvent
+
+on command:
+    command starts with "gm":
+        set {_args::*} to args where [length of input is greater than 5]
+        set {_p} to player({_args::1})
+        if {_p}'s world is "50xEvent":
+            cancel event
+    player's world is "50xEvent"
+    player doesn't have permission "worldguard.region.bypass.50xEvent"
+    command isn't "spawn"
+    cancel event
+
+on region enter:
+    player's world is "50xEvent"
+    player doesn't have permission "worldguard.region.bypass.50xEvent"
+    region is "event_room_1" or "event_room_2":
+        set player's gamemode to survival
+    else:
+        set player's gamemode to adventure
+
+on EntityPotionEffectEvent:
+    event.getAction() is "ADDED"
+    event.getEntity().getWorld().getName() is "50xEvent"
+    event.setCancelled(true)

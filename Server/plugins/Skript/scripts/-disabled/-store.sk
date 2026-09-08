@@ -1,0 +1,60 @@
+command buy:
+	prefix: core
+	executable by: players
+	trigger:
+		send "&7[&4!&r&7] &rThe store has been disabled, contact &cegono &ron discord directly to purchase. &8(Or make a ticket)"
+#		create a gui with virtual chest inventory with 3 rows named "              ♦ Store ♦":	
+#			make gui slot (integers from 0 to 26) with black stained glass pane named ""
+#			make gui slot 10 with painting named "<#FF9456>Ranks" with lore "&8ᴄᴀᴛᴇɢᴏʀʏ", "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴏᴘᴇɴ ᴛʜɪs ᴄᴀᴛᴇɢᴏʀʏ":
+#				buygui(player, 1)
+#			make gui slot 13 with name tag named "<#FFC000>Rank Upgrades" with lore "&8ᴄᴀᴛᴇɢᴏʀʏ", "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴏᴘᴇɴ ᴛʜɪs ᴄᴀᴛᴇɢᴏʀʏ":
+#				buygui(player, 1)
+#			make gui slot 16 with name tag named "<#56FFBA>Others" with lore "&8ᴄᴀᴛᴇɢᴏʀʏ", "" and "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴏᴘᴇɴ ᴛʜɪs ᴄᴀᴛᴇɢᴏʀʏ":
+#				buygui(player, 1)
+#		open last gui for player
+#		invsfx(player, 1)
+
+function buygui(p: player, i: int):
+	close {_p}'s inventory
+	{_i} = 1:
+		create a gui with virtual chest inventory with 3 rows named "              ♦ Ranks ♦":
+			make gui slot (integers from 0 to 26) with black stained glass pane named ""
+			make gui slot 10 with name tag named toHex("&#3fc5ff&ki&8[&#3fc5ffᴅᴇsɪɢɴᴇʀ&8]&#3fc5ff&ki") with lore "&8ʀᴀɴᴋ", "", "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘᴜʀᴄʜᴀsᴇ ᴛʜɪs ᴘᴀᴄᴋᴀɢᴇ":
+				close {_p}'s inventory
+				send "&8&m                                      ", "&d&lVISIT OUR WEBSTORE", "&a&n<url:https://50xcreative.tebex.io/package/5240531>Click me to claim your package!" and "&8&m                                     " to {_p}
+			make gui slot 12 with name tag named toHex("&l&#00FFC7&ki&8[&#00FFC7ᴀʀᴄʜɪᴛᴇᴄᴛ&8]&#00FFC7&ki") with lore "&8ʀᴀɴᴋ", "", "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘᴜʀᴄʜᴀsᴇ ᴛʜɪs ᴘᴀᴄᴋᴀɢᴇ":
+				close {_p}'s inventory
+				send "&8&m                                      ", "&d&lVISIT OUR WEBSTORE", "&a&n<url:https://50xcreative.tebex.io/package/5240558>Click me to claim your package!" and "&8&m                                     " to {_p}
+			make gui slot 14 with name tag named toHex("&#fed554&ki&8[&#fed554ᴇɴɢɪɴᴇᴇʀ&8]&#fed554&ki") with lore "&8ʀᴀɴᴋ", "", "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘᴜʀᴄʜᴀsᴇ ᴛʜɪs ᴘᴀᴄᴋᴀɢᴇ":
+				close {_p}'s inventory
+				send "&8&m                                      ", "&d&lVISIT OUR WEBSTORE", "&a&n<url:https://50xcreative.tebex.io/package/6294497>Click me to claim your package!" and "&8&m                                     " to {_p}
+			make gui slot 16 with name tag named toHex("&#ffa231&ki&8[&#ffa231ᴄʀᴇᴀᴛᴏʀ&8]&#ffa231&ki") with lore "&8ʀᴀɴᴋ", "", "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘᴜʀᴄʜᴀsᴇ ᴛʜɪs ᴘᴀᴄᴋᴀɢᴇ":
+				close {_p}'s inventory
+				send "&8&m                                      ", "&d&lVISIT OUR WEBSTORE", "&a&n<url:https://50xcreative.tebex.io/package/6294468>Click me to claim your package!" and "&8&m                                     " to {_p}
+		open last gui for {_p}
+		invsfx({_p}, 1)
+	{_i} = 2:
+		create a gui with virtual chest inventory with 3 rows named "   ♦ Rank Upgrades ♦":
+			make gui slot (integers from 0 to 26) with black stained glass pane named ""
+			make gui slot 11 with name tag named toHex("&#3fc5ffᴅᴇsɪɢɴᴇʀ &8> &#00FFC7ᴀʀᴄʜɪᴛᴇᴄᴛ") with lore "&8ʀᴀɴᴋ ᴜᴘɢʀᴀᴅᴇ", "", "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘᴜʀᴄʜᴀsᴇ ᴛʜɪs ᴘᴀᴄᴋᴀɢᴇ":
+				close {_p}'s inventory
+				send "&8&m                                      ", "&d&lVISIT OUR WEBSTORE", "&a&n<url:https://50xcreative.tebex.io/package/6295750>Click me to claim your package!" and "&8&m                                     " to {_p}
+			make gui slot 13 with name tag named toHex("&#00FFC7ᴀʀᴄʜɪᴛᴇᴄᴛ &8> &#fed554ᴇɴɢɪɴᴇᴇʀ") with lore "&8ʀᴀɴᴋ ᴜᴘɢʀᴀᴅᴇ", "", "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘᴜʀᴄʜᴀsᴇ ᴛʜɪs ᴘᴀᴄᴋᴀɢᴇ":
+				close {_p}'s inventory
+				send "&8&m                                      ", "&d&lVISIT OUR WEBSTORE", "&a&n<url:https://50xcreative.tebex.io/package/6295754>Click me to claim your package!" and "&8&m                                     " to {_p}
+			make gui slot 15 with name tag named toHex("&#fed554ᴇɴɢɪɴᴇᴇʀ &8> &#ffa231ᴄʀᴇᴀᴛᴏʀ") with lore "&8ʀᴀɴᴋ ᴜᴘɢʀᴀᴅᴇ", "", "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘᴜʀᴄʜᴀsᴇ ᴛʜɪs ᴘᴀᴄᴋᴀɢᴇ":
+				close {_p}'s inventory
+				send "&8&m                                      ", "&d&lVISIT OUR WEBSTORE", "&a&n<url:https://50xcreative.tebex.io/package/6295761>Click me to claim your package!" and "&8&m                                     " to {_p}
+		open last gui for {_p}
+		invsfx({_p}, 1)
+	{_i} = 3:
+		create a gui with virtual chest inventory with 3 rows named "           ♦ Others ♦":
+			make gui slot (integers from 0 to 26) with black stained glass pane named ""
+			make gui slot 12 with name tag named "&aFREE $100" with lore "&8ᴏᴛʜᴇʀs", "", "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘᴜʀᴄʜᴀsᴇ ᴛʜɪs ᴘᴀᴄᴋᴀɢᴇ":
+				close {_p}'s inventory
+				send "&8&m                                      ", "&d&lVISIT OUR WEBSTORE", "&a&n<url:https://50xcreative.tebex.io/package/5918576>Click me to claim your package!" and "&8&m                                     " to {_p}
+			make gui slot 12 with name tag named "&cJAILFORCE PLAYERS &7(WIP)" with lore "&8ᴏᴛʜᴇʀs", "", "&2&l￫ &aᴄʟɪᴄᴋ &fᴛᴏ ᴘᴜʀᴄʜᴀsᴇ ᴛʜɪs ᴘᴀᴄᴋᴀɢᴇ":
+				close {_p}'s inventory
+				send "&8&m                                      ", "&d&lVISIT OUR WEBSTORE", "&a&n<url:https://50xcreative.tebex.io/package/5258542>Click me to claim your package!" and "&8&m                                     " to {_p}
+		open last gui for {_p}
+		invsfx({_p}, 1)

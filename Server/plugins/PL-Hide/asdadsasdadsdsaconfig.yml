@@ -1,0 +1,681 @@
+blocked-command-message: "&8[&4&l❗&8]&c You do not have permission for this."
+/pl-message: '&8[&4&l❗&8]&c You do not have permission for this.'
+
+update-notify: true
+op-protection: false
+allowed-operators: []
+
+op-message: []
+unauthorized-operator-kick-message: []
+
+groups:
+  owner:
+    priority: 15
+    included-groups: admin
+    commands: []
+    group-mode: blacklist
+
+  developer:
+    priority: 14
+    included-groups: admin
+    commands: []
+    group-mode: blacklist
+
+  manager:
+    priority: 13
+    included-groups: admin
+    commands: []
+    group-mode: blacklist
+
+  sradmin:
+    priority: 12
+    included-groups: admin
+    commands: []
+    group-mode: blacklist
+
+  admin:
+    priority: 11
+    included-groups: []
+    group-mode: blacklist
+    commands:
+      - ?
+      - about
+      - help
+      - pl
+      - plugins
+      - rl
+      - reload 
+      - timings
+      - ver
+      - version
+      - bukkit:?
+      - bukkit:about
+      - bukkit:help
+      - bukkit:pl
+      - bukkit:plugins
+      - bukkit:rl
+      - bukkit:reload 
+      - bukkit:timings
+      - bukkit:ver
+      - bukkit:version
+  srmod:
+    priority: 10
+    commands:
+      - fakewarn
+      - faketempban
+      - fakeban
+      - faketempmute
+      - fakemute
+      - fakekick
+      - fakejoin
+      - fakeleave
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+    included-groups:
+      - mod
+      - jrmod
+      - trainee
+      - donator
+      - engineer
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+
+  mod:
+    priority: 9
+    commands:
+      - fakejoin
+      - fakeleave
+      - 
+      - freeze
+      - unfreeze
+      - 
+      - mutechat
+      - chatmute
+      - mc
+      - 
+      - vanish 
+      - v
+      - 
+      - banhammer
+      - bhammer
+
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+    included-groups:
+      - jrmod
+      - trainee
+      - donator
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+
+  jrmod:
+    priority: 8
+    commands: []
+    included-groups:
+      - trainee
+      - donator
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+
+  trainee:
+    priority: 7
+    commands:
+      - staffchat
+      - sc
+      - 
+      - clearchat
+      - chatclear
+      - cc
+      - 
+      - mapreset
+      - mr
+      - 
+      - clearinv
+      - invclear
+      - clearinventory
+      - inventoryclear
+      - 
+      - openinv
+      - openinventory
+      - invopen
+      - inventoryopen
+      - 
+      - stopvotekick
+      -
+      - 
+      - kick
+      - staffhist
+      - staffhistory
+      - 
+      - announce
+      - 
+      - staff:
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+    included-groups:
+      - donator
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+
+  media:
+    priority: 6
+    commands:
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+    included-groups:
+      - creator
+      - engineer
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+
+  creator:
+    priority: 5
+    commands:
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+    included-groups:
+      - engineer
+      - architect 
+      - designer
+      - default
+    group-mode: whitelist
+
+  engineer:
+    priority: 4
+    commands:
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+
+      - wand
+      - toggleeditwand
+      - sel
+      - desel
+      - pos1
+      - pos2
+      - hpos1
+      - hpos2
+      - chunk
+      - expand
+      - contract
+      - outset
+      - inset
+      - count
+      - distr
+      - set
+      - replace
+      - overlay
+      - walls
+      - outline
+      - center
+      - smooth
+      - deform
+      - regen
+      - hollow
+      - move
+      - stack
+      - naturalize
+      - line
+      - curve
+      - forest
+      - flora
+      - copy
+      - paste
+      - rotate
+      - flip
+      - schem
+      - schematic
+      - cut
+      - generate
+      - generatebiome
+      - hcyl
+      - cyl
+      - sphere
+      - hsphere
+      - pyramid
+      - hpyramid
+      - forestgen
+      - pumpkins
+      - toggleplace
+      - fill
+      - fillr
+      - drain
+      - fixwater
+      - fixlava
+      - removeabove
+      - removebelow
+      - replacenear
+      - replacenear
+      - removenear
+      - snow
+      - thaw
+      - ex
+      - butcher
+      - remove
+      - green
+      - chunkinfo
+      - calc
+      - listchunks
+      - sp
+      - tool
+      - none
+      - farwand
+      - tree
+      - deltree
+      - repl
+      - cycler
+      - flood
+      - brush
+      - size
+      - mat
+      - range
+      - mask
+      - gmask
+      - unstuck
+      - ascend
+      - descend
+      - thru
+      - jumpto
+      - up
+      - restore
+      - snapshot
+      - cs
+      - .s
+      - biomelist
+      - biomeinfo
+      - setbiome
+      - /wand
+      - /toggleeditwand
+      - /sel
+      - /desel
+      - /pos1
+      - /pos2
+      - /hpos1
+      - /hpos2
+      - /chunk
+      - /expand
+      - /contract
+      - /outset
+      - /inset
+      - /count
+      - /distr
+      - /set
+      - /replace
+      - /overlay
+      - /walls
+      - /outline
+      - /center
+      - /smooth
+      - /deform
+      - /regen
+      - /hollow
+      - /move
+      - /stack
+      - /naturalize
+      - /line
+      - /curve
+      - /forest
+      - /flora
+      - /copy
+      - /paste
+      - /rotate
+      - /flip
+      - /schem
+      - /schematic
+      - /cut
+      - /generate
+      - /generatebiome
+      - /hcyl
+      - /cyl
+      - /sphere
+      - /hsphere
+      - /pyramid
+      - /hpyramid
+      - /forestgen
+      - /pumpkins
+      - /toggleplace
+      - /fill
+      - /fillr
+      - /drain
+      - /fixwater
+      - /fixlava
+      - /removeabove
+      - /removebelow
+      - /replacenear
+      - /replacenear
+      - /removenear
+      - /snow
+      - /thaw
+      - /ex
+      - /butcher
+      - /remove
+      - /green
+      - /chunkinfo
+      - /calc
+      - /listchunks
+      - /
+      - /sp
+      - /tool
+      - /none
+      - /farwand
+      - /tree
+      - /deltree
+      - /repl
+      - /cycler
+      - /flood
+      - /brush
+      - /size
+      - /mat
+      - /range
+      - /mask
+      - /gmask
+      - /unstuck
+      - /ascend
+      - /descend
+      - /thru
+      - /jumpto
+      - /up
+      - /restore
+      - /snapshot
+      - /cs
+      - /.s
+      - /biomelist
+      - /biomeinfo
+      - /setbiome
+      - /undo
+      - /redo
+    included-groups:
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+
+  architect:
+    priority: 3
+    commands:
+      - chatcolorhex
+      - walkspeed
+      - wspeed
+      - flyspeed
+      - fspeed
+      - 
+      - 
+      - 
+      - 
+    included-groups:
+      - designer
+      - default
+    group-mode: whitelist
+
+  designer:
+    priority: 2
+    commands:
+      - donatorchat
+      - dchat
+
+      - skull
+      - head
+      - 
+      - jailforce
+      - jailprank
+      -
+      - nick
+      - nickme
+      - nickname
+      - 
+      - donator:
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+    included-groups:
+      - default
+    group-mode: whitelist
+
+  default:
+    priority: 1
+    commands:
+      - shop
+      - 
+      - vault
+      - v
+      - 
+      - yell
+      - yodel
+      - shout
+      - 
+      - clear
+      - 
+      - options
+      - 
+      - stats
+      - 
+      - rules
+      - 
+      - vk
+      - vkick
+      - votekick
+      - 
+      - 50x:
+      - 
+      - hat
+      - discord
+      - afk
+      - tpa
+      - tpaccept
+      - tpadeny
+      - tpahere
+      - spawn
+      - rules
+      - help
+      - report
+      - balance
+      - bal
+      - baltop
+      - balancetop
+      - rich
+      - money
+      - paytoggle
+      - pay
+      - nbts
+      - money
+      - jailforce
+      - nick
+      - sticko
+      - head
+      - whoistherichest
+      - purchase
+      - store
+      - gmc
+      - gms
+      - gma
+      - vk
+      - vkick
+      - votek
+      - votekick
+      - skulls
+      - co
+      - coreprotect
+      - report
+      - controlpanel
+      - panel
+      - friends
+      - friend
+      - poll
+      - chatcolor
+      - realname
+      - stats
+      - aclaim
+      - playtime
+      - tell
+      - sit
+      - dclink
+      - link
+      - unlink
+      - dcunlink
+      - vr
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - mh
+      - mhc
+      - minehut
+      - backup
+      - fav
+      - favorite
+      - find
+      - ignore
+      - m
+      - message
+      - msg
+      - r
+      - reply
+      - setting
+      - settings
+      - tell
+    group-mode: whitelist
+    included-groups: []

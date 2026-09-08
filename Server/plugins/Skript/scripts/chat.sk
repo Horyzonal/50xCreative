@@ -1,0 +1,185 @@
+import:
+    java.math.BigInteger
+
+on load:
+    set {-ADJECTIVES::*} to "Cosmic", "Neon", "Frozen", "Ancient", "Electric", "Crimson", "Silent", "Golden", "Hollow", "Rusty", "Blazing", "Frosty", "Wandering", "Twisted", "Spectral", "Molten", "Cursed", "Radiant", "Broken", "Infinite"
+    set {-NOUNS::*} to "Starfish", "Galaxy", "Nebula", "Comet", "Wrench", "Cactus", "Penguin", "Lantern", "Prism", "Anvil", "Fossil", "Vortex", "Drifter", "Beacon", "Ember", "Pebble", "Thorn", "Riddle", "Spark", "Hollow", "Mitten", "Biscuit", "Turnip", "Goblin", "Nomad", "Shard", "Pickle", "Flare"
+
+function getUserName(id: text) :: text:
+    set {_hash} to {_id} hashed with SHA-256
+    set {_adjHex} to subtext of {_hash} from characters 1 to 8
+    set {_nounHex} to subtext of {_hash} from characters 9 to 16
+    set {_numHex} to subtext of {_hash} from characters 17 to 20
+    set {_adjSize} to size of {-ADJECTIVES::*}
+    set {_nounSize} to size of {-NOUNS::*}
+    set {_adjInt} to new BigInteger({_adjHex}, 16).mod(new BigInteger("%{_adjSize}%")).intValue()
+    set {_nounInt} to new BigInteger({_nounHex}, 16).mod(new BigInteger("%{_nounSize}%")).intValue()
+    set {_adj} to ({_adjInt} + 1)th element of {-ADJECTIVES::*}
+    set {_noun} to ({_nounInt} + 1)th element of {-NOUNS::*}
+    return "%{_adj}%%{_noun}%"
+
+on message receive:
+	event-member is not a discord bot
+	set {_id} to discord id of event-member
+	discord id of event-channel is "1489920264601993385"
+	set {_name} to nickname of event-member
+	if {_name} is "Kundaliel":
+		post "You forgot to hide ur name bud" to text channel with id "1489920264601993385" with bot bot "50xCreative"
+		stop
+	broadcast "&d&lN.U.L.L &8• <#D896FF>%{_name}%&f <#808080>&l» <#E6D5FF>%event-message%"
+
+function OtherChatLog(p: offline player, m: text):
+	replace all "@" with "" in {_m}
+	replace all "_" with "\_" in {_m}
+	replace all "*" with "\*" in {_m}
+	replace all "`" with "\`" in {_m}
+	make new embed and store it in {_embed}:
+		set author of embed to {_p}'s name
+		set author icon of embed to "https://mc-heads.net/avatar/%{_p}%"
+		set description of embed to unformatted {_m}
+		set embed color of embed to hex "#770000" if {_p}'s group = "owner"
+		set embed color of embed to hex "#880000" if {_p}'s group = "co-owner"
+		set embed color of embed to hex "#D143FF" if {_p}'s group = "developer"
+		set embed color of embed to hex "#FF0080" if {_p}'s group = "manager"
+		set embed color of embed to hex "#CA0000" if {_p}'s group = "sradmin"
+		set embed color of embed to hex "#FF0000" if {_p}'s group = "admin"
+		set embed color of embed to hex "#FF5D00" if {_p}'s group = "srmod"
+		set embed color of embed to hex "#FFA500" if {_p}'s group = "mod"
+		set embed color of embed to hex "#FFE300" if {_p}'s group = "jrmod"
+		set embed color of embed to hex "#00D339" if {_p}'s group = "trainee"
+		set embed color of embed to hex "#FF6AD1" if {_p}'s group = "media"
+		set embed color of embed to hex "#FF8F4E" if {_p}'s group = "creator"
+		set embed color of embed to hex "#FFD64E" if {_p}'s group = "engineer"
+		set embed color of embed to hex "#00FFC7" if {_p}'s group = "architect"
+		set embed color of embed to hex "#00EAFF" if {_p}'s group = "designer"
+		set embed color of embed to hex "#9CA9B3" if {_p}'s group = "default"
+	post {_embed} to text channel with id "1489920264601993385" with bot bot "50xCreative"
+
+
+function gradientShadow(text: string, color1: string, color2: string) :: string:
+    set {_c1} to color from hex code {_color1}
+    set {_c2} to color from hex code {_color2}
+    
+    set {_chars::*} to split {_text} by ""
+    set {_len} to size of {_chars::*}
+    set {_result} to ""
+    
+    loop {_chars::*}:
+        set {_i} to loop-index parsed as number
+        set {_t} to ({_i} - 1) / max(1, {_len} - 1)
+        set {_ti} to 1 - {_t}
+        
+        set {_r1} to {_c1}.getRed()
+        set {_g1} to {_c1}.getGreen()
+        set {_b1} to {_c1}.getBlue()
+        set {_r2} to {_c2}.getRed()
+        set {_g2} to {_c2}.getGreen()
+        set {_b2} to {_c2}.getBlue()
+        
+        set {_tr} to floor({_r1} + ({_r2} - {_r1}) * {_t})
+        set {_tg} to floor({_g1} + ({_g2} - {_g1}) * {_t})
+        set {_tb} to floor({_b1} + ({_b2} - {_b1}) * {_t})
+        
+        set {_sr} to floor({_r1} + ({_r2} - {_r1}) * {_ti})
+        set {_sg} to floor({_g1} + ({_g2} - {_g1}) * {_ti})
+        set {_sb} to floor({_b1} + ({_b2} - {_b1}) * {_ti})
+        
+        set {_tHex} to hex code of rgb({_tr}, {_tg}, {_tb})
+        set {_sHex} to hex code of rgb({_sr}, {_sg}, {_sb})
+        
+        set {_result} to "%{_result}%<color:#%{_tHex}%><shadow:#%{_sHex}%AA>%loop-value%"
+    
+    return {_result}
+
+function gradientShadows(text: string, colors: strings) :: string:
+    set {_c1} to color from hex code {_colors::1}
+    set {_c2} to color from hex code {_colors::2}
+    set {_c3} to color from hex code {_colors::3}
+    set {_c4} to color from hex code {_colors::4}
+
+    set {_r1} to {_c1}.getRed()
+    set {_g1} to {_c1}.getGreen()
+    set {_b1} to {_c1}.getBlue()
+    set {_r2} to {_c2}.getRed()
+    set {_g2} to {_c2}.getGreen()
+    set {_b2} to {_c2}.getBlue()
+
+    set {_r3} to {_c3}.getRed()
+    set {_g3} to {_c3}.getGreen()
+    set {_b3} to {_c3}.getBlue()
+    set {_r4} to {_c4}.getRed()
+    set {_g4} to {_c4}.getGreen()
+    set {_b4} to {_c4}.getBlue()
+
+    set {_chars::*} to split {_text} by ""
+    set {_len} to size of {_chars::*}
+    set {_result} to ""
+
+    loop {_chars::*}:
+        set {_i} to loop-index parsed as number
+        set {_t} to ({_i} - 1) / max(1, {_len} - 1)
+        set {_ti} to 1 - {_t}
+
+        # Text: color1 -> color2 (forward)
+        set {_tr} to floor({_r1} + ({_r2} - {_r1}) * {_t})
+        set {_tg} to floor({_g1} + ({_g2} - {_g1}) * {_t})
+        set {_tb} to floor({_b1} + ({_b2} - {_b1}) * {_t})
+
+		# Shadow: color3 -> color4
+        set {_sr} to floor({_r3} + ({_r4} - {_r3}) * {_t})
+        set {_sg} to floor({_g3} + ({_g4} - {_g3}) * {_t})
+        set {_sb} to floor({_b3} + ({_b4} - {_b3}) * {_t})
+
+        set {_tHex} to hex code of rgb({_tr}, {_tg}, {_tb})
+        set {_sHex} to hex code of rgb({_sr}, {_sg}, {_sb})
+
+        set {_result} to "%{_result}%<color:#%{_tHex}%><shadow:#%{_sHex}%AA>%loop-value%"
+
+    return {_result}
+
+on chat with priority lowest:
+	OtherChatLog(player, message)
+	if player's world isn't world "honey":
+		if player's name isn't "Kundaliel":
+			stop
+		set message to chatEvent(player, message)
+		set message to formatted message
+		set {_format} to text component from "%player's prefix%%toHex({nick::%player's uuid%}) ? player% <#6E6E6E>» "
+		#set {_format} to merge components {_format} and minimessage from gradientShadows(message, ("#FF0000", "#FFFF00", "#0000FF", and "#00FFFF"))
+		set {_format} to merge components {_format} and minimessage from "<color:#FFF4E6><shadow:#4A5F7AFF>%message%"
+		#set {_format} to merge components {_format} and minimessage from "<color:#FF0000><shadow:#00FF00>%message%"
+		if {secret.toggle::%player's uuid%} is set:
+			send component {_format} to all players where [input isn't player] and console
+		else:
+			broadcast component {_format}
+		cancel event
+	else:
+		set {_pr} to player's prefix
+		regex replace ".*\[" with "" in {_pr}
+		set {_color} to first string color code of {_pr} ? raw "&f"
+		if player's name is "Kundaliel":
+			set {_format} to text component from "%{_color}%<%{nick::%player's uuid%} ? player%%{_color}%>&f "
+			set {_format} to merge components {_format} and minimessage from "<color:#FFF4E6><shadow:#8B7355>%message%"
+		else:
+			set {_format} to text component from "%{_color}%<%player%%{_color}%>&f %message%"
+		send component {_format} to all players where [input's world is world "honey"]
+
+on damage:
+	victim's name is "Kundaliel"
+	damage cause is suffocation:
+		cancel event
+
+on kick:
+	player's uuid is "6fde7365-ca36-46a8-8d7c-f88e777b282d"
+	cancel event
+
+command get-cmd-list:
+	permission: op
+	trigger:
+		set {_items::*} to items in player's inventory
+		loop {_items::*}:
+			set name of loop-value to "&f%name of loop-value%"
+			set {_nbt} to nbt compound of loop-value
+			set {_blockdata} to compound tag "minecraft:block_entity_data" of {_nbt}
+			set {_command} to string tag "Command" of {_blockdata}
+			send "% uncolored name of loop-value%:&f %{_command}%"

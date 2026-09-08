@@ -1,0 +1,106 @@
+{
+  "type": "imageframe:url_animated",
+  "index": 3,
+  "name": "messw",
+  "url": "https://cdn.discordapp.com/attachments/925855860557746267/1316762043134640188/the_best.gif?ex\u003d6a2d5e37\u0026is\u003d6a2c0cb7\u0026hm\u003db61109b85cc08191d58bdbab135f84f698a4ded6b110f8b8d6164d1d88e54685\u0026",
+  "width": 3,
+  "height": 3,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "pausedAt": -1,
+  "tickOffset": 0,
+  "hasAccess": {},
+  "creationTime": 1781300261393,
+  "mapdata": [
+    {
+      "mapid": 314,
+      "images": [
+        "0.png",
+        "0.png",
+        "0.png",
+        "0.png"
+      ],
+      "markers": []
+    },
+    {
+      "mapid": 315,
+      "images": [
+        "4.png",
+        "4.png",
+        "4.png",
+        "4.png"
+      ],
+      "markers": []
+    },
+    {
+      "mapid": 316,
+      "images": [
+        "8.png",
+        "8.png",
+        "8.png",
+        "8.png"
+      ],
+      "markers": []
+    },
+    {
+      "mapid": 317,
+      "images": [
+        "12.png",
+        "12.png",
+        "12.png",
+        "12.png"
+      ],
+      "markers": []
+    },
+    {
+      "mapid": 318,
+      "images": [
+        "16.png",
+        "16.png",
+        "16.png",
+        "16.png"
+      ],
+      "markers": []
+    },
+    {
+      "mapid": 319,
+      "images": [
+        "20.png",
+        "20.png",
+        "20.png",
+        "20.png"
+      ],
+      "markers": []
+    },
+    {
+      "mapid": 320,
+      "images": [
+        "24.png",
+        "24.png",
+        "24.png",
+        "24.png"
+      ],
+      "markers": []
+    },
+    {
+      "mapid": 321,
+      "images": [
+        "28.png",
+        "28.png",
+        "28.png",
+        "28.png"
+      ],
+      "markers": []
+    },
+    {
+      "mapid": 322,
+      "images": [
+        "32.png",
+        "32.png",
+        "32.png",
+        "32.png"
+      ],
+      "markers": []
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "imageframe:url_static",
+  "index": 7,
+  "name": "knif",
+  "url": "https://cdn.discordapp.com/attachments/1311367214795849861/1515671972732993617/image.png?ex\u003d6a2fdb06\u0026is\u003d6a2e8986\u0026hm\u003d1f80537128046d0cd1df053c68a7b24a061a3372028917e7de478c08f302541a\u0026",
+  "width": 1,
+  "height": 1,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "hasAccess": {},
+  "creationTime": 1781434767619,
+  "mapdata": [
+    {
+      "mapid": 396,
+      "image": "0.png",
+      "markers": []
+    }
+  ]
+}

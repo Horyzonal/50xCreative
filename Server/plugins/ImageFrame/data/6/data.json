@@ -1,0 +1,19 @@
+{
+  "type": "imageframe:url_static",
+  "index": 6,
+  "name": "e2",
+  "url": "https://cdn.discordapp.com/attachments/1311367214795849861/1515671014439256124/image.png?ex\u003d6a2fda21\u0026is\u003d6a2e88a1\u0026hm\u003dd66a0f7297b46742cf7f231392f0eb759726407518108a260a106c6d1a6a4070\u0026",
+  "width": 1,
+  "height": 1,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "hasAccess": {},
+  "creationTime": 1781434565669,
+  "mapdata": [
+    {
+      "mapid": 395,
+      "image": "0.png",
+      "markers": []
+    }
+  ]
+}

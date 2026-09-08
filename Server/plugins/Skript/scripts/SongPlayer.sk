@@ -1,0 +1,423 @@
+import:
+    com.kundaliel.converter.conversion.MidiConverter
+    com.kundaliel.converter.song.Instrument
+    java.io.File
+    java.nio.file.Paths
+    java.lang.Thread
+    java.util.concurrent.locks.LockSupport
+
+on load:
+    set {AllowedMidiDirs::*} to "JingosPringos", "Game-OSTs", "UTDR", "General", "Classical", "All"
+    set {AdminDirs::*} to "Black", "Tests", "Unsorted"
+
+on tab complete:
+    set {_command} to event-string
+    replace all "/" with "" in {_command}
+    ((aliases of command "midiplayer") and "midiplayer") contains {_command}
+    
+    if player has permission "midiplayer.use":
+        set tab completions for position 1 to "play", "setdir", "stop", "loop", "help", "playback"
+    else:
+        set tab completions for position 1 to "playback", "help"
+    
+    if tab arg-1 is "play":
+        if player doesn't have permission "midiplayer.use":
+            stop
+        
+        set {_midiDir} to {MidiDirectory::%player's uuid%} ? "midis/General"
+        
+        if {_midiDir} is "midis/All":
+            loop {AllowedMidiDirs::*}:
+                set {_scanDir} to loop-value
+                if {_scanDir} is "All":
+                    continue
+                set {_folder} to new File("midis/%{_scanDir}%")
+                if {_folder}.exists() is true:
+                    loop ...{_folder}.listFiles():
+                        set {_name} to (loop-value-2).getName()
+                        set {_arg} to tab arg-2
+                        if {_arg} is set:
+                            {_name} doesn't contain {_arg}
+                            continue
+                        add {_name} to tab completions for position 2
+                        if loop-counter-2 > 250:
+                            exit loop
+        else:
+            set {_midisFolder} to new File({_midiDir})
+            {_midisFolder}.exists() is true:
+                loop ...{_midisFolder}.listFiles():
+                    set {_name} to loop-value.getName()
+                    set {_arg} to tab arg-2
+                    if {_arg} is set:
+                        {_name} doesn't contain {_arg}
+                        continue
+                    add {_name} to tab completions for position 2
+                    if loop-counter > 250:
+                        exit loop
+
+    else if tab arg-1 is "setdir":
+        if player doesn't have permission "midiplayer.use":
+            stop
+            
+        set tab completions for position 2 to {AllowedMidiDirs::*}
+        if player has permission "midiplayer.bypass":
+            add {AdminDirs::*} to tab completions for position 2
+    
+    else if tab arg-1 is "playback":
+        set tab completions for position 2 to "on", "off", "toggle", "self"
+
+function padZeroLeft(num: number, length: integer) :: text:
+    set {_str} to "%{_num}%"
+    set {_currentLength} to length of {_str}
+    
+    if {_currentLength} >= {_length}:
+        return {_str}
+    
+    set {_zerosNeeded} to {_length} - {_currentLength}
+    
+    set {_result} to ""
+    loop {_zerosNeeded} times:
+        set {_result} to "%{_result}%0"
+    
+    set {_result} to "%{_result}%%{_str}%"
+    
+    return {_result}
+
+function padZeroRight(num: number, decimals: integer) :: text:
+    set {_str} to "%{_num}%"
+    
+    if {_str} contains ".":
+        set {_parts::*} to {_str} split at "."
+        set {_whole} to {_parts::1}
+        set {_decimal} to {_parts::2}
+        set {_currentDecimals} to length of {_decimal}
+    else:
+        set {_whole} to {_str}
+        set {_decimal} to ""
+        set {_currentDecimals} to 0
+    
+    if {_currentDecimals} < {_decimals}:
+        set {_zerosNeeded} to {_decimals} - {_currentDecimals}
+        loop {_zerosNeeded} times:
+            set {_decimal} to "%{_decimal}%0"
+        return "%{_whole}%.%{_decimal}%"
+    else if {_currentDecimals} > {_decimals}:
+        set {_decimal} to first {_decimals} characters of {_decimal}
+        if {_decimals} is 0:
+            return {_whole}
+        return "%{_whole}%.%{_decimal}%"
+    else:
+        if {_decimals} is 0:
+            return {_whole}
+        return "%{_whole}%.%{_decimal}%"
+
+function padZero(num: number, totalLength: integer, decimals: integer) :: string:
+    set {_str} to padZeroRight({_num}, {_decimals})
+    
+    set {_currentLength} to length of {_str}
+    
+    if {_currentLength} >= {_totalLength}:
+        return {_str}
+    
+    set {_zerosNeeded} to {_totalLength} - {_currentLength}
+    set {_result} to ""
+    loop {_zerosNeeded} times:
+        set {_result} to "%{_result}%0"
+    
+    return "%{_result}%%{_str}%"
+
+function formatMidiTime(ms: number) :: text:
+    set {_totalSeconds} to floor({_ms} / 1000)
+    set {_minutes} to floor({_totalSeconds} / 60)
+    set {_seconds} to mod({_totalSeconds}, 60)
+    return "%padZeroLeft({_minutes}, 2)%:%padZeroLeft({_seconds}, 2)%"
+
+function resolveFilePath(filename: text, p: player) :: text:
+    set {_midiDir} to {MidiDirectory::%{_p}'s uuid%} ? "midis/General"
+    
+    if {_midiDir} is not "midis/All":
+        return "%{_midiDir}%/%{_filename}%"
+    
+    loop {AllowedMidiDirs::*}:
+        if loop-value is "All":
+            continue
+        set {_candidate} to "midis/%loop-value%/%{_filename}%"
+        set {_file} to new File({_candidate})
+        if {_file}.exists() is true:
+            return {_candidate}
+    
+    return ""
+
+command midiplayer [<text=help>] [<text>]:
+    aliases: mp, midip, pmidi, playmidi
+    trigger:
+        if player doesn't have permission "midiplayer.use":
+            if arg 1 is "playback":
+                handlePlaybackCommand(player, arg 2)
+            else:
+                sendMidiHelp(player)
+            stop
+        
+        if arg 1 is "play":
+            set {_player} to player
+            
+            if {CurrentlyPlaying::%player's uuid%} is true:
+                send "&cA song is already playing! Use &e/midiplayer stop &cfirst."
+                stop
+            
+            send "&aProcessing song..."
+
+            create new section with {_arg} stored in {_init}:
+                set {_filepath} to resolveFilePath({_arg}, {_player})
+                if {_filepath} is "":
+                    return ""
+                return MidiConverter.getSongFromFile(Paths.get({_filepath}))
+
+            run section {_init} async with arg 2 and store result in {_song} and wait
+            
+            if {_song} is not set:
+                send "&cFailed to load song! Check the file exists."
+                stop
+            
+            set {_notes} to {_song}.notes
+            set {_size} to {_notes}.size()
+            set {_start} to now
+            set {_length} to {_song}.length
+            
+            set {CurrentlyPlaying::%player's uuid%} to true
+            
+            send "&aLoading song: %{_song}.name%"
+            send "&aTotal notes: %{_size}%"
+            send "&aLength: %{_length}% ms"
+            if {LoopingEnabled::%player's uuid%} is true:
+                send "&aLoop: &2&lON"
+            else:
+                send "&aLoop: &7OFF"
+            send "&aStarting playback..."
+            
+            create new section stored in {_songthing}:
+                set {_loopCount} to 0
+                
+                while {CurrentlyPlaying::%{_player}'s uuid%} is true:
+                    add 1 to {_loopCount}
+                    set {_lastTime} to 0
+                    set {_notesPlayed} to 0
+                    set {_cancelled} to false
+                    
+                    loop {_size} times:
+                        if {CurrentlyPlaying::%{_player}'s uuid%} is not true:
+                            send "&cPlayback cancelled!" to {_player}
+                            set {_cancelled} to true
+                            exit loop
+                            
+                        set {_index} to loop-number - 1
+                        set {_note} to {_notes}.get({_index})
+                        
+                        set {_noteTime} to {_note}.time  
+                        set {_noteId} to {_note}.noteId
+                        set {_velocity} to {_note}.velocity
+                        
+                        set {_instrumentId} to {_noteId} / 25
+                        set {_pitch} to mod({_noteId}, 25)
+                        
+                        set {_sound} to getMinecraftSound({_instrumentId})
+                        
+                        set {_mcPitch} to 2 ^ (({_pitch} - 12) / 12)
+                        
+                        set {_volume} to {_velocity} / 100
+
+                        set {_delayMs} to {_noteTime} - {_lastTime}
+                        if {_delayMs} > 0:
+                            LockSupport.parkNanos({_delayMs} * 1000000)
+                        set {_lastTime} to {_noteTime}
+                        
+                        if {MidiPlaybackSelfOnly::%{_player}'s uuid%} is true:
+                            play sound {_sound} with volume {_volume} and pitch {_mcPitch} at {_player} for {_player}
+                        else:
+                            play sound {_sound} with volume {_volume} and pitch {_mcPitch} at {_player} for all players where [{NoMidiPlayback::%input's uuid%} isn't set]
+                        add 1 to {_notesPlayed}
+                    
+                    if {_cancelled} is true:
+                        stop
+                    
+                    if {LoopingEnabled::%{_player}'s uuid%} is true:
+                        send "&7&o(Loop %{_loopCount}% complete, restarting...)" to {_player}
+                    else:
+                        send "&aPlayback complete! (%{_notesPlayed}% notes played)" to {_player}
+                        delete {CurrentlyPlaying::%{_player}'s uuid%}
+                        stop
+            
+            run section {_songthing} async
+            
+            while {CurrentlyPlaying::%player's uuid%} is true:
+                set {_elapsedRaw} to (unix timestamp of now - unix timestamp of {_start}) * 1000
+                set {_elapsedMs} to mod({_elapsedRaw}, {_length})
+                
+                set {_currentTime} to formatMidiTime({_elapsedMs})
+                set {_totalTime} to formatMidiTime({_length})
+                
+                if {LoopingEnabled::%player's uuid%} is true:
+                    send actionbar "&e%{_currentTime}% &7- &e%{_totalTime}% &8[&aLOOP&8]" to player
+                else:
+                    send actionbar "&e%{_currentTime}% &7- &e%{_totalTime}%" to player
+                wait 1 tick
+
+        else if arg 1 is "stop":
+            if {CurrentlyPlaying::%player's uuid%} is not true:
+                send "&cNo song is currently playing!"
+            else:
+                delete {CurrentlyPlaying::%player's uuid%}
+                send "&aStopping playback..."
+
+        else if arg 1 is "loop":
+            set {LoopingEnabled::%player's uuid%} to true if {LoopingEnabled::%player's uuid%} isn't true else false
+            if {LoopingEnabled::%player's uuid%} is true:
+                send "&a&lLOOP ENABLED &7- The song will repeat when it ends."
+            else:
+                send "&7&lLOOP DISABLED &7- The song will stop when it ends."
+
+        else if arg 1 is "setdir":
+            set {_newDir} to arg 2
+        
+            if player doesn't have permission "midiplayer.bypass":
+                if {AllowedMidiDirs::*} doesn't contain {_newDir}:
+                    send "&cInvalid directory! Allowed directories are:"
+                    loop {AllowedMidiDirs::*}:
+                        send "&e- %loop-value%"
+                    stop
+            
+            if {_newDir} is "All":
+                set {MidiDirectory::%player's uuid%} to "midis/All"
+                send "&aMIDI directory changed to: &eAll"
+                stop
+            
+            set {_folder} to new File("midis/%{_newDir}%")
+            
+            if {_folder}.exists() is false:
+                send "&cDirectory '%{_newDir}%' does not exist!"
+                stop
+                
+            if {_folder}.isDirectory() is false:
+                send "&c'%{_newDir}%' is not a directory!"
+                stop
+            
+            set {MidiDirectory::%player's uuid%} to "midis/%{_newDir}%"
+            send "&aMIDI directory changed to: %{_newDir}%"
+        else if arg 1 is "playback":
+            handlePlaybackCommand(player, arg 2)
+        else:
+            sendMidiHelp(player)
+
+function handlePlaybackCommand(p: player, mode: text):
+    if {_mode} is "on":
+        delete {NoMidiPlayback::%{_p}'s uuid%}
+        send "&2&lENABLED &aMIDI playback. You can now hear MIDI songs from other players." to {_p}
+    else if {_mode} is "off":
+        set {NoMidiPlayback::%{_p}'s uuid%} to true
+        send "&c&lDISABLED &aMIDI playback. You will no longer hear MIDI sounds from other players." to {_p}
+    else if {_mode} is "toggle":
+        if {NoMidiPlayback::%{_p}'s uuid%} isn't set:
+            set {NoMidiPlayback::%{_p}'s uuid%} to true
+        else:
+            delete {NoMidiPlayback::%{_p}'s uuid%}
+        if {NoMidiPlayback::%{_p}'s uuid%} is true:
+            send "&c&lDISABLED &aMIDI playback. You will no longer hear MIDI songs from other players." to {_p}
+        else:
+            send "&2&lENABLED &aMIDI playback. You can now hear MIDI songs from other players." to {_p}
+    else if {_mode} is "self":
+        set {MidiPlaybackSelfOnly::%{_p}'s uuid%} to true if {MidiPlaybackSelfOnly::%{_p}'s uuid%} isn't true else false
+        if {MidiPlaybackSelfOnly::%{_p}'s uuid%} is true:
+            send "&e&lENABLED SELF-ONLY &amode. Your MIDI songs will only be heard by you." to {_p}
+        else:
+            send "&e&lDISABLED SELF-ONLY &amode. Your MIDI songs can now be heard by everyone." to {_p}
+    else if {_mode} is not set:
+        send "&7&l--- Your MIDI Settings ---" to {_p}
+        if {NoMidiPlayback::%{_p}'s uuid%} is true:
+            send "&7Playback (hear others): &c&lOFF" to {_p}
+        else:
+            send "&7Playback (hear others): &2&lON" to {_p}
+        if {MidiPlaybackSelfOnly::%{_p}'s uuid%} is true:
+            send "&7Self-Only (others hear you): &c&lOFF" to {_p}
+        else:
+            send "&7Self-Only (others hear you): &2&lON" to {_p}
+    else:
+        send "&cInvalid playback option! Use: &eon&c, &eoff&c, &etoggle&c, or &eself" to {_p}
+
+function sendMidiHelp(p: player):
+    send "&6&l===== MIDI Player Help =====" to {_p}
+    if {_p} has permission "midiplayer.use":
+        send "&e/midiplayer play <filename> &7- Play a MIDI file" to {_p}
+        send "&e/midiplayer stop &7- Stop current playback" to {_p}
+        send "&e/midiplayer loop &7- Toggle song looping" to {_p}
+        send "&e/midiplayer setdir <folder> &7- Change MIDI directory" to {_p}
+    send "&e/midiplayer playback <option> &7- Control MIDI playback" to {_p}
+    send "  &7• &eon/off/toggle &7- Control if you hear &eothers' &7MIDI" to {_p}
+    send "  &7• &eself &7- Toggle if &eothers &7can hear your MIDI" to {_p}
+    send "&e/midiplayer help &7- Show this help menu" to {_p}
+    send "" to {_p}
+    
+    send "&7&l--- Your Current Settings ---" to {_p}
+    if {NoMidiPlayback::%{_p}'s uuid%} is true:
+        send "&7Hear others' MIDI: &c&lOFF" to {_p}
+    else:
+        send "&7Hear others' MIDI: &2&lON" to {_p}
+    if {MidiPlaybackSelfOnly::%{_p}'s uuid%} is true:
+        send "&7Others hear your MIDI: &c&lOFF" to {_p}
+    else:
+        send "&7Others hear your MIDI: &2&lON" to {_p}
+    if {LoopingEnabled::%{_p}'s uuid%} is true:
+        send "&7Loop: &2&lON" to {_p}
+    else:
+        send "&7Loop: &7&lOFF" to {_p}
+    send "" to {_p}
+    
+    if {_p} has permission "midiplayer.bypass":
+        send "&6Available Directories: &c&lALL (OP Access)" to {_p}
+    else if {_p} has permission "midiplayer.use":
+        send "&6Available Directories:" to {_p}
+        loop {AllowedMidiDirs::*}:
+            send "&e- %loop-value%" to {_p}
+    if {_p} has permission "midiplayer.use":
+        send "" to {_p}
+        set {_displayDir} to {MidiDirectory::%{_p}'s uuid%} ? "midis/General"
+        if {_displayDir} is "midis/All":
+            send "&7Current directory: &eAll &7(all permitted folders)" to {_p}
+        else:
+            send "&7Current directory: &a%{_displayDir}%" to {_p}
+
+function getMinecraftSound(id: integer) :: string:
+    
+    if {_id} is 0:  
+        return "block.note_block.harp"
+    else if {_id} is 1:  
+        return "block.note_block.basedrum"
+    else if {_id} is 2:  
+        return "block.note_block.snare"
+    else if {_id} is 3:  
+        return "block.note_block.hat"
+    else if {_id} is 4:  
+        return "block.note_block.bass"
+    else if {_id} is 5:  
+        return "block.note_block.flute"
+    else if {_id} is 6:  
+        return "block.note_block.bell"
+    else if {_id} is 7:  
+        return "block.note_block.guitar"
+    else if {_id} is 8:  
+        return "block.note_block.chime"
+    else if {_id} is 9:  
+        return "block.note_block.xylophone"
+    else if {_id} is 10:  
+        return "block.note_block.iron_xylophone"
+    else if {_id} is 11:  
+        return "block.note_block.cow_bell"
+    else if {_id} is 12:  
+        return "block.note_block.didgeridoo"
+    else if {_id} is 13:  
+        return "block.note_block.bit"
+    else if {_id} is 14:  
+        return "block.note_block.banjo"
+    else if {_id} is 15:  
+        return "block.note_block.pling"
+    else:
+        return "block.note_block.harp"

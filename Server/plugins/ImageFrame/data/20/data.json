@@ -1,0 +1,59 @@
+{
+  "type": "imageframe:url_static",
+  "index": 20,
+  "name": "AiSlopCaps",
+  "url": "https://cdn.discordapp.com/attachments/1311367214795849861/1516477820887367770/image.png?ex\u003d6a32c987\u0026is\u003d6a317807\u0026hm\u003d073222631b9f2d55d41f07424cbc648189dc8700c4af31ba3832ec2166f1ca2a\u0026",
+  "width": 3,
+  "height": 3,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "hasAccess": {},
+  "creationTime": 1781626894253,
+  "mapdata": [
+    {
+      "mapid": 726,
+      "image": "0.png",
+      "markers": []
+    },
+    {
+      "mapid": 727,
+      "image": "1.png",
+      "markers": []
+    },
+    {
+      "mapid": 728,
+      "image": "2.png",
+      "markers": []
+    },
+    {
+      "mapid": 729,
+      "image": "3.png",
+      "markers": []
+    },
+    {
+      "mapid": 730,
+      "image": "4.png",
+      "markers": []
+    },
+    {
+      "mapid": 731,
+      "image": "5.png",
+      "markers": []
+    },
+    {
+      "mapid": 732,
+      "image": "6.png",
+      "markers": []
+    },
+    {
+      "mapid": 733,
+      "image": "7.png",
+      "markers": []
+    },
+    {
+      "mapid": 734,
+      "image": "8.png",
+      "markers": []
+    }
+  ]
+}

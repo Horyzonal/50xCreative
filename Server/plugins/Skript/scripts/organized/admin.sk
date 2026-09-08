@@ -1,0 +1,295 @@
+# ================================================================================================================================================================= #
+
+options:
+	name: %minimessage from "<b><gradient:#1685FF:#16E3FF>50xCreative</gradient></b>"%
+	info: &8[<##167BFF>&l❗&8]&f
+	warn: &8[<##FF0000>&l❗&8]&c
+	
+	primary: <#0079FF>
+	secondary: <#16AFFF>
+	tertiary: <#16E3FF>
+	
+	usage: &8[<##FF0000>&l❗&8]&c Correct command usage &7»&f
+	notyou: &8[<##FF0000>&l❗&8]&c Console may not use this command.
+	noperm: &8[<##FF0000>&l❗&8]&c You do not have permission for this command.
+	notthis: &8[<##FF0000>&l❗&8]&c You may not use this feature of the command.
+	nothere: &8[<##FF0000>&l❗&8]&c You may not use this command in this region.
+	nothigh: &8[<##FF0000>&l❗&8]&c That person has a higher authority than you.
+	notnow: &8[<##FF0000>&l❗&8]&c You may use this command after %remaining time%.
+	supported_worlds: "donor", "creative", or "plots"
+
+# ================================================================================================================================================================= #
+
+
+# ADMIN TROLL PREVENTION
+
+on command "op", "deop", "minecraft:op" or "minecraft:deop":
+	sender != CONSOLE
+	cancel event
+	send "{@warn} Only console is allowed to op and/or deop people."
+
+# ========= #
+# ADMINCHAT #
+# ========= #
+
+function adminchat(p: sender, m: text):
+	send "&8[%minimessage from "<bold><gradient:#B70000:#FF2323>ADMINCHAT"%&8] %"&8(&aVANISHED&8) " if {_p}'s metadata "vanished" is set else ""%&f%{_p}%&7: &f%{_m}%" to console and all players where [priority(input) >= 12]
+
+on tab complete of "adminchat" and "achat":
+	priority(sender) >= 12
+	set tab completions for position 1 to "<message>"
+
+command adminchat [<text>]:
+	prefix: admin
+	usage: {@usage} /<achat | adminchat> &7[message]
+	aliases: achat
+	permission: admin.chat
+	permission message: {@noperm}
+	trigger:
+		arg-1 is set:
+			adminchat(sender, arg-1)
+		else:
+			sender = console:
+				send "{@usage} /<achat | adminchat> <message>"
+			else:
+				player's metadata "adminchat" is set:
+					clear player's metadata "adminchat"
+					clear player's metadata "staffchat"
+					clear player's metadata "donorchat"
+				else:
+					set player's metadata "adminchat" to true
+				send "{@info} You have toggled admin chat to %"&aon" if player's metadata "adminchat" is set else "&coff"%&f."
+
+# ====== #
+# CMDSPY #
+# ====== #
+
+on tab complete of "togglespy":
+	sender has permission "admin.togglespy"
+	set tab completions for position 1 to "cmdspy", "bookspy", and "signspy"
+
+on command:
+	sender = player
+	event-player isn't an operator
+	loop all players where [input has permission "admin.cmdspy"]:
+		event-player != loop-player
+		{cmdspy::%loop-player's uuid%} is set
+		event isn't cancelled
+		send "&f[CMDSPY] &7%sender%: &7/%complete command%" to loop-player
+
+on book edit:
+    loop event-texts:
+        set {_middle} to minimessage from "<transition:#27FF4F:#FDFF5A:#FF4141:%loop-counter/100%>Book-%loop-counter%"
+        send "&7[%{_middle}%&7] &f%player% &8» &f%loop-value%" to all players where [{bookspy::%input's uuid%} is set]
+
+on sign edit:
+    loop event-texts:
+        loop-value isn't ""
+        set {_middle} to minimessage from "<transition:#27FF4F:#FDFF5A:#FF4141:%loop-counter/100%>Sign-%loop-counter%"
+        send "&7[%{_middle}%&7] &f%player% &8» &f%loop-value%" to all players where [{signspy::%input's uuid%} is set]
+
+command togglespy <string>:
+	prefix: admin
+	usage: {@usage} /cmdspy
+	aliases: tspy
+	permission: admin.togglespy
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		set {_o::*} to "cmdspy", "bookspy", and "signspy"
+		set {_n::*} to "Command Spy", "Book Spy", and "Sign Spy"
+		if {_o::*} doesn't contain arg:
+			send "{@warn} Invalid Option!"
+			stop
+
+		set {_i} to index of arg in {_o::*}
+		set {_d} to {_n::%{_i}%}
+		
+		{%arg%::%player's uuid%} isn't set:
+			set {%arg%::%player's uuid%} to true
+		else:
+			delete {%arg%::%player's uuid%}
+		
+		
+		send "{@info} %{_d}% is now %"&aenabled" if {%arg%::%player's uuid%} is set else "&cdisabled"%&f."
+
+# ==== #
+# LOCK #
+# ==== #
+
+on tab complete of "lock":
+	sender has permission "admin.lock"
+	set tab completions for position 1 to all worlds
+
+command lock <world>:
+	prefix: admin
+	usage: {@usage} /lock <world>
+	permission: admin.lock
+	permission message: {@noperm}
+	trigger:
+		{lock::%name of arg-1%} is set:
+			delete {lock::%name of arg-1%}
+		else:
+			set {lock::%name of arg-1%} to true
+		adminlog("%sender% &fhas %"&clocked" if {lock::%name of arg-1%} is set else "&aunlocked"% &fworld named <#16E3FF>&l%smallcaps(name of arg-1)%&f.")
+
+# ==== #
+# NBTS #
+# ==== #
+
+command addnbts:
+	prefix: admin
+	executable by: palayers
+	permission: admin.nbts
+	permission message: {@noperm}
+	trigger:
+		send "&aDone"
+		add 1 of player's tool to {nbts::*}
+		
+command removenbts:
+	prefix: admin
+	executable by: palayers
+	permission: admin.nbts
+	permission message: {@noperm}
+	trigger:
+		send "&aDone"
+		remove player's tool from {nbts::*}
+
+# ============ #
+# NBT ANALYZER #
+# ============ #
+
+command nbtanalyze:
+	prefix: admin
+	executable by: palayers
+	permission: admin.nbts
+	permission message: {@noperm}
+	trigger:
+		send "{@info} %player's tool%: %full nbt compound of player's tool%"
+
+# ======== #
+# NICKNAME #
+# ======== #
+
+on tab complete of "adminnick" or "anick":
+	sender has permission "admin.nick"
+	set tab completions for position 1 to all players
+
+command adminnick <offlineplayer> <text> [<text>]:
+	prefix: admin
+	usage: {@usage} /adminnick &f<offline player> &f<off | nickname>
+	aliases: anick
+	permission: admin.nick
+	permission message: {@noperm}
+	trigger:
+		arg-3 is set:
+			send "{@warn} Nicknames must not contain spaces!"
+		else if arg-2 = "off":
+			{nick::%arg-1's uuid%} isn't set:
+				send "{@warn} That player does not have a nickname to begin with!"
+			else:
+				delete {nick::%arg-1's uuid%}
+				adminlog("%sender% &fhas removed <#FF2323>%arg-1%&f's nickname.")
+				send "{@info} Your nickname has been removed by an admin." to arg-1 if arg-1 is online
+		else:
+			set {nick::%arg-1's uuid%} to toHex(arg-2)
+			adminlog("%sender% &fhas set <#FF2323>%arg-1%&f's nickname to <#FF2323>%toHex(arg-2)%&f.")
+			send "{@info} Your nickname has been set to %toHex(arg-2)% &rby an admin." to arg-1 if arg-1 is online
+
+# ======== #
+# SETSPAWN #
+# ======== #
+
+on tab complete of "setspawn":
+	sender has permission "admin.setspawn"
+	set tab completions for position 1 to all worlds
+
+command setspawn <text="lobby">:
+	prefix: admin
+	permission: admin.setspawn
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		set {spawn::%arg-1%} to player's location
+		adminlog("%sender% &fhas updated the spawn of world named <#16E3FF>&l%smallcaps(arg-1)%&f.")
+
+# ==== #
+# SUDO #
+# ==== #
+
+command sudo <player> <text>:
+	prefix: admin
+	usage: {@usage} /sudo &f<player> </command|message>
+	permission: admin.sudo
+	permission message: {@noperm}
+	trigger:
+		priority(sender) < priority(arg-1):
+			send "{@nothigh}"
+		else:
+			make arg-1 say arg-2
+			adminlog("%sender% &fmade <#FF2323>%arg-1% &fexecute <#FF2323>%arg-2%&f." if first character of arg-2 = "/" else "<#FF2323>%sender% &fmade <#FF2323>%arg-1% &fsay <#FF2323>%arg-2%&f.")
+
+command sudoall <text>:
+	prefix: admin
+	usage: {@usage} /sudoall &f</command|message>
+	permission: admin.sudoall
+	permission message: {@noperm}
+	trigger:
+		make all players where [priority(input) < priority(sender)] say arg-1
+		adminlog("%sender% &fmade <#FF2323>everyone &fexecute <#FF2323>%arg-1%&f." if first character of arg-1 = "/" else "<#FF2323>%sender% &fmade <#FF2323>everyone &fsay <#FF2323>%arg-1%&f.")
+
+# ===== #
+# VAULT #
+# ===== #
+
+on tab complete for "clearvault", "vaultclear", "openvault" and "vaultopen":
+	sender has permission "admin.vault"
+	set tab completions for position 1 to all players
+	tab argument 1 is set
+	set tab completions for position 2 to indices of {vaults::%(tab argument 1 parsed as offlineplayer)'s uuid%::*}
+
+command clearvault <offlineplayer> <id:int>:
+	prefix: admin
+	usage: {@usage} /<clearvault | vaultclear> &f<offline player> &f<1-7>
+	aliases: vaultclear
+	permission: admin.vault
+	permission message: {@noperm}
+	trigger:
+		set {_id} to arg-1's uuid
+		{vaults::%{_id}%::%{_id}%} is not set:
+			send "{@warn} %arg-1% does not have vault #%{_id}%."
+			stop
+		set {_v::*} to viewers of {-vCache::%{_id}%::%{_id}%}
+		close inventory of {_v::*}
+		delete {vaults::%{_id}%::%{_id}%} and {-vCache::%{_id}%::%{_id}%}
+		adminlog("%sender% &fhas deleted <#FF2323>%arg-1%&f's <#FF2323>vault #%{_id}%&f.")
+
+# ====================== #
+# EVEN MORE DANGER STUFF #
+# ====================== #
+
+command sethead <string>:
+	prefix: admin
+	permission: admin.sethead
+	permission message: {@noperm}
+	executable by: players
+	trigger:
+		set {head::%arg-1%} to player's tool
+		send "{@info} Head named <#16E3FF>%arg-1% &fhas been successfully set."
+
+command setskin <offlineplayer> [<string>]:
+	prefix: admin
+	permission: admin.sethead
+	permission message: {@noperm}
+	executable by: console
+	trigger:
+		set skin of arg-1 to skin of arg-2
+
+command setprefix <offlineplayer> <string>:
+	permission: admin.setprefix
+	permission message: {@noperm}
+	usage: {@usage} /setprefix &f<player> &f<rank>
+	trigger:
+		set arg 1's prefix to arg 2
+		send "{@info} &aSuccessfully set &f%arg 1%&a's prefix to &f%arg 2%" to player
+		send "{@info} &aYour prefix has been set to &f%arg 2%" to arg 1

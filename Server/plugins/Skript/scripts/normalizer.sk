@@ -1,0 +1,120 @@
+function normalizeText(text: text) :: text:
+    set {_t} to {_text}
+    
+    # --- A ---
+    replace all "À", "Á", "Â", "Ã", "Ä", "Å", "Ā", "Ă", "Ą", "Α", "А", "𝐀", "𝐴", "𝑨", "𝒜", "𝓐", "𝔄", "𝔸", "𝕬", "𝖠", "𝗔", "𝘈", "𝘼", "𝙰", "Ａ" in {_t} with "A" with case sensitivity
+    replace all "à", "á", "â", "ã", "ä", "å", "ā", "ă", "ą", "α", "а", "ɑ", "𝐚", "𝑎", "𝒂", "𝒶", "𝓪", "𝔞", "𝕒", "𝖆", "𝖺", "𝗮", "𝘢", "𝙖", "ａ" in {_t} with "a" with case sensitivity
+
+    # --- B ---
+    replace all "Β", "В", "𝐁", "𝐵", "𝑩", "𝒷", "𝓑", "𝔅", "𝔹", "𝕭", "𝖡", "𝗕", "𝘉", "𝘽", "𝙱", "Ｂ" in {_t} with "B" with case sensitivity
+    replace all "ƀ", "ɓ", "𝐛", "𝑏", "𝒃", "𝒷", "𝓫", "𝔟", "𝕓", "𝖇", "𝖻", "𝗯", "𝘣", "𝙗", "ｂ" in {_t} with "b" with case sensitivity
+
+    # --- C ---
+    replace all "Ç", "Ć", "Ĉ", "Ċ", "Č", "Ϲ", "С", "𝐂", "𝐶", "𝑪", "𝒞", "𝓒", "𝔠", "ℂ", "𝕮", "𝖢", "𝗖", "𝘊", "𝘾", "𝙲", "Ｃ" in {_t} with "C" with case sensitivity
+    replace all "ç", "ć", "ĉ", "ċ", "č", "ϲ", "с", "𝐜", "𝑐", "𝒄", "𝒸", "𝓬", "𝔠", "𝕔", "𝖈", "𝖼", "𝗰", "𝘤", "𝙘", "ｃ" in {_t} with "c" with case sensitivity
+
+    # --- D ---
+    replace all "Ď", "Đ", "Ɗ", "𝐃", "𝐷", "𝑫", "𝒟", "𝓓", "𝔇", "𝔻", "𝕯", "𝖣", "𝗗", "𝘋", "𝘿", "𝙳", "Ｄ" in {_t} with "D" with case sensitivity
+    replace all "ď", "đ", "ɗ", "𝐝", "𝑑", "𝒅", "𝒹", "𝓭", "𝔡", "𝕕", "𝖉", "𝖽", "𝗱", "𝘥", "𝙙", "ｄ" in {_t} with "d" with case sensitivity
+
+    # --- E ---
+    replace all "È", "É", "Ê", "Ë", "Ē", "Ĕ", "Ė", "Ę", "Ě", "Ε", "Е", "Ё", "𝐄", "𝐸", "𝑬", "𝓔", "𝔈", "𝔼", "𝕰", "𝖤", "𝗘", "𝘌", "𝙀", "𝙴", "Ｅ" in {_t} with "E" with case sensitivity
+    replace all "è", "é", "ê", "ë", "ē", "ĕ", "ė", "ę", "ě", "ε", "е", "ё", "ℯ", "𝐞", "𝑒", "𝒆", "𝒻", "𝓮", "𝔢", "𝕖", "𝖊", "𝖾", "𝗲", "𝘦", "𝙚", "ｅ" in {_t} with "e" with case sensitivity
+
+    # --- F ---
+    replace all "Ƒ", "𝐅", "𝐹", "𝑭", "𝓕", "𝔉", "𝔽", "𝕱", "𝖥", "𝗙", "𝘍", "𝙁", "𝙵", "Ｆ" in {_t} with "F" with case sensitivity
+    replace all "ƒ", "𝐟", "𝑓", "𝒇", "𝒻", "𝓯", "𝔣", "𝕗", "𝖋", "𝖿", "𝗳", "𝘧", "𝙛", "ｆ" in {_t} with "f" with case sensitivity
+
+    # --- G ---
+    replace all "Ĝ", "Ğ", "Ġ", "Ģ", "𝐆", "𝐺", "𝑮", "𝒢", "𝓖", "𝔊", "𝔾", "𝕲", "𝖦", "𝗚", "𝘎", "𝙂", "𝙶", "Ｇ" in {_t} with "G" with case sensitivity
+    replace all "ĝ", "ğ", "ġ", "ģ", "ɡ", "𝐠", "𝑔", "𝒈", "𝓰", "𝔤", "𝕘", "𝖌", "𝗀", "𝗴", "𝘨", "𝙜", "ｇ" in {_t} with "g" with case sensitivity
+
+    # --- H ---
+    replace all "Ĥ", "Η", "Н", "ℍ", "𝐇", "𝐻", "𝑯", "𝓗", "𝔥", "𝕳", "𝖧", "𝗛", "𝘏", "𝙃", "𝙷", "Ｈ" in {_t} with "H" with case sensitivity
+    replace all "ĥ", "ħ", "η", "н", "𝐡", "𝒉", "𝒽", "𝓱", "𝔥", "𝕙", "𝖍", "𝗁", "𝗵", "𝘩", "𝙝", "ｈ" in {_t} with "h" with case sensitivity
+
+    # --- I ---
+    replace all "Ì", "Í", "Î", "Ï", "Ī", "Ĭ", "Į", "İ", "Ι", "І", "Ӏ", "ℐ", "ℑ", "𝐈", "𝐼", "𝑰", "𝓘", "𝔍", "𝕀", "𝕴", "𝖨", "𝗜", "𝘐", "𝙄", "𝙸", "Ｉ" in {_t} with "I" with case sensitivity
+    replace all "ì", "í", "î", "ï", "ī", "ĭ", "į", "ı", "ι", "і", "𝐢", "𝑖", "𝒊", "𝒾", "𝓲", "𝔦", "𝕚", "𝖎", "𝗂", "𝗶", "𝘪", "𝙞", "ｉ" in {_t} with "i" with case sensitivity
+
+    # --- J ---
+    replace all "Ĵ", "𝐉", "𝐽", "𝑱", "𝒥", "𝓙", "𝔍", "𝕁", "𝕵", "𝖩", "𝗝", "𝘑", "𝙅", "𝙹", "Ｊ" in {_t} with "J" with case sensitivity
+    replace all "ĵ", "ȷ", "𝐣", "𝑗", "𝒋", "𝒿", "𝓳", "𝔧", "𝕛", "𝖏", "𝗃", "𝗷", "𝘫", "𝙟", "ｊ" in {_t} with "j" with case sensitivity
+
+    # --- K ---
+    replace all "Ķ", "Κ", "К", "𝐊", "𝐾", "𝑲", "𝒦", "𝓚", "𝔎", "𝕂", "𝕶", "𝖪", "𝗞", "𝘒", "𝙆", "𝙺", "Ｋ" in {_t} with "K" with case sensitivity
+    replace all "ķ", "ĸ", "κ", "к", "𝐤", "𝑘", "𝒌", "𝓀", "𝓴", "𝔨", "𝕜", "𝖐", "𝗄", "𝗸", "𝘬", "𝙠", "ｋ" in {_t} with "k" with case sensitivity
+
+    # --- L ---
+    replace all "Ĺ", "Ļ", "Ľ", "Ŀ", "Ł", "𝐋", "𝐿", "𝑳", "𝒻", "𝓛", "𝔏", "𝕃", "𝕷", "𝖫", "𝗟", "𝘓", "𝙇", "𝙻", "Ｌ" in {_t} with "L" with case sensitivity
+    replace all "ĺ", "ļ", "ľ", "ŀ", "ł", "ⅼ", "𝐥", "𝑙", "𝒍", "𝓁", "𝓵", "𝔩", "𝕝", "𝖑", "𝗅", "𝗹", "𝘭", "𝙡", "ｌ" in {_t} with "l" with case sensitivity
+
+    # --- M ---
+    replace all "Μ", "М", "ℳ", "𝐌", "𝑀", "𝑴", "𝒻", "𝓜", "𝔐", "𝕄", "𝕸", "𝖬", "𝗠", "𝘔", "𝙈", "𝙼", "Ｍ" in {_t} with "M" with case sensitivity
+    replace all "μ", "м", "𝐦", "𝑚", "𝒎", "𝓂", "𝓶", "𝔪", "𝕞", "𝖒", "𝗆", "𝗺", "𝘮", "𝙢", "ｍ" in {_t} with "m" with case sensitivity
+
+    # --- N ---
+    replace all "Ñ", "Ń", "Ņ", "Ň", "Ν", "Н", "𝐍", "𝑁", "𝑵", "𝒩", "𝓝", "𝔑", "ℕ", "𝕹", "𝖭", "𝗡", "𝘕", "𝙉", "𝙽", "Ｎ" in {_t} with "N" with case sensitivity
+    replace all "ñ", "ń", "ņ", "ň", "ŉ", "ν", "𝐧", "𝑛", "𝒏", "𝓃", "𝓷", "𝔫", "𝕟", "𝖓", "𝗇", "𝗻", "𝘯", "𝙣", "ｎ" in {_t} with "n" with case sensitivity
+
+    # --- O ---
+    replace all "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ō", "Ŏ", "Ő", "Ο", "О", "𝐎", "𝑂", "𝑶", "𝒪", "𝓞", "𝔒", "𝕆", "𝕺", "𝖮", "𝗢", "𝘖", "𝙊", "𝙾", "Ｏ" in {_t} with "O" with case sensitivity
+    replace all "ò", "ó", "ô", "õ", "ö", "ø", "ō", "ŏ", "ő", "ο", "о", "ℴ", "𝐨", "𝑜", "𝒐", "𝓸", "𝔬", "𝕠", "𝖔", "𝗈", "𝗼", "𝘰", "𝙤", "ｏ" in {_t} with "o" with case sensitivity
+
+    # --- P ---
+    replace all "Ρ", "Р", "℘", "𝐏", "𝑃", "𝑷", "𝒫", "𝓟", "𝔓", "𝕻", "𝖯", "𝗣", "𝘗", "𝙋", "𝙿", "Ｐ" in {_t} with "P" with case sensitivity
+    replace all "ρ", "р", "𝐩", "𝑝", "𝒑", "𝓅", "𝓹", "𝔭", "𝕡", "𝖕", "𝗉", "𝗽", "𝘱", "𝙥", "ｐ" in {_t} with "p" with case sensitivity
+
+    # --- Q ---
+    replace all "𝐐", "𝑄", "𝑸", "𝒬", "𝓠", "𝔔", "𝕼", "𝖰", "𝗤", "𝘘", "𝙌", "𝚀", "Ｑ" in {_t} with "Q" with case sensitivity
+    replace all "𝐪", "𝑞", "𝒒", "𝓆", "𝓺", "𝔮", "𝕢", "𝖖", "𝗊", "𝗾", "𝘲", "𝙦", "ｑ" in {_t} with "q" with case sensitivity
+
+    # --- R ---
+    replace all "Ŕ", "Ŗ", "Ř", "Ρ", "𝐑", "𝑅", "𝑹", "𝒭", "𝓡", "ℜ", "ℝ", "𝕽", "𝖱", "𝗥", "𝘙", "𝙍", "𝚁", "Ｒ" in {_t} with "R" with case sensitivity
+    replace all "ŕ", "ŗ", "ř", "ɾ", "𝐫", "𝑟", "𝒓", "𝓇", "𝓻", "𝔯", "𝕣", "𝖗", "𝗋", "𝗿", "𝘳", "𝙧", "ｒ" in {_t} with "r" with case sensitivity
+
+    # --- S ---
+    replace all "Ś", "Ŝ", "Ş", "Š", "Ѕ", "𝐒", "𝑆", "𝑺", "𝒮", "𝓢", "𝔖", "𝕊", "𝕾", "𝖲", "𝗦", "𝘚", "𝙎", "𝚂", "Ｓ" in {_t} with "S" with case sensitivity
+    replace all "ś", "ŝ", "ş", "š", "ѕ", "𝐬", "𝑠", "𝒔", "𝓈", "𝓼", "𝔰", "𝕤", "𝖘", "𝗌", "𝘀", "𝘴", "𝙨", "ｓ" in {_t} with "s" with case sensitivity
+
+    # --- T ---
+    replace all "Ţ", "Ť", "Τ", "Т", "𝐓", "𝑇", "𝑻", "𝒯", "𝓣", "𝔗", "𝕋", "𝕿", "𝖳", "𝗧", "𝘛", "𝙏", "𝚃", "Ｔ" in {_t} with "T" with case sensitivity
+    replace all "ţ", "ť", "τ", "т", "𝐭", "𝑡", "𝒕", "𝓉", "𝓽", "𝔱", "𝕥", "𝖙", "𝗍", "𝗿", "𝘵", "𝙩", "ｔ" in {_t} with "t" with case sensitivity
+
+    # --- U ---
+    replace all "Ù", "Ú", "Û", "Ü", "Ū", "Ŭ", "Ů", "Ű", "Ų", "𝐔", "𝑈", "𝑼", "𝒰", "𝓤", "𝔘", "𝕌", "𝖀", "𝖴", "𝗨", "𝘜", "𝙐", "𝚄", "Ｕ" in {_t} with "U" with case sensitivity
+    replace all "ù", "ú", "û", "ü", "ū", "ŭ", "ů", "ű", "ų", "υ", "𝐮", "𝑢", "𝒖", "𝓊", "𝓾", "𝔲", "𝕦", "𝖚", "𝗎", "𝘂", "𝘶", "𝙪", "ｕ" in {_t} with "u" with case sensitivity
+
+    # --- V ---
+    replace all "Ѵ", "𝐕", "𝑉", "𝑽", "𝒱", "𝓥", "𝔙", "𝕍", "𝖁", "𝖵", "𝗩", "𝘝", "𝙑", "𝚅", "Ｖ" in {_t} with "V" with case sensitivity
+    replace all "ν", "ѵ", "𝐯", "𝑣", "𝒗", "𝓋", "𝓿", "𝔳", "𝕧", "𝖛", "𝗏", "𝘃", "𝘷", "𝙫", "ｖ" in {_t} with "v" with case sensitivity
+
+    # --- W ---
+    replace all "Ŵ", "𝐖", "𝑊", "𝑾", "𝒲", "𝓦", "𝔚", "𝕎", "𝖂", "𝖶", "𝗪", "𝘞", "𝙒", "𝚆", "Ｗ" in {_t} with "W" with case sensitivity
+    replace all "ŵ", "ω", "𝐰", "𝑤", "𝒘", "𝓌", "𝔀", "𝔴", "𝕨", "𝖜", "𝗐", "𝘄", "𝘸", "𝙬", "ｗ" in {_t} with "w" with case sensitivity
+
+    # --- X ---
+    replace all "Χ", "Х", "𝐗", "𝑋", "𝑿", "𝒳", "𝓧", "𝔛", "𝕏", "𝖃", "𝖷", "𝗫", "𝘟", "𝙓", "𝚇", "Ｘ" in {_t} with "X" with case sensitivity
+    replace all "χ", "х", "𝐱", "𝑥", "𝒙", "𝓍", "𝔁", "𝔵", "𝕩", "𝖝", "𝗑", "𝘅", "𝘹", "𝙭", "ｘ" in {_t} with "x" with case sensitivity
+
+    # --- Y ---
+    replace all "Ý", "Ŷ", "Ÿ", "Υ", "Ү", "𝐘", "𝑌", "𝒀", "𝒴", "𝓨", "𝔜", "𝕐", "𝖄", "𝖸", "𝗬", "𝘠", "𝙔", "𝚈", "Ｙ" in {_t} with "Y" with case sensitivity
+    replace all "ý", "ŷ", "ÿ", "υ", "ү", "𝐲", "𝑦", "𝒚", "𝓎", "𝔂", "𝔶", "𝕪", "𝖞", "𝗒", "𝘆", "𝘺", "𝙮", "ｙ" in {_t} with "y" with case sensitivity
+
+    # --- Z ---
+    replace all "Ź", "Ż", "Ž", "Ζ", "𝐙", "𝑍", "𝒁", "𝒵", "𝓩", "ℤ", "𝖅", "𝖹", "𝗭", "𝘡", "𝙕", "𝚉", "Ｚ" in {_t} with "Z" with case sensitivity
+    replace all "ź", "ż", "ž", "ζ", "𝐳", "𝑧", "𝒛", "𝓏", "𝔃", "𝔷", "𝕫", "𝖟", "𝗓", "𝘇", "𝘻", "𝙯", "ｚ" in {_t} with "z" with case sensitivity
+
+    # --- 0-9 ---
+    replace all "０", "⓪", "𝟎", "𝟘", "𝟢", "𝟬", "𝟶" in {_t} with "0"
+    replace all "１", "①", "𝟏", "𝟙", "𝟣", "𝟭", "𝟷" in {_t} with "1"
+    replace all "２", "②", "𝟐", "𝟚", "𝟤", "𝟮", "𝟸" in {_t} with "2"
+    replace all "３", "③", "𝟑", "𝟛", "𝟥", "𝟯", "𝟹" in {_t} with "3"
+    replace all "４", "④", "𝟒", "𝟜", "𝟦", "𝟰", "𝟺" in {_t} with "4"
+    replace all "５", "⑤", "𝟓", "𝟝", "𝟧", "𝟱", "𝟻" in {_t} with "5"
+    replace all "６", "⑥", "𝟔", "𝟞", "𝟨", "𝟲", "𝟼" in {_t} with "6"
+    replace all "７", "⑦", "𝟕", "𝟟", "𝟩", "𝟳", "𝟽" in {_t} with "7"
+    replace all "８", "⑧", "𝟖", "𝟠", "𝟪", "𝟴", "𝟾" in {_t} with "8"
+    replace all "９", "⑨", "𝟗", "𝟡", "𝟫", "𝟵", "𝟿" in {_t} with "9"
+
+    return {_t}

@@ -1,0 +1,44 @@
+import:
+    java.lang.Math
+    java.lang.String as JavaString
+
+# ─────────────────────────────────────────────
+# /trigtest — Op only
+# Fair comparison: Skript sin() given degrees,
+# Java Math.sin() given radians — same angle, correct units for each.
+# Angle: 60° = π/3 radians, sin should equal 0.8660254038...
+# ─────────────────────────────────────────────
+
+command /trigtest:
+    permission: skript.op
+    trigger:
+        set {_pi} to Math.PI
+        set {_angle_deg} to 60
+        set {_angle_rad} to {_pi} / 3
+
+        # Skript built-in — given degrees (its native unit)
+        set {_skript_result} to sin({_angle_deg})
+        set {_skript_str} to JavaString.format("%%.10f", {_skript_result})
+
+        # Java Math.sin() — given radians (its native unit)
+        set {_java_result} to Math.sin({_angle_rad})
+        set {_java_str} to JavaString.format("%%.10f", {_java_result})
+
+        set {_diff} to Math.abs({_java_result} - {_skript_result})
+        set {_diff_str} to JavaString.format("%%.10f", {_diff})
+
+        send ""
+        send "&8&m                                        "
+        send "  &b&lTrig Comparison &8— &fsin(60°)"
+        send "&8&m                                        "
+        send "  &7Expected result: &a0.8660254038..."
+        send ""
+        send "  &c&lSkript built-in &8sin(60°)&8:"
+        send "  &c%{_skript_str}%"
+        send ""
+        send "  &a&lJava Math.sin&8(π/3 rad)&8:"
+        send "  &a%{_java_str}%"
+        send ""
+        send "  &e&lDifference: &f%{_diff_str}%"
+        send "&8&m                                        "
+        send ""

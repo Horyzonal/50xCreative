@@ -1,0 +1,17 @@
+# FAULTY CODE GOES HERE
+
+# TICK FREEZE
+# FOUND IN: DISCORD.SK !?!?!?
+
+every 1 tick:
+	if tps < 8:
+		execute console command "tick freeze"
+		broadcast "{@err} The server's ticks have been frozen, due to it reaching bellow 8 TPS. Please wait on a staff member."
+		post "@everyone The server has reached bellow 8 TPS, ticks have been frozen. Please join the server and resolve the problem (lag machine)." to text channel with id "1279327509703430177" with bot bot "50xCreative"
+		wait 10 minutes
+		execute console command "tick unfreeze"
+
+# YUCKS BROTHER
+
+
+# Egono type shit

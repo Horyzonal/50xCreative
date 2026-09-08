@@ -1,0 +1,210 @@
+import:
+    com.plotsquared.bukkit.util.BukkitUtil
+options:
+	name: %minimessage from "<b><gradient:#1685FF:#16E3FF>50xCreative</gradient></b>"%
+	info: &8[<##167BFF>&l❗&8]&f
+	warn: &8[<##FF0000>&l❗&8]&c
+	
+	primary: <#0079FF>
+	secondary: <#16AFFF>
+	tertiary: <#16E3FF>
+	
+	usage: &8[<##FF0000>&l❗&8]&c Correct command usage &7»&f
+	notyou: &8[<##FF0000>&l❗&8]&c Console may not use this command.
+	noperm: &8[<##FF0000>&l❗&8]&c You do not have permission for this command.
+	notthis: &8[<##FF0000>&l❗&8]&c You may not use this feature of the command.
+	nothere: &8[<##FF0000>&l❗&8]&c You may not use this command in this region.
+	nothigh: &8[<##FF0000>&l❗&8]&c That person has a higher authority than you.
+	notnow: &8[<##FF0000>&l❗&8]&c You may use this command after %remaining time%.
+	supported_worlds: "donor", "creative", or "plots"
+
+function isInRegion(p: player) :: boolean:
+    set {_plotPlayer} to BukkitUtil.adapt({_p})
+    set {_location} to {_plotPlayer}.getLocation()
+    set {_area} to {_location}.getPlotArea()
+    set {_plot} to {_area}.getPlot({_location})
+    {_plot} is set
+    "%{_plot}.getId()%" is "26;25":
+        return true
+    else:
+        return false
+
+command /checkregion:
+    trigger:
+        if isInRegion(player) is true:
+            send "&aTrue - You are in a region!" to player
+        else:
+            send "&cFalse - You are not in any region!" to player
+
+
+every second:
+    loop all players where [isInRegion(input) is true]:
+
+        set title of loop-player's fastboard to minimessage from "<bold><gradient:#EEA215:#EA6B1A:#925232>⚜ City of Faith ⚜</gradient></bold>"
+
+        set line 1 of loop-player's fastboard to minimessage from "<st><gradient:#EEA215:#EA6B1A:#925232>•                             •"
+        set line 2 of loop-player's fastboard to minimessage from "<bold><gradient:#EEA215:#EA6B1A>ᴘʟᴀʏᴇʀ</gradient></bold>"
+        set line 3 of loop-player's fastboard to minimessage from "<#EA6B1A>| <#EEA215>💲 <white>ғᴀɪᴛʜ ᴛᴏᴋᴇɴs <gray>→ <#EEA215>%numFormat({fcash::%loop-player's uuid%})%"
+        set line 4 of loop-player's fastboard to minimessage from "<#EA6B1A>| <#EEA215>🏗 <white>ʀᴀᴛɪɴɢ <gray>→ <#EEA215>%numFormat({buildscore::%loop-player's uuid%} ? 0)%&f/<#EEA215>10"
+        set line 5 of loop-player's fastboard to ""
+        loop 9 times:
+            set line 5 + loop-value-2 of loop-player's fastboard to ""
+        set line 15 of loop-player's fastboard to minimessage from "<st><gradient:#EEA215:#EA6B1A:#925232>•                             •"
+
+on tab complete of "faitheco":
+    set tab completions for position 1 to "set", "add", and "remove" if sender has permission "faith.economy"
+    set tab completions for position 2 to "**", "*" and all players if sender has permission "faith.economy"
+
+command faitheco <text> <offlineplayer> <number>:
+    prefix: faith
+    permission: faith.economy
+    permission message: {@noperm}
+    usage: {@usage} /faitheco <set|add|remove> <player> &7<amount>
+    trigger:
+        if isInRegion(player) isn't true:
+            send "{@warn} You're not in the city of faith."
+            stop
+        arg-1 = "set":
+            arg-2 has played before:
+                set {fcash::%arg-2's uuid%} to arg-3
+                send "{@info} Your balance has been mysteriously set to <#EEA215>%arg-3% ғᴀɪᴛʜ ᴛᴏᴋᴇɴs&f." to arg-2 if arg-2 is online
+                send "{@info} You have set &fthe balance of &d%arg-2 if arg-2 isn't player else "yours"%&f to <#EEA215>%arg-3% ғᴀɪᴛʜ ᴛᴏᴋᴇɴs&f."
+            else:
+                send "{@warn} ""%arg-2%"" doesn't exist or didn't join the server before."
+        else if arg-1 = "add":
+            arg-2 has played before:
+                add arg-3 to {fcash::%arg-2's uuid%}
+                send "{@info} <#EEA215>%arg-3% ғᴀɪᴛʜ ᴛᴏᴋᴇɴs &fhas been mysteriously added to your balance." to arg-2 if arg-2 is online
+                send "{@info} You have added <#EEA215>%arg-3% ғᴀɪᴛʜ ᴛᴏᴋᴇɴs &fto the balance of &d%arg-2 if arg-2 isn't player else "yours"%&f."
+            else:
+                send "{@warn} ""%arg-2%"" doesn't exist or didn't join the server before."
+        else if arg-1 = "remove":
+            arg-2 has played before:
+                remove arg-3 from {fcash::%arg-2's uuid%}
+                send "{@info} <#EEA215>%arg-3% ғᴀɪᴛʜ ᴛᴏᴋᴇɴs &fhas been mysteriously removed to your balance." to arg-2 if arg-2 is online
+                send "{@info} You have removed <#EEA215>%arg-3% ғᴀɪᴛʜ ᴛᴏᴋᴇɴs &ffrom the balance of &d%arg-2 if arg-2 isn't player else "yours"%&f."
+            else:
+                send "{@warn} ""%arg-2%"" doesn't exist or didn't join the server before."
+        else:
+            send ""
+            send "{@info} Economy Commands"
+            send ""
+            send "<#FFCF4A>/faitheco add (player) (amount)"
+            send "<#FFCF4A>/faitheco set (player) (amount)"
+            send "<#FFCF4A>/faitheco remove (player) (amount)"
+            send ""
+
+on tab complete of "faithrate":
+    set tab completions for position 1 to all players if sender has permission "faith.rate"
+    set tab completions for position 2 to "1", "2", "3", "4", "5", "6", "7", "8", "9", and "10" if sender has permission "faith.rate"
+
+command /faithrate [<offlineplayer>] [<number>]:
+    usage: {@usage} /faithrate <player> <rating 0-10>
+    cooldown: 12 hours
+    cooldown bypass: faith.rate.admin
+    trigger:
+        if isInRegion(player) isn't true:
+            send "{@warn} You're not in the city of faith."
+            stop
+        if arg-1 is not set:
+            send "{@usage} /faithrate <player> <rating 0-10>"
+            stop
+        
+        if arg-2 is not set:
+            send "{@usage} /faithrate <player> <rating 0-10>"
+            stop
+        
+        if arg-1 hasn't played before:
+            send "{@warn} ""%arg-1%"" doesn't exist or didn't join the server before."
+            stop
+        
+        if any:
+            arg-2 < 0
+            arg-2 > 10
+        then:
+            send "{@warn} Rating must be between 0 and 10."
+            stop
+        
+        if arg-1 is player:
+            send "{@warn} You cannot rate yourself."
+            stop
+        
+        if {faithrating::%arg-1's uuid%::voters::*} contains player's uuid:
+            send "{@warn} You have already rated this player."
+            stop
+        
+        add arg-2 to {faithrating::%arg-1's uuid%::ratings::*}
+        add player's uuid to {faithrating::%arg-1's uuid%::voters::*}
+        
+        set {_total} to 0
+        set {_count} to size of {faithrating::%arg-1's uuid%::ratings::*}
+        loop {faithrating::%arg-1's uuid%::ratings::*}:
+            add loop-value to {_total}
+        
+        set {_average} to {_total} / {_count}
+        set {buildscore::%arg-1's uuid%} to rounded {_average}
+        
+        send "{@info} You rated &d%arg-1%&f with <#EEA215>%arg-2%/10&f. Their new average is <#EEA215>%round({_average})%/10&f (%{_count}% rating%"s" if {_count} is 1 else ""%)."
+        send "{@info} &d%player%&f has rated you <#EEA215>%arg-2%/10&f. Your new average rating is <#EEA215>%rounded {_average}%/10&f." to arg-1 if arg-1 is online
+
+on tab complete of "faithrateadmin":
+    set tab completions for position 1 to "clear" and "view" if sender has permission "faith.rate.admin"
+    set tab completions for position 2 to all players if sender has permission "faith.rate.admin"
+
+command /faithrateadmin [<text>] [<offlineplayer>]:
+    permission: faith.rate.admin
+    permission message: {@noperm}
+    usage: {@usage} /faithrateadmin <clear|view> <player>
+    trigger:
+        if isInRegion(player) isn't true:
+            send "{@warn} You're not in the city of faith."
+            stop
+        if arg-1 is not set:
+            send ""
+            send "{@info} Rating Admin Commands"
+            send ""
+            send "<#FFCF4A>/faithrateadmin view <player> &7- View all ratings"
+            send "<#FFCF4A>/faithrateadmin clear <player> &7- Clear all ratings"
+            send ""
+            stop
+        
+        if arg-2 is not set:
+            send "{@usage} /faithrateadmin <clear|view> <player>"
+            stop
+        
+        if arg-2 hasn't played before:
+            send "{@warn} ""%arg-2%"" doesn't exist or didn't join the server before."
+            stop
+        
+        if arg-1 = "clear":
+            delete {faithrating::%arg-2's uuid%::*}
+            set {buildscore::%arg-2's uuid%} to 0
+            send "{@info} Cleared all ratings for &d%arg-2%&f."
+            send "{@info} Your ratings have been cleared by an administrator." to arg-2 if arg-2 is online
+        
+        else if arg-1 = "view":
+            set {_count} to size of {faithrating::%arg-2's uuid%::ratings::*}
+            if {_count} is 0:
+                send "{@info} &d%arg-2%&f has no ratings yet."
+                stop
+            
+            set {_total} to 0
+            loop {faithrating::%arg-2's uuid%::ratings::*}:
+                add loop-value to {_total}
+            set {_average} to {_total} / {_count}
+            
+            send ""
+            send "{@info} Ratings for &d%arg-2%&f"
+            send ""
+            send "<#FFCF4A>Average: <#EEA215>%rounded {_average}%/10"
+            send "<#FFCF4A>Total Ratings: &f%{_count}%"
+            send "<#FFCF4A>Individual Ratings: &f%{faithrating::%arg-2's uuid%::ratings::*}%"
+            send ""
+        
+        else:
+            send ""
+            send "{@info} Rating Admin Commands"
+            send ""
+            send "<#FFCF4A>/faithrateadmin view <player> &7- View all ratings"
+            send "<#FFCF4A>/faithrateadmin clear <player> &7- Clear all ratings"
+            send ""

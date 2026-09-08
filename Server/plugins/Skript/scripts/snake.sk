@@ -1,0 +1,484 @@
+# ============================================================
+#  SNAKE MINIGAME  —  snake_minigame.sk
+# ============================================================
+
+on load:
+    set {SNAKE::Corner::1} to location(-43.00, 101.00, 20.00, world "creative")
+    set {SNAKE::Corner::2} to location(-25.00, 101.00, 38.00, world "creative")
+    set {SNAKE::ALLPOS::*} to all blocks within {SNAKE::Corner::1} ~ vector(1, -1, 1) and {SNAKE::Corner::2} ~ vector(-2, -1, -2)
+
+function snakeStartDelay() :: number:
+    return 10
+
+function snakeSpeedStep() :: number:
+    return 1
+
+function snakeSpeedMin() :: number:
+    return 3
+
+function snakeEnrageMin() :: number:
+    return 2
+
+# Enrage triggers after this many ticks without eating (15 seconds = 300 ticks)
+function snakeEnrageThreshold() :: number:
+    return 300
+
+# ──────────────────────────────────────────────
+#  HELPER: arena bounds
+# ──────────────────────────────────────────────
+function arenaMinX() :: number:
+    return min({SNAKE::Corner::1}'s x, {SNAKE::Corner::2}'s x)
+
+function arenaMaxX() :: number:
+    return max({SNAKE::Corner::1}'s x, {SNAKE::Corner::2}'s x)
+
+function arenaMinZ() :: number:
+    return min({SNAKE::Corner::1}'s z, {SNAKE::Corner::2}'s z)
+
+function arenaMaxZ() :: number:
+    return max({SNAKE::Corner::1}'s z, {SNAKE::Corner::2}'s z)
+
+function arenaY() :: number:
+    return {SNAKE::Corner::1}'s y
+
+function arenaWorld() :: world:
+    return world of {SNAKE::Corner::1}
+
+
+# ──────────────────────────────────────────────
+#  COMMANDS
+# ──────────────────────────────────────────────
+command /startsnake:
+    permission: snake.start
+    trigger:
+        if {SNAKE::Running} is true:
+            send "&cSnake is already running!" to player
+            stop
+        startSnakeGame()
+        send "&aSnake game started!" to player
+
+command /stopsnake:
+    permission: snake.stop
+    trigger:
+        {SNAKE::Running} isn't true:
+            send "&cNo Snake currently eating!" to player
+            stop
+        endSnakeGame(true)
+        send "&cSnake game force-stopped." to player
+
+on command:
+    {SNAKE::Running} is true
+    player is within {SNAKE::Corner::1} and {SNAKE::Corner::2} ~ vector(0, 20, 0)
+    cancel event
+    send "The Snake eat your command request" to player
+
+on break:
+    {SNAKE::Running} is true
+    player is within {SNAKE::Corner::1} and {SNAKE::Corner::2} ~ vector(0, 20, 0)
+    cancel event
+    if event-block is lime concrete powder, lime wool, red concrete powder, or red wool:
+        send "The Snake parried you." to player
+    else:
+        send "The ground parried you." to player
+
+on place:
+    {SNAKE::Running} is true
+    player is within {SNAKE::Corner::1} and {SNAKE::Corner::2} ~ vector(0, 20, 0)
+    cancel event
+    send "Before the block even render, the Snake ate it." to player
+
+on click:
+    {SNAKE::Running} is true
+    player is within {SNAKE::Corner::1} and {SNAKE::Corner::2} ~ vector(0, 20, 0)
+    cancel event
+    send "You sent a click packet... The Snake ate it." to player
+
+on damage:
+    {SNAKE::Running} is true
+    attacker is within {SNAKE::Corner::1} and {SNAKE::Corner::2} ~ vector(0, 20, 0)
+    cancel event
+    send "You sent a damage packet... The Snake ate it." to attacker
+
+on spawn:
+    {SNAKE::Running} is true
+    entity is within {SNAKE::Corner::1} and {SNAKE::Corner::2} ~ vector(0, 20, 0)
+    cancel event
+    send "You tried to spawn an entity... The Snake ate it." to player
+
+function clear_board():
+    set all blocks within {SNAKE::Corner::1} ~ vector(0, -1, 0) and {SNAKE::Corner::2} ~ vector(-1, -1, -1) to black concrete
+    set {_floor::*} to all blocks within {SNAKE::Corner::1} ~ vector(1, -1, 1) and {SNAKE::Corner::2} ~ vector(-2, -1, -2)
+    set blocks at ({_floor::*} where [mod(input's x + (input's z), 2) is 0]) to green terracotta
+    set blocks at ({_floor::*} where [mod(input's x + (input's z), 2) is 1]) to green concrete
+    set {_block::*} to all blocks within {SNAKE::Corner::1} ~ vector(0, 0, 0) and {SNAKE::Corner::2} ~ vector(0, 20, 0)
+    set blocks at {_block::*} to air
+
+# ──────────────────────────────────────────────
+#  STARTUP
+# ──────────────────────────────────────────────
+function startSnakeGame():
+    set {SNAKE::Running} to true
+    set {SNAKE::Delay} to snakeStartDelay()
+    set {SNAKE::Enraged} to false
+    set {SNAKE::TicksSinceEat} to 0
+
+    set {SNAKE::Players::*} to all players within {SNAKE::Corner::1} and {SNAKE::Corner::2} ~ vector(0, 20, 0)
+    set {SNAKE::OGPlayer::*} to {SNAKE::Players::*}
+
+    loop {SNAKE::Players::*}:
+        teleport loop-value to random element of {SNAKE::ALLPOS::*} ~ vector(0, 0.5, 0)
+
+    if size of {SNAKE::Players::*} < 2:
+        broadcast "&cNeed at least 2 players in the arena to start!"
+        set {SNAKE::Running} to false
+        stop
+
+    set worldborder of {SNAKE::Players::*} to a virtual worldborder:
+        set worldborder radius to 9
+        set world border center of event-worldborder to location(-34, 102, 29, world "creative")
+
+    set gamemode of {SNAKE::Players::*} to creative
+    set {SNAKE::Players::*}'s flight mode to false
+    set {SNAKE::Players::*}'s helmet to apple
+    set {SNAKE::Players::*}'s hunger to 20
+    set {SNAKE::Players::*}'s saturation to 200
+    clear_board()
+
+    broadcast "&aSnake will appear in the center of the board in 5 seconds%nl%Get Ready!!"
+
+    wait 5 seconds
+
+    broadcast "&6&lSNAKE &eis hunting! &7(%size of {SNAKE::Players::*}% players)"
+
+    set {_cx} to floor((arenaMinX() + arenaMaxX()) / 2)
+    set {_cz} to floor((arenaMinZ() + arenaMaxZ()) / 2)
+    set {_y}  to arenaY()
+    set {_w}  to arenaWorld()
+
+    delete {SNAKE::Body::*}
+    set {SNAKE::Body::1} to location({_cx}, {_y}, {_cz}, {_w})
+    set {SNAKE::Body::2} to location({_cx} + 1 * -1, {_y}, {_cz}, {_w})
+    set {SNAKE::Body::3} to location({_cx} + 2 * -1, {_y}, {_cz}, {_w})
+    set {SNAKE::Length} to 3
+
+    set {SNAKE::DX} to 1
+    set {SNAKE::DZ} to 0
+
+    drawSnake()
+    scheduleSnakeMove()
+
+
+# ──────────────────────────────────────────────
+#  SCHEDULING
+# ──────────────────────────────────────────────
+function scheduleSnakeMove():
+    wait timespan({SNAKE::Delay}, ticks)
+    if {SNAKE::Running} is true:
+        snakeMove()
+
+
+# ──────────────────────────────────────────────
+#  MAIN MOVE TICK
+# ──────────────────────────────────────────────
+function snakeMove():
+    if {SNAKE::Running} is not true:
+        stop
+
+    # Tick the hunger timer and check for enrage
+    set {SNAKE::TicksSinceEat} to {SNAKE::TicksSinceEat} + {SNAKE::Delay}
+    if {SNAKE::Enraged} is false:
+        if {SNAKE::TicksSinceEat} >= snakeEnrageThreshold():
+            enrageSnake()
+
+    chooseDirection()
+
+    set {_head} to {SNAKE::Body::1}
+    set {_nx} to {_head}'s x + {SNAKE::DX}
+    set {_nz} to {_head}'s z + {SNAKE::DZ}
+    set {_y}  to arenaY()
+    set {_w}  to arenaWorld()
+
+    if {_nx} < arenaMinX():
+        set {_nx} to arenaMaxX()
+    if {_nx} > arenaMaxX():
+        set {_nx} to arenaMinX()
+    if {_nz} < arenaMinZ():
+        set {_nz} to arenaMaxZ()
+    if {_nz} > arenaMaxZ():
+        set {_nz} to arenaMinZ()
+
+    set {_newHead} to location({_nx}, {_y}, {_nz}, {_w})
+
+    # ── Self-collision: if the new head would land on any body segment
+    #    (excluding the tail, which vacates this tick), end the game.
+    set {_selfHit} to false
+    set {_checkLen} to {SNAKE::Length} - 1
+    loop {_checkLen} times:
+        set {_bx} to {SNAKE::Body::%loop-number%}'s x
+        set {_bz} to {SNAKE::Body::%loop-number%}'s z
+        if {_bx} is {_nx}:
+            if {_bz} is {_nz}:
+                set {_selfHit} to true
+
+    if {_selfHit} is true:
+        broadcast "&c&lSNAKE ate itself! Game over."
+        endSnakeGame(false)
+        stop
+
+    set {_ate} to false
+    loop {SNAKE::Players::*}:
+        # Only eat one player per tick
+        if {_ate} is true:
+            stop loop
+        # Kill any player who has escaped outside the arena border
+        if loop-value is not within {SNAKE::Corner::1} and {SNAKE::Corner::2} ~ vector(0, 20, 0):
+            set {_escapee} to loop-value
+            set {_msg} to a random element out of "&7%{_escapee}% tried to escape. The snake has a long memory.", "&7%{_escapee}% forgot the snake can see them from here.", "&7%{_escapee}% thought grass was safer. It was not.", "&7%{_escapee}% left the arena. The snake filed a complaint.", "&7%{_escapee}% tried to leave. The snake disagreed." and "&7%{_escapee}% escaped the arena but not their fate."
+            broadcast {_msg}
+            eatPlayer({_escapee})
+            set {_ate} to true
+        else:
+            set {_px} to floor(loop-value's x)
+            set {_pz} to floor(loop-value's z)
+            if {_px} is {_nx}:
+                if {_pz} is {_nz}:
+                    eatPlayer(loop-value)
+                    set {_ate} to true
+
+    set {_len} to {SNAKE::Length}
+    if {_ate} is false:
+        # Clear the old tail block AND its barrier before shifting
+        set {_oldTail} to {SNAKE::Body::%{_len}%}
+        set block at {_oldTail} to air
+        set block at location({_oldTail}'s x, {_y} + 1, {_oldTail}'s z, {_w}) to air
+        set {_i} to {_len}
+        while {_i} > 1:
+            set {SNAKE::Body::%{_i}%} to {SNAKE::Body::%{_i} - 1%}
+            set {_i} to {_i} - 1
+        set {SNAKE::Length} to {_len}
+    else:
+        # Snake grows — no tail removal, just shift body array forward
+        set {_len} to {_len} + 1
+        set {_i} to {_len}
+        while {_i} > 1:
+            set {SNAKE::Body::%{_i}%} to {SNAKE::Body::%{_i} - 1%}
+            set {_i} to {_i} - 1
+        set {SNAKE::Length} to {_len}
+
+    set {SNAKE::Body::1} to {_newHead}
+
+    drawSnake()
+
+    if size of {SNAKE::Players::*} <= 1:
+        endSnakeGame(false)
+        stop
+
+    scheduleSnakeMove()
+
+
+# ──────────────────────────────────────────────
+#  ENRAGE
+#  - Forces speed to min (2 ticks/move)
+#  - Restores previous speed on expire or eat
+#  - Auto-expires after 5 seconds (100 ticks)
+#  - Eating while enraged also cancels it early
+# ──────────────────────────────────────────────
+function enrageSnake():
+    set {SNAKE::PreEnrageDelay} to {SNAKE::Delay}
+    set {SNAKE::Enraged} to true
+    set {SNAKE::Delay} to snakeEnrageMin()
+    broadcast "&c&lTHE SNAKE IS ENRAGED!"
+    loop {SNAKE::Players::*}:
+        play sound "entity.ender_dragon.growl" at loop-value
+    drawSnake()
+    # Auto-unenrage after 5 seconds (100 ticks)
+    wait timespan(100, ticks)
+    if {SNAKE::Enraged} is true:
+        if {SNAKE::Running} is true:
+            unenrageSnake()
+
+
+function unenrageSnake():
+    set {SNAKE::Enraged} to false
+    set {SNAKE::TicksSinceEat} to 0
+    # Restore speed to what it was before enrage
+    set {SNAKE::Delay} to {SNAKE::PreEnrageDelay}
+    delete {SNAKE::PreEnrageDelay}
+    broadcast "&a&lThe snake has calmed down."
+    drawSnake()
+
+
+# ──────────────────────────────────────────────
+#  AI — body-aware direction scoring
+#  Skips any direction that would drive the head
+#  into a body segment (tail excluded, it moves).
+# ──────────────────────────────────────────────
+function chooseDirection():
+    set {_head} to {SNAKE::Body::1}
+    set {_hx} to {_head}'s x
+    set {_hz} to {_head}'s z
+
+    set {_bestDist} to 999999
+    set {_tx} to {_hx}
+    set {_tz} to {_hz}
+    loop {SNAKE::Players::*}:
+        set {_px} to floor(loop-value's x)
+        set {_pz} to floor(loop-value's z)
+        set {_d} to abs({_hx} - {_px}) + abs({_hz} - {_pz})
+        if {_d} < {_bestDist}:
+            set {_bestDist} to {_d}
+            set {_tx} to {_px}
+            set {_tz} to {_pz}
+
+    set {_bestScore} to 999999
+    set {_bestDX} to {SNAKE::DX}
+    set {_bestDZ} to {SNAKE::DZ}
+
+    set {_dirs::1::dx} to 1
+    set {_dirs::1::dz} to 0
+    set {_dirs::2::dx} to 1 * -1
+    set {_dirs::2::dz} to 0
+    set {_dirs::3::dx} to 0
+    set {_dirs::3::dz} to 1
+    set {_dirs::4::dx} to 0
+    set {_dirs::4::dz} to 1 * -1
+
+    loop 4 times:
+        set {_ddx} to {_dirs::%loop-number-1%::dx}
+        set {_ddz} to {_dirs::%loop-number-1%::dz}
+
+        # Cannot reverse direction
+        if {_ddx} is {SNAKE::DX} * -1:
+            if {_ddz} is {SNAKE::DZ} * -1:
+                continue
+
+        set {_nx} to {_hx} + {_ddx}
+        set {_nz} to {_hz} + {_ddz}
+
+        if {_nx} < arenaMinX():
+            set {_nx} to arenaMaxX()
+        if {_nx} > arenaMaxX():
+            set {_nx} to arenaMinX()
+        if {_nz} < arenaMinZ():
+            set {_nz} to arenaMaxZ()
+        if {_nz} > arenaMaxZ():
+            set {_nz} to arenaMinZ()
+
+        # Skip this direction if it collides with the body (tail excluded)
+        set {_bodyHit} to false
+        set {_checkLen} to {SNAKE::Length} - 1
+        loop {_checkLen} times:
+            set {_bx} to {SNAKE::Body::%loop-number-2%}'s x
+            set {_bz} to {SNAKE::Body::%loop-number-2%}'s z
+            if {_bx} is {_nx}:
+                if {_bz} is {_nz}:
+                    set {_bodyHit} to true
+
+        if {_bodyHit} is true:
+            continue
+
+        set {_score} to abs({_nx} - {_tx}) + abs({_nz} - {_tz})
+        if {_score} < {_bestScore}:
+            set {_bestScore} to {_score}
+            set {_bestDX} to {_ddx}
+            set {_bestDZ} to {_ddz}
+
+    set {SNAKE::DX} to {_bestDX}
+    set {SNAKE::DZ} to {_bestDZ}
+
+
+# ──────────────────────────────────────────────
+#  DRAW
+#  Normal:  head = lime concrete powder, body = lime wool
+#  Enraged: head = red concrete powder,  body = red wool
+#  A barrier is placed one block above every segment so
+#  players cannot stand or jump on top of the snake.
+# ──────────────────────────────────────────────
+function drawSnake():
+    set {_y} to arenaY()
+    set {_w} to arenaWorld()
+    loop {SNAKE::Length} times:
+        set {_loc} to {SNAKE::Body::%loop-number%}
+        if {_loc} is set:
+            if loop-number is 1:
+                if {SNAKE::Enraged} is true:
+                    set block at {_loc} to red concrete powder
+                else:
+                    set block at {_loc} to lime concrete powder
+            else:
+                if {SNAKE::Enraged} is true:
+                    set block at {_loc} to red wool
+                else:
+                    set block at {_loc} to lime wool
+            # Invisible barrier roof — stops players landing on the snake
+            set block at location({_loc}'s x, {_y} + 1, {_loc}'s z, {_w}) to barrier
+
+
+# ──────────────────────────────────────────────
+#  PLAYER EATEN
+# ──────────────────────────────────────────────
+function eatPlayer(p: player):
+    broadcast "&6&lSNAKE &7ate &e%{_p}%&7! &a(+1 length)"
+    play sound "entity.player.death" at {_p}
+    teleport {_p} to location({_p}'s x, arenaY() + 5, {_p}'s z, arenaWorld())
+    set gamemode of {_p} to spectator
+    remove {_p} from {SNAKE::Players::*}
+
+    # Reset hunger timer; cancel enrage early if active
+    if {SNAKE::Enraged} is true:
+        unenrageSnake()
+    else:
+        set {SNAKE::TicksSinceEat} to 0
+
+    set {_newDelay} to {SNAKE::Delay} - snakeSpeedStep()
+    if {_newDelay} < snakeSpeedMin():
+        set {_newDelay} to snakeSpeedMin()
+    set {SNAKE::Delay} to {_newDelay}
+    broadcast "&7Snake speed: &c%{SNAKE::Delay}% ticks/move"
+
+
+# ──────────────────────────────────────────────
+#  END GAME
+# ──────────────────────────────────────────────
+function endSnakeGame(forced: boolean):
+    set {SNAKE::Running} to false
+
+    if {_forced} is false:
+        if size of {SNAKE::Players::*} is 1:
+            set {_winner} to first element of {SNAKE::Players::*}
+            broadcast "&6&lSNAKE GAME OVER! &e%{_winner}% &asurvived!"
+            set gamemode of {_winner} to survival
+        else:
+            broadcast "&6&lSNAKE GAME OVER! &7Nobody survived."
+    else:
+        broadcast "&cSnake game was forcibly ended."
+
+    set {SNAKE::OGPlayer::*}'s flight mode to true
+
+    # Reset every player's virtual worldborder back to the server default
+    reset worldborder of {SNAKE::OGPlayer::*}
+
+    set {SNAKE::OGPlayer::*}'s gamemode to creative
+
+    loop {SNAKE::OGPlayer::*}:
+        teleport loop-value to random element of {SNAKE::ALLPOS::*} ~ vector(0, 0.5, 0)
+
+    delete {SNAKE::Players::*} and {SNAKE::OGPlayer::*}
+
+    # Clear snake body blocks AND the barrier blocks above each segment
+    set {_y} to arenaY()
+    set {_w} to arenaWorld()
+    loop {SNAKE::Length} times:
+        set {_loc} to {SNAKE::Body::%loop-number%}
+        if {_loc} is set:
+            set block at {_loc} to air
+            set block at location({_loc}'s x, {_y} + 1, {_loc}'s z, {_w}) to air
+
+    delete {SNAKE::Body::*}
+    delete {SNAKE::Length}
+    delete {SNAKE::DX}
+    delete {SNAKE::DZ}
+    delete {SNAKE::Delay}
+    delete {SNAKE::Enraged}
+    delete {SNAKE::TicksSinceEat}
+    delete {SNAKE::PreEnrageDelay}

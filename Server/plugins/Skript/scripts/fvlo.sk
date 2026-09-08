@@ -1,0 +1,25 @@
+options:
+	err: &8(&4&l❗&8)&c
+	info: &8(<##FC00FF>&l❗&8)&f
+	usage: &8(&4&l❗&8) &cCorrect command usage &7»&f
+	notyou: &8(&4&l❗&8) &cConsole may not use this command.
+	noperm: &8(&4&l❗&8) &cYou do not have permission for this command.
+	notthis: &8(&4&l❗&8) &cYou may not use this feature of the command.
+	nothere: &8(&4&l❗&8) &cYou may not use this command in this region.
+	nothigh: &8(&4&l❗&8) &cThat person has a higher authority than you.
+	notnow: &8(&4&l❗&8) &cYou may use this command after %remaining time%.
+	notplayed: &8(&4&l❗&8) &cPlayer hasn't played before
+
+command /reach [<number=4.5>]:
+    trigger:
+        if arg < 0:
+            send "{@err} Reach must be at least 0 blocks!" to player
+            stop
+
+        if arg > 100:
+            send "{@err} Reach cannot exceed 100 blocks!" to player
+            stop
+
+        set player's block interaction range attribute to arg
+        
+        send "{@info} Your reach has been set to &e%arg% blocks&f!%" &7(&ddefault&7)" if arg is 4.5 else ""%" to player

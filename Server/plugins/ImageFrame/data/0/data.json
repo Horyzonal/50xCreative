@@ -1,0 +1,59 @@
+{
+  "type": "imageframe:url_static",
+  "index": 0,
+  "name": "honeyslime",
+  "url": "https://static.wikia.nocookie.net/slime-rancherr/images/b/b6/Honey_Slime_SP.png/revision/latest?cb\u003d20170710022302\u0026path-prefix\u003dpl",
+  "width": 3,
+  "height": 3,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "hasAccess": {},
+  "creationTime": 1779630907296,
+  "mapdata": [
+    {
+      "mapid": 41,
+      "image": "0.png",
+      "markers": []
+    },
+    {
+      "mapid": 42,
+      "image": "1.png",
+      "markers": []
+    },
+    {
+      "mapid": 43,
+      "image": "2.png",
+      "markers": []
+    },
+    {
+      "mapid": 44,
+      "image": "3.png",
+      "markers": []
+    },
+    {
+      "mapid": 45,
+      "image": "4.png",
+      "markers": []
+    },
+    {
+      "mapid": 46,
+      "image": "5.png",
+      "markers": []
+    },
+    {
+      "mapid": 47,
+      "image": "6.png",
+      "markers": []
+    },
+    {
+      "mapid": 48,
+      "image": "7.png",
+      "markers": []
+    },
+    {
+      "mapid": 49,
+      "image": "8.png",
+      "markers": []
+    }
+  ]
+}

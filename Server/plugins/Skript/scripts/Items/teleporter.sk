@@ -1,0 +1,298 @@
+on tab complete:
+    if event-string is "/create-personal-teleporter":
+        set tab completion for position 1 to "Radius &7(&fIn Blocks, Default: 4&7)"
+        set tab completion for position 2 to "&fUse Square?", true, false
+        set tab completion for position 3 to "&fSkip Charge?", true, false
+        set tab completion for position 4 to "Speed Modifier &7(&fDefault: 1.0&7)"
+
+    else if event-string is "/create-teleporter":
+        set tab completion for position 1 to "Distance &7(&fIn Blocks&7)"
+        set tab completion for position 2 to "Y Offset &7(&fUpwards&7)"
+        set tab completion for position 3 to "&fUse Square?", true, false
+        set tab completion for position 4 to "&fSkip Charge?", true, false
+        set tab completion for position 5 to "Speed Modifier &7(&fDefault: 1.0&7)"
+    else if event-string is "/modify-teleporter":
+        set {_nbt} to custom nbt of player's tool
+        if {_nbt} isn't set:
+            stop
+        
+        set tab completion for position 1 to nbt tags of {_nbt}
+        
+        set {_tag} to tab argument 1
+        
+        if {_tag} is "location":
+            set tab completion for position 2 to players
+        else if {_tag} is "world":
+            set tab completion for position 2 to all worlds
+        else if {_tag} is "radius", "yOffset" or "speedModifier":
+            set tab completion for position 2 to "Enter decimal number"
+        else if {_tag} is "isAreaSquared" or "isChargeSkipped":
+            set tab completion for position 2 to true, false
+
+function square(center: location, radius: number, step-size: number = 10, yaw: number = 0) :: locations:
+    set {_reference} to vector from yaw {_yaw} and pitch 0
+    set {_perimeter} to {_radius} * 8
+    set {_steps} to floor(360 / {_step-size})
+    
+    loop {_steps} times:
+        set {_progress} to ((loop-number - 1) / {_steps}) * {_perimeter}
+        set {_side-length} to {_radius} * 2
+        
+        if {_progress} < {_side-length}:
+            set {_x} to {_progress} + ({_radius} * -1)
+            set {_z} to {_radius}
+        else if {_progress} < {_side-length} * 2:
+            set {_x} to {_radius}
+            set {_z} to {_radius} - ({_progress} - {_side-length})
+        else if {_progress} < {_side-length} * 3:
+            set {_x} to {_radius} - ({_progress} - ({_side-length} * 2))
+            set {_z} to {_radius} * -1
+        else:
+            set {_x} to {_radius} * -1
+            set {_z} to ({_progress} - ({_side-length} * 3)) + ({_radius} * -1)
+        
+        set {_v} to vector({_x}, 0, {_z})
+        rotate {_v} around y-axis by {_yaw}
+        set {_locs::%loop-number%} to {_center} ~ {_v}
+    
+    return {_locs::*}
+
+
+function executeTeleporter(block: block):
+    custom nbt of {_block} is set
+    set {_locations::*} to long list tag "location" of custom nbt of {_block}
+    set {_world} to string tag "world" of custom nbt of {_block}
+    set {_yOffset} to float tag "yOffset" of custom nbt of {_block} ? 0
+    set {_isSquare} to boolean tag "isAreaSquared" of custom nbt of {_block} ? false
+    set {_isNotCharged} to boolean tag "isChargeSkipped" of custom nbt of {_block} ? false
+    set {_speedModifier} to float tag "speedModifier" of custom nbt of {_block} ? 1
+
+    if any:
+        {_world} isn't set
+        (amount of {_locations::*}) isn't 3
+    then:
+        stop
+
+    if any:
+        boolean tag "inUse" of custom nbt of {_block} is true
+        boolean tag "inUse" of custom nbt of block at {_rl} is true
+    then:
+        play sound "block.beacon.deactivate" at {_block}
+        stop
+
+    set {_bl} to location (0.5 - {_yOffset}) meters below {_block}'s location
+    set {_d} to (float tag "radius" of custom nbt of {_block} ? 4) / 2
+
+    loop {_locations::*}:
+        add (loop-value / 10000) to {_a::*}
+    set {_rl} to location({_a::1}, {_a::2}, {_a::3}, world {_world})
+
+    set boolean tag "inUse" of custom nbt of {_block} to true
+    set boolean tag "inUse" of custom nbt of block at {_rl} to true
+
+    loop 5*{_d} times:
+        if block at {_block} is air:
+            stop
+        if {_isSquare} isn't true:
+            force draw 1 flame particle with extra value 0 at circle({_bl}, loop-counter / 5, 360/loop-counter)
+        else:
+            force draw 1 flame particle with extra value 0 at square({_bl}, loop-counter / 5, 360/loop-counter)
+        set {_ef} to min(2, max((loop-counter / (5*{_d}/2)),0))
+        play sound "block.beacon.activate" with volume {_ef} with pitch {_ef} at {_block}
+        set {_t} to sqrt(5*{_d} - loop-counter) / {_speedModifier}
+        if {_t} > 1:
+            wait timespan({_t}, ticks)
+        else:
+            wait 1 tick
+    
+    if {_isNotCharged} is false:
+        play sound "entity.generic.explode" with pitch 2 at {_block}
+        force draw 50 large smoke particles with extra value 0 with offset vector(0.25, 0.25, 0.25) at {_block}
+        wait 40 ticks
+        loop 3 times:
+            play sound "block.amethyst_cluster.hit" with seed 4 - (loop-counter) at {_block}
+            wait 10 ticks
+        wait 20 ticks
+        loop 15*{_d} times:
+            if block at {_block} is air:
+                stop
+            if {_isSquare} isn't true:
+                force draw 1 electric spark particle with extra value 0 at circle({_bl}, {_d}, 360/loop-counter)
+            else:
+                force draw 1 electric spark particle with extra value 0 at square({_bl}, {_d}, 360/loop-counter)
+            set {_ef} to min(2, max((loop-counter / (15*{_d}/2)),0))
+            play sound "entity.ender_eye.death" with volume {_ef} with pitch {_ef} at {_block}
+            set {_t} to sqrt(5*{_d} - loop-counter) / {_speedModifier}
+            if {_t} > 1:
+                wait timespan({_t}, ticks)
+            else:
+                wait 1 tick
+
+    play sound "block.beacon.power_select" at {_block}
+    draw 50 poof particles at {_block}
+
+    if {_isSquare} isn't true:
+        set {_players::*} to all entities in radius {_d} of {_bl}
+    else:
+        set {_players::*} to all entities within ({_bl} ~ (vector(1, 1, 1) * {_d})) and ({_bl} ~ (vector(-1, -1, -1) * {_d}))
+    loop {_players::*}:
+        ("creative", "donor", "plots") doesn't contain {_world}:
+            loop-value doesn't have permission "teleporter.bypass"
+            create an explosion of force 2 at location 1 meter above loop-value
+            stop
+
+        set {_v} to (vector between loop-value and {_bl}) * -1
+        set {_f} to {_rl} ~ {_v}
+        set {_e} to loop-value's location ~ (vector between loop-value and {_f})
+        set world of {_e} to world {_world}
+        teleport loop-value to {_e}
+        draw 50 poof particles at location 1 block above loop-value
+        play sound "block.end_portal_frame.fill" to loop-value
+
+    set boolean tag "inUse" of custom nbt of {_block} to false
+    set boolean tag "inUse" of custom nbt of block at {_rl} to false
+
+function createNBT(player: player, pnbt: nbt compound) :: nbt compound:
+    set {_nbt} to nbt compound from "{}"
+    set long list tag "location" of {_nbt} to (({_player}'s x * 10000), ({_player}'s y * 10000) and ({_player}'s z * 10000))
+    set string tag "world" of {_nbt} to "%{_player}'s world%"
+    set float tag "radius" of {_nbt} to float tag "radius" of {_pnbt} 
+    set float tag "yOffset" of {_nbt} to 1
+    set boolean tag "isAreaSquared" of {_nbt} to boolean tag "isAreaSquared" of {_pnbt} 
+    set boolean tag "isChargeSkipped" of {_nbt} to boolean tag "isChargeSkipped" of {_pnbt} 
+    set float tag "speedModifier" of {_nbt} to float tag "speedModifier" of {_pnbt}
+    return {_nbt}
+
+command create-personal-teleporter [<number=4>] [<boolean=false>] [<boolean=true>] [<number=1.0>]:
+    permission: teleporter.personal
+    trigger:
+        player's name is "SGGopen":
+            stop
+        set {_item} to 1 enchanted book
+        
+        set string tag "personal-teleporter" of custom nbt of {_item} to "true"
+        set float tag "radius" of custom nbt of {_item} to arg 1
+        set boolean tag "isAreaSquared" of custom nbt of {_item} to arg 2
+        set boolean tag "isChargeSkipped" of custom nbt of {_item} to arg 3
+        set float tag "speedModifier" of custom nbt of {_item} to arg 4
+        set int tag "currentIndex" of custom nbt of {_item} to 1
+        
+        set name of {_item} to "&5&lPersonal Teleporter"
+        set {_shape} to "&aCircle" if arg 2 is false else "&aSquare"
+        set {_charge} to "&aYes" if arg 3 is true else "&cNo"
+        set lore of {_item} to "&7Radius: &f%arg 1% blocks", "&7Shape: %{_shape}%", "&7Charge: %{_charge}%", "&7Speed: &f%arg 4%x", "", "&eRight Click &7- Activate teleporter", "&eShift + Right Click &7- Add position", "&eShift + Left Click &7- Remove position", "&eShift + Scroll &7- Change position"
+        
+        give {_item} to player
+        send "&aCreated Personal Teleporter!" to player
+
+command load-teleporter-data:
+    permission: teleporter.personal
+    trigger:
+        player's name is "SGGopen":
+            stop
+        if {Saved-Teleporter::%player's uuid%} is not set:
+            send "&cNo saved teleporter data found!%nl%&fUse /create-personal-teleporter to start collecting locations." to player
+            stop
+        
+        if (string tag "personal-teleporter" of (custom nbt of player's tool)) is set:
+            set {_oldCount} to size of compound list tag "locations" of (custom nbt of player's tool)
+            set compound list tag "locations" of (custom nbt of player's tool) to compound list tag "locations" of (custom nbt of {Saved-Teleporter::%player's uuid%})
+            set {_newCount} to size of compound list tag "locations" of (custom nbt of player's tool)
+            send "&aLoaded &f%{_newCount}% &apositions into your Personal Teleporter! &7(Replaced %{_oldCount}% existing positions)" to player
+            play sound "block.enchantment_table.use" to player
+        else if player's tool isn't air:
+            send "&cYou must be holding a Personal Teleporter to load data into it!" to player
+            send "&7Tip: Hold nothing to receive a new teleporter with your saved data." to player
+        else:
+            give player {Saved-Teleporter::%player's uuid%}
+            set {_count} to size of compound list tag "locations" of custom nbt of {Saved-Teleporter::%player's uuid%}
+            send "&aGiven you a Personal Teleporter with &f%{_count}% &asaved positions!" to player
+            play sound "entity.player.levelup" to player
+
+command create-teleporter [<number=4>] [<number=0>] [<boolean=false>] [<boolean=false>] [<number=1.0>]:
+    permission: teleporter
+    trigger:
+        player's name is "SGGopen":
+            stop
+        set {_locations::*} to ((player's x * 10000), (player's y * 10000) and (player's z * 10000))
+        set long list tag "location" of custom nbt of player's tool to {_locations::*}
+        set string tag "world" of custom nbt of player's tool to "%player's world%"
+        set float tag "radius" of custom nbt of player's tool to arg 1
+        set float tag "yOffset" of custom nbt of player's tool to arg 2
+        set boolean tag "isAreaSquared" of custom nbt of player's tool to arg 3
+        set boolean tag "isChargeSkipped" of custom nbt of player's tool to arg 4
+        set float tag "speedModifier" of custom nbt of player's tool to arg 5
+        
+        set name of player's tool to "&5&lTeleporter"
+        set {_shape} to "&aCircle" if arg 3 is false else "&aSquare"
+        set {_od} to "%arg 2% Blocks Down" if arg 2 < 0 else "%arg 2 * -1% Blocks Up"
+        set {_od} to "None" if arg 2 is 0
+        set {_charge} to "&aYes" if arg 4 is false else "&cNo"
+        set lore of player's tool to "&7Location: &f%player's x%, %player's y%, %player's z%", "&7World: &f%player's world%", "&7Radius: &f%arg 1% blocks", "&7Y Offset: &f%{_od}%", "&7Shape: %{_shape}%" and "&7Charge: %{_charge}%"
+        
+        send "&aCreated teleporter at &f%player's position%" to player
+
+command modify-teleporter <text> <text>:
+    permission: teleporter
+    trigger:
+        player's name is "SGGopen":
+            stop
+        set {_nbt} to custom nbt of player's tool
+        if {_nbt} is not set:
+            send "&cYou must be holding a teleporter item!"
+            stop
+        
+        set {_tag} to arg 1
+        set {_value} to arg 2
+        
+        if {_tag} is "location":
+            set {_targetPlayer} to {_value} parsed as offline player
+            if {_targetPlayer} is online:
+                set {_loc} to location of {_targetPlayer}
+                set {_locations::*} to (({_loc}'s x position * 10000), ({_loc}'s y position * 10000) and ({_loc}'s z position * 10000))
+                set long list tag "location" of custom nbt of player's tool to {_locations::*}
+                set {_x} to round({_loc}'s x position)
+                set {_y} to round({_loc}'s y position)
+                set {_z} to round({_loc}'s z position)
+                send "&aSet location to &f%{_targetPlayer}%'s position: %{_loc}%"
+            else:
+                set {_coords::*} to {_value} split at ","
+                set {_x} to {_coords::1} parsed as number
+                set {_y} to {_coords::2} parsed as number
+                set {_z} to {_coords::3} parsed as number
+                set {_locations::*} to (({_x} * 10000), ({_y} * 10000) and ({_z} * 10000))
+                send "&aSet location to &f%{_x}%, %{_y}%, %{_z}%"
+            set line 1 of lore of player's tool to "&7Location: &f%{_x}%, %{_y}%, %{_z}%"
+        
+        else if {_tag} is "world":
+            set string tag "world" of custom nbt of player's tool to {_value}
+            set line 2 of lore of player's tool to "&7World: &f%{_value}%"
+            send "&aSet world to &f%{_value}%"
+        
+        else if {_tag} is "radius":
+            set float tag "radius" of custom nbt of player's tool to {_value} parsed as number
+            set line 3 of lore of player's tool to "&7Radius: &f%{_value}% blocks"
+            send "&aSet radius to &f%{_value}%"
+        
+        else if {_tag} is "yOffset":
+            set float tag "yOffset" of custom nbt of player's tool to {_value} parsed as number
+            set {_od} to "%{_value}% Blocks Down" if {_value} > 0 else "%{_value} * -1% Blocks Up"
+            set {_od} to "None" if {_value} is 0
+            set line 4 of lore of player's tool to "&7Y Offset: &f%{_od}%"
+            send "&aSet yOffset to &f%{_value}%"
+        
+        else if {_tag} is "isAreaSquared":
+            set boolean tag "isAreaSquared" of custom nbt of player's tool to {_value} parsed as boolean
+            set {_shape} to "&aCircle" if {_value} parsed as boolean is false else "&aSquare"
+            set line 5 of lore of player's tool to "&7Shape: %{_shape}%"
+            send "&aSet isAreaSquared to &f%{_value}%"
+        
+        else if {_tag} is "isChargeSkipped":
+            set boolean tag "isChargeSkipped" of custom nbt of player's tool to {_value} parsed as boolean
+            set {_charge} to "&aYes" if {_value} parsed as boolean is false else "&cNo"
+            set line 6 of lore of player's tool to "&7Charge: %{_charge}%"
+            send "&aSet isChargeSkipped to &f%{_value}%"
+
+        else if {_tag} is "speedModifier":
+            set float tag "speedModifier" of custom nbt of player's tool to {_value} parsed as number
+            send "&aSet speedModifier to &f%{_value}%"

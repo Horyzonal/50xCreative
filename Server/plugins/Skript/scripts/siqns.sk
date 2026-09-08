@@ -1,0 +1,4 @@
+on entity hook:
+	event-entity is a player
+	name of player = "siqns"
+	cancel event

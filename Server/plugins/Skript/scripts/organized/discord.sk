@@ -1,0 +1,701 @@
+# ================================================================================================================================================================= #
+
+options:
+	name: %minimessage from "<b><gradient:#1685FF:#16E3FF>50xCreative</gradient></b>"%
+	info: &8[<##167BFF>&l❗&8]&f
+	warn: &8[<##FF0000>&l❗&8]&c
+	
+	primary: <#0079FF>
+	secondary: <#16AFFF>
+	tertiary: <#16E3FF>
+	
+	usage: &8[<##FF0000>&l❗&8]&c Correct command usage &7»&f
+	notyou: &8[<##FF0000>&l❗&8]&c Console may not use this command.
+	noperm: &8[<##FF0000>&l❗&8]&c You do not have permission for this command.
+	notthis: &8[<##FF0000>&l❗&8]&c You may not use this feature of the command.
+	nothere: &8[<##FF0000>&l❗&8]&c You may not use this command in this region.
+	nothigh: &8[<##FF0000>&l❗&8]&c That person has a higher authority than you.
+	notnow: &8[<##FF0000>&l❗&8]&c You may use this command after %remaining time%.
+	supported_worlds: "donor", "creative", or "plots"
+
+	# DISCORD
+	guild: "1129335265907978260"
+	bot: "1485319774702538876"
+	invitelink: https://dcd.gg/50xCreative/
+
+define new bot named "50xCreative":
+	token: "MTQ4NTMxOTc3NDcwMjUzODg3Ng.Gf0PVT.R1HD7jVCDb_KRnTsxAu0iDCd-PwcIWM10oD-Sk"
+	intents: default intents
+	policy: all
+	auto reconnect: true
+	compression: none
+	force reload: true
+
+on bot loaded:
+	send "{@info} The discord bot has been successfully &aenabled&f." to console
+	post "# 50xCreative is now online! %nl%## %now%" to text channel with id "1417472418217197679" with bot bot "50xCreative"
+	set the presence of the bot named "50xCreative" to playing "50xCreative.fun"
+
+import:
+	java.lang.Object
+
+on message receive:
+	event-member is not a discord bot
+	discord id of event-member is "784518893414514699":
+		if chance of 10%:
+			stop
+	discord id of event-channel is "1417472418217197679":
+		# I swear to god, if I see one more person change the discord message format... Do you know how many people use terrible/nsfw names?
+###
+		member nickname of event-member is set:
+			set {_name} to "%member nickname of event-member% <#BEC2FF>(@%discord name of event-member%)"
+		else:
+			set {_name} to "%discord name of event-member%"
+###
+		set {_name} to "<#BEC2FF>%discord name of event-member%"
+		set {_p} to text component from "&9&lDISCORD &8• <#989CFB>%{_name}% <#999999>&l» "
+		add click event to suggest command discord name of event-member to {_p}
+		set {_m::*} to split event-message at nl
+		loop indices of {_m::*}:
+			loop-counter > 1:
+				set {_m::%loop-value%} to "&e↳ <#D4D7FF>%unformatted {_m::%loop-value%}%"
+			else:
+				set {_m::%loop-value%} to "<#D4D7FF>%unformatted {_m::%loop-value%}%"
+		set {_fm} to join {_m::*} with nl
+		set {_m} to text component from "%{_fm}%"
+		broadcast component merge components ({_p} and {_m})
+
+	discord id of event-channel is "1353300908968116244":
+		if event-message is "!nextnumber" or "!next":
+			reply with "The next number is %({discord::count} ? 0)%!"
+
+		if any:
+			{discord::last::0} is discord id of event-member
+			event-message parsed as an integer isn't ({discord::count} ? 0)
+		then:
+			destroy event-message
+			stop
+		if event-message parsed as an integer is ({discord::count} ? 0):
+			add 1 to {discord::count}
+			set {discord::last::0} to discord id of event-member
+			set {discord::last::1} to discord id of event-message
+			react to event-message with reaction "white_check_mark"
+
+function syncAccount(p: offlineplayer):
+	{dc::id::%{_p}'s uuid%} isn't set:
+		send "{@warn} Your account is not linked! Execute ""/link"" to link your Minecraft account to your Discord account!" to {_p}
+	else:
+		priority({_p}) < 8:
+			remove role with id "1129565067835351180" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1246397421211353298" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1247871294674964500" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1246398482357555271" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1247804403000410133" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+		else:
+			remove role with id "1129565067835351180" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1246397421211353298" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1247871294674964500" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1246398482357555271" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1247804403000410133" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1190473801323003994" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1129565491892080640" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			remove role with id "1129630887655518388" from roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+			add role with id "1130063796090712146" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+		add role with id "1129631619720958022" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "developer"
+		add role with id "1196456609312936037" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "manager"
+		add role with id "1242455790925778994" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "sradmin"
+		add role with id "1129652531077857300" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "admin"
+		add role with id "1129630887655518388" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "srmod"
+		add role with id "1129623735066955867" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "mod"
+		add role with id "1129565491892080640" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "jrmod"
+		add role with id "1190473801323003994" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "trainee"
+		
+		add role with id "1247804403000410133" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "media"
+		add role with id "1246398482357555271" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "creator"
+		add role with id "1247871294674964500" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "engineer"
+		add role with id "1246397421211353298" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "architect"
+		add role with id "1129565067835351180" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild} if {_p}'s group = "designer"
+		add role with id "1244972134879592519" to roles of member with id {dc::id::%{_p}'s uuid%} in guild with id {@guild}
+
+command getlinkdc <offline player> [<text>]:
+	prefix: admin
+	usage: {@usage} /getlinkdc <offline player>
+	permission: admin.getlinked
+	permission message: {@noperm}
+	trigger:
+		arg-2 is set:
+			send usage
+			stop
+		send formatted "{@info} &fThe &9Discord Tag &fof player &a%arg-1% &fis <#C278FD>%uptime% <#C6B2FD>(ID: &n<sgt:%{dc::%arg-1's uuid%}%><ttp:&fClick to copy!>%{dc::%arg-1's uuid%}%<reset><#C6B2FD>)&f." if {dc::id::%arg-1's uuid%} is set else "{@warn} &cUser isn't linked."
+
+command getlinkmc <text> [<text>]:
+	prefix: admin
+	usage: {@usage} /getlinkmc <discord ID>
+	permission: admin.getlinked
+	permission message: {@noperm}
+	trigger:
+		arg-2 is set:
+			send usage
+			stop
+		loop {dc::id::*}:
+			set {_aaa} to loop-index parsed as offlineplayer's name
+			send "%loop-value% %{_aaa}%" to console
+		send formatted "{@info} &fThe &2Minecraft Account &fof <#C6B2FD>(ID: %arg-1%) &fis &a%{_aaa}%&f."
+
+command link:
+	prefix: core
+	trigger:
+		{dc::id::%uuid of player%} is set:
+			send "{@info} &cYour account is already linked!"
+			stop
+		set {code} to random integer between 11111 and 99999
+		send formatted "{@info} &fYour verification code is &9%{code}%&f. &8[<sgt:%{code}%><ttp:&7Click to copy the verification code!>&aCopy code!<reset>&8]", "{@info} <url:{@invitelink}><ttp:&7Click to join our discord server!>&9&ndiscord<reset> &fserver to link your account!"
+		set {coded::%{code}%} to player's uuid
+
+command unlink:
+	prefix: core
+	trigger:
+		{dc::id::%uuid of player%} is not set:
+			send "{@info} &cYour account is not linked!"
+			stop
+		remove role with id "1244972134879592519" from roles of member with id {dc::id::%uuid of player%} in guild with id {@guild}
+		delete {dc::name::%player's uuid%}
+		delete {dc::id::%player's uuid%}
+		send "{@info} &fYou account is now &cunlinked&f!"
+
+command sync:
+	prefix: core
+	trigger:
+		{dc::id::%uuid of player%} is not set:
+			send "{@info} &cYour account is not linked!"
+			stop
+		syncAccount(player)
+		send "{@info} &fYour account has been &6synchronized&f!"
+
+# REPORT
+
+options:
+	P: &8[<#fb4c8b>&lR<#f35196>&le<#ea56a2>&lp<#e25cad>&lo<#da61b9>&lr<#d266c4>&lt <#c96bcf>&lP<#c170db>&la<#b976e6>&ln<#b07bf2>&le<#a880fd>&ll&8]&f
+	ReportChannelID: "1255906717636628542"
+	ReportRoleID: "1130064276372062290"
+
+command report [<offline player>] [<text>]:
+	prefix: core
+	cooldown: 2 minutes
+	cooldown message: {@notnow}
+	cooldown bypass: 50x.report.admin
+	trigger:
+		if arg-1 isn't set:
+			send "" to player
+			send "<#fb4c8b>&lR<#f35196>&le<#ea56a2>&lp<#e25cad>&lo<#da61b9>&lr<#d266c4>&lt <#c96bcf>&lP<#c170db>&la<#b976e6>&ln<#b07bf2>&le<#a880fd>&ll" to player
+			send "" to player
+			send "&fFound a player &cbreaking the rules&f? &d/report &fnow!" to player
+			send "&eFalse reports may lead to heavy punishments." to player
+			send "" to player
+			send "&7Usage: &f/report [player] [reason]" to player
+			send "" to player
+			cancel the cooldown
+			stop
+		else:
+			if arg-2 isn't set:
+				send "{@P} &7Correct usage: &f/report [player] [reason]" to player
+				cancel the cooldown
+			else:
+				send "{@P} You have &asuccessfully reported &c%arg-1% &ffor '&c%arg-2%&r'. Our staff team will be there to assess this issue shortly, please be patient in the mean time." to player
+				send "&8[&c&lREPORT&8] &f%player% &7reported &c%arg-1% &7for: &f%arg-2%" to all players where [priority(input) >= 10] and console
+				create a new message and store it in {_msg}:
+					add 1 to {buttonlist}
+					set the content of the message to "_ _%nl%Reported by: **%player%**%nl%%mention tag of role with id {@ReportRoleID}%%nl%_ _"
+					make embed and store it in {_embed}:
+						set title of embed to "%arg-1%"
+						set embed color of embed to red
+						set footer of embed to "Reason: %arg-2%"
+					add {_embed} to the embeds of the message
+					make new component row and store it in {_rowas}:
+						add new success button with id "btn-2" named "Click to set as solved!" to components of the row builder
+					add {_rowas} to rows of the message
+				post {_msg} to text channel with id {@ReportChannelID}
+				delete {_msg}
+				delete {buttonlol::%{buttonlist}%}
+
+on button click:
+    set {_date} to now formatted as "MM/dd/yyyy 'at' HH:mm"
+    set {_solver} to discord name of event-member
+    set {_embeds::*} to (embeds of event-message)
+    set {_lines::*} to (event-message split by nl) where [input doesn't contain "_ _"]
+    create a new message and store it in {_msg}:
+        set the content of the message to "_ _%nl%%{_lines::1}%%nl%%{_lines::2}%%nl%_ _"
+        make embed and store it in {_embed}:
+            set title of embed to title of {_embeds::1}
+            set embed color of embed to red
+            set footer of embed to "%footer of {_embeds::1}%%nl%%nl%✅ SOLVED by %{_solver}% on %{_date}%"
+        add {_embed} to the embeds of the message
+    edit event-message to show {_msg}
+
+# ============== #
+# SLASH COMMANDS #
+# ============== #
+
+# LINK
+
+slash command link <number="code">:
+	description: Link your Minecraft account to your Discord account.
+	arguments:
+		number: The super duper secret code to link your account.
+	bot: 50xCreative
+	trigger:
+		{coded::%{code}%} is set:
+			set {dc::id::%{coded::%{code}%}%} to discord id of event-user
+			set {dc::name::%{dc::id::%{coded::%{code}%}%}%} to {coded::%{code}%} parsed as offline player's name
+			make embed and store it in {_embed}: 
+			
+				set description of embed to "# Welcome, %event-member%!%nl%Your account has been successfully **linked**, %nl%to the Minecraft account **%{coded::%{code}%} parsed as offline player%**!"
+				set embed color of the embed to orange
+				set footer of embed to "Account linked"
+				set footer icon of embed to "https://cdn3.emoji.gg/emojis/3721-verified.png"
+				set thumbnail of embed to "https://skins.mcstats.com/bust/%{coded::%{code}%} parsed as offline player's uuid%"
+				set timestamp of embed to now
+			reply with hidden {_embed}
+			set member nickname of event-member to "%{coded::%{code}%} parsed as offline player%"
+			send formatted "{@info} &fYour account is now &alinked &fwith &9%event-member%&f. &8[<cmd:/unlink><ttp:&eClick to unlink your account.>&cUnlink<reset>&8]" to {coded::%{code}%} parsed as offline player
+			syncAccount({coded::%{code}%} parsed as offline player)
+			delete {coded::%{code}%}
+		else:
+			reply with hidden ":no_entry: Invalid Code! Double-check the code or type **/link** in game to generate another secret code."
+#	else:
+#		reply with hidden "You may not use this command in this channel."
+
+# =================================================================================================== #
+
+# STATS
+
+slash command stats:
+	description: Shows the current statistics of the Minecraft server.
+	bot: 50xCreative
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			set {_sl::*} to all players where [priority(input) >= 10]
+			set {_s} to size of all players where [priority(input) >= 10]
+			set {_v} to size of all players where [input's metadata "vanished" is set]
+			set {_sv::*} to all players where [input's metadata "vanished" is set]
+			make embed:
+				set title of embed to ":bar_chart: 50xCreative Server Status"
+				set embed color of the embed to yellow
+				add field named ":diamond_shape_with_a_dot_inside: Server TPS - %tps from the last minute%" with value "TPS should be 20. Otherwise, server is lagging!" to fields of embed
+				add field named ":green_circle: Online Players - %realPlayers()%" with value "`%all players%`" to fields of embed
+				add field named ":hammer_pick: Online Staffs - %{_s}%" with value "`%{_sl::*} ? "No staffs are currently online."%`" to fields of embed
+				add field named ":detective::skin-tone-1: Vanished Staffs - %{_v} ? 0%" with value "%{_sv::*} ? "No one is currently vanished."%" to fields of embed
+				set footer of embed to "%size of all players% players currently online."
+				set thumbnail of embed to "https://cdn.discordapp.com/icons/1001857289692643328/3bbc502834bc252e2732735d67dc65eb.png?size=4096"
+				set timestamp of embed to now
+			reply with last embed
+		else:
+			reply with hidden "You are not authorised for this command."
+
+# WARN
+
+slash command warn <string="target"> <string="reason">:
+	description: Warns a user from the Minecraft server.
+	guilds: 1129335265907978260
+	bot: 50xCreative
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		reason: Reason for the warning to be issued.
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully warned `%arg-1%` for the reason: `%arg-2%`"
+			console command "warn %arg-1% warned by %discord name of event-member%: %arg-2%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+slash command unwarn <string="target">:
+	description: Unwarns a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully unwarned `%arg-1%`"
+			console command "unwarn %arg-1%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+# MUTE
+
+slash command mute <string="target"> <string="reason">:
+	description: Mutes a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		reason: Reason for the mute to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully muted `%arg-1%` for the reason: `%arg-2%`"
+			console command "mute %arg-1% muted by %discord name of event-member%: %arg-2%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+slash command ipmute <string="target"> <string="reason">:
+	description: IP-Mutes a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		reason: Reason for the ip-mute to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully IP-muted `%arg-1%` for the reason: `%arg-2%`"
+			console command "ipmute %arg-1% IP-muted by %discord name of event-member%: %arg-2%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+slash command tempmute <string="target"> <string="duration"> <string="reason">:
+	description: Temporarily mutes a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		duration: How long should the person be muted for.
+		reason: Reason for the mute to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully tempmuted `%arg-1%` for `%arg-2%` for the reason: `%arg-3%`"
+			console command "tempmute %arg-1% %arg-2% Tempmuted by %discord name of event-member%: %arg-3%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+slash command tempipmute <string="target"> <string="duration"> <string="reason">:
+	description: Temporarily IP-mutes a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		duration: How long should the user be temporarily IP-muted for.
+		reason: Reason for the mute to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully temp IP-muted `%arg-1%` for `%arg-2%` for the reason: `%arg-3%`"
+			console command "tempipmute %arg-1% %arg-2% Temp IP-muted by %discord name of event-member%: %arg-3%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+slash command unmute <string="target"> <string="reason">:
+	description: Unmutes a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		reason: Reason for the unmute to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully unmuted `%arg-1%` for the reason: `%arg-2%`"
+			console command "unmute %arg-1% Unmuted by %discord name of event-member%: %arg-2%"
+		else:
+			reply with hidden "You are not authorised for this command."
+			
+slash command unmuteip <string="target"> <string="reason">:
+	description: Unmute-IP a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		reason: Reason for the unmute to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully unmute-IP `%arg-1%` for the reason: `%arg-2%`"
+			console command "unmuteip %arg-1% Unmute-IP by %discord name of event-member%: %arg-2%"
+		else:
+			reply with hidden "You are not authorised for this command."
+			
+# BANS
+
+slash command ban <string="target"> <string="reason">:
+	description: Bans a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		reason: Reason for the ban to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully banned `%arg-1%` for the reason: `%arg-2%`"
+			console command "ban %arg-1% banned by %discord name of event-member%: %arg-2%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+slash command ipban <string="target"> <string="reason">:
+	description: IP-bans a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		reason: Reason for the ip-ban to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully IP-banned `%arg-1%` for the reason: `%arg-2%`"
+			console command "ipban %arg-1% IP-banned by %discord name of event-member%: %arg-2%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+slash command tempban <string="target"> <string="duration"> <string="reason">:
+	description: Temporarily bans a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		duration: How long should the user be temporarily banned for.
+		reason: Reason for the ban to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully tempbanned `%arg-1%` for `%arg-2%` for the reason: `%arg-3%`"
+			console command "tempban %arg-1% %arg-2% Tempbanned by %discord name of event-member%: %arg-3%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+slash command tempipban <string="target"> <string="duration"> <string="reason">:
+	description: Temporarily IP-bans a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		duration: How long should the user be temporarily IP-banned for.
+		reason: Reason for the ban to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully temp IP-banned `%arg-1%` for `%arg-2%` for the reason: `%arg-3%`"
+			console command "tempipban %arg-1% %arg-2% Temp IP-banned by %discord name of event-member%: %arg-3%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+slash command unban <string="target"> <string="reason">:
+	description: Unbans a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		reason: Reason for the unban to be issued.
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully unbanned `%arg-1%` for the reason: `%arg-2%`"
+			console command "unban %arg-1% Unbanned by %discord name of event-member%: %arg-2%"
+		else:
+			reply with hidden "You are not authorised for this command."
+			
+slash command unbanip <string="target"> <string="reason">:
+	bot: 50xCreative
+	description: Unban-IP a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		reason: Reason for the unban-IP to be issued.
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully Unban-IP `%arg-1%` for the reason: `%arg-2%`"
+			console command "unbanip %arg-1% Unban-IP by %discord name of event-member%: %arg-2%"
+		else:
+			reply with hidden "You are not authorised for this command."
+			
+# KICK
+
+slash command kick <string="target"> <string="reason">:
+	description: Kicks a user from the Minecraft server.
+	arguments:
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		reason: Reason for the kick to be issued.		
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			reply with ":white_check_mark: Successfully kicked `%arg-1%` for the reason: `%arg-2%`"
+			console command "kick %arg-1% Kicked by %discord name of event-member%: %arg-2%"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+slash command appeal <string="action"> <user="member"> <string="punishment"> <string="target"> <string="reason"> [<string="strike">]:
+	description: Allows appeal or denies one.
+	arguments:
+		action:
+			description: Accept or deny appeal.
+			on completion request:
+				add new choice "Accept" with value "Accept" to {_a::*}
+				add new choice "Deny" with value "Deny" to {_a::*}
+				return {_a::*}
+		punishment:
+			description: Punishment type.
+			on completion request:
+				add new choice "Mute" with value "Mute" to {_b::*}
+				add new choice "Ban" with value "Ban" to {_b::*}
+				add new choice "Warn" with value "Warn" to {_b::*}
+				return {_b::*}
+		target:
+			description: Minecraft username of the user.
+			on completion request:
+				loop all players:
+					add new choice "%loop-player%" with value "%loop-player%" to {_c::*}
+				return {_c::*}
+		member: Person to be decided of their fate.
+		reason: Reason for the player to be appealed/unapplied.
+		strike:
+			description: Remove griefing offense.
+			on completion request:
+				add new choice "True" with value "True" to {_b::*}
+				add new choice "False" with value "False" to {_b::*}
+				return {_b::*}
+	bot: 50xCreative
+	guilds: 1129335265907978260
+	trigger:
+		event-member has discord role with id "1130063796090712146":
+			if arg-1 is "accept":
+				if arg-3 is "Mute":
+					console command "unmute %arg-4% Unmuted by %discord name of event-member%: %arg-5%"
+				if arg-3 is "Ban":
+					console command "unban %arg-4% Unbanned by %discord name of event-member%: %arg-5%"
+				if arg-3 is "Warn":
+					console command "unwarn %arg-4% Unwarned by %discord name of event-member%: %arg-5%"
+				if arg-6 is "True":
+					console command "removestrikes %arg-4%"
+				open private channel of arg-2 and store it in {_ch}
+				create a new message and store it in {_msgass}:
+					set the content of the message to "Valuator: %event-user%"
+					make embed:
+						set title of embed to "Your Appeal for %arg-3% has been accepted."
+						set embed color of embed to lime
+						set footer of embed to "Notes: %arg-5%"
+					add last embed to the embeds of the message
+				post {_msgass} to {_ch} if {_ch} is set
+				reply with ":white_check_mark: Successfully accepted appeal - punishment `%arg-3%` for `%arg-4%` for the reason: `%arg-5%`"
+				stop
+			else:
+				open private channel of arg-2 and store it in {_ch}
+				create a new message and store it in {_msgass}:
+					set the content of the message to "Valuator: %event-user%"
+					make embed:
+						set title of embed to "Your Appeal for %arg-3% has been denied."
+						set embed color of embed to red
+						set footer of embed to "Reason: %arg-5%"
+					add last embed to the embeds of the message
+				post {_msgass} to {_ch} if {_ch} is set
+				reply with ":white_check_mark: Successfully denied appeal - punishment `%arg-3%` for `%arg-4%` for the reason: `%arg-5%`"
+		else:
+			reply with hidden "You are not authorised for this command."
+
+function DCChatLog(p: offline player, m: text):
+	replace all "@" with "" in {_m}
+	replace all "_" with "\_" in {_m}
+	replace all "*" with "\*" in {_m}
+	replace all "`" with "\`" in {_m}
+	make new embed and store it in {_embed}:
+		set author of embed to {_p}'s name
+		set author icon of embed to "https://mc-heads.net/avatar/%{_p}%"
+		set description of embed to unformatted {_m}
+		set embed color of embed to hex "#770000" if {_p}'s group = "owner"
+		set embed color of embed to hex "#880000" if {_p}'s group = "co-owner"
+		set embed color of embed to hex "#D143FF" if {_p}'s group = "developer"
+		set embed color of embed to hex "#FF0080" if {_p}'s group = "manager"
+		set embed color of embed to hex "#CA0000" if {_p}'s group = "sradmin"
+		set embed color of embed to hex "#FF0000" if {_p}'s group = "admin"
+		set embed color of embed to hex "#FF5D00" if {_p}'s group = "srmod"
+		set embed color of embed to hex "#FFA500" if {_p}'s group = "mod"
+		set embed color of embed to hex "#FFE300" if {_p}'s group = "jrmod"
+		set embed color of embed to hex "#00D339" if {_p}'s group = "trainee"
+		set embed color of embed to hex "#FF6AD1" if {_p}'s group = "media"
+		set embed color of embed to hex "#FF8F4E" if {_p}'s group = "creator"
+		set embed color of embed to hex "#FFD64E" if {_p}'s group = "engineer"
+		set embed color of embed to hex "#00FFC7" if {_p}'s group = "architect"
+		set embed color of embed to hex "#00EAFF" if {_p}'s group = "designer"
+		set embed color of embed to hex "#9CA9B3" if {_p}'s group = "default"
+	post {_embed} to text channel with id "1417472418217197679" with bot bot "50xCreative"
+
+	
+on command:
+	sender is a player
+	sender isn't an operator
+	post "`%sender%` has executed `/%full command%`" to text channel with id "1423179383698358403" with bot bot "50xCreative"
+
+message command quote:
+    bot: my_bot
+    trigger:
+        set {_e} to new embed:
+            author: discord name of author of target message
+            author icon: avatar url of author of target message
+            description: content of target message
+            color: blue
+            footer: "Quoted by %event-user%"
+        reply with {_e}

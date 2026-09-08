@@ -1,0 +1,33 @@
+import:
+    java.nio.file.Paths
+    java.nio.file.Files
+
+command senddata <player>:
+    permission: op
+    trigger:
+        set {_delay} to 2
+        set {_t} to Files.readString(Paths.get("plugins/Skript/scripts/image.txt"))
+        set {_chunkSize} to 4000
+        set {RUNNING_IT} to true
+        set {_count} to 0
+        set {_s} to sender
+        set {_totalLoops} to ceil((length of {_t}) / {_chunkSize})
+        set {_r::*} to {_s} and arg
+        send "Image upload starting in 10 seconds..." to {_r::*}
+        send "Upload will last for %{_totalLoops}/(20/{_delay} * 5)% Seconds." to {_r::*}
+        send "Image is %length of {_t}% bytes." to {_r::*}
+        send "The Image will be sent in %{_totalLoops}% chunks." to {_r::*}
+        send "Image encoded in Base64." to {_r::*}
+        wait 10 seconds
+        send "[SOF Image Uploader]" to {_r::*}
+        while {RUNNING_IT} is true:
+            set {_text} to subtext of {_t} from characters ({_chunkSize}*({_count}))+1 to ({_chunkSize}*({_count}+1))
+            send "[Uploaded Chunk %{_count}+1%] %{_text}%" to arg
+            send "Sent %{_count}+1%/%{_totalLoops}%" to {_s}
+            mod(loop-counter, 5) is 0:
+                wait timespan({_delay}, ticks)
+            if ({_chunkSize}*({_count})) > length of {_t}:
+                set {RUNNING_IT} to false
+                exit loop
+            add 1 to {_count}
+        send "[EOF Image Uploader]" to {_r::*}

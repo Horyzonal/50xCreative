@@ -1,0 +1,486 @@
+# ================================================================================ #
+
+options:
+	name: %"<b><gradient:#6000FF:#E700FF>50xCreative</gradient></b>"%
+	info: &8[<##6000FF>&l❗&8]&f
+	warn: &8[<##FF0000>&l❗&8]&c
+	noperm: &8[<##FF0000>&l❗&8]&c You do not have permission for this.
+	notthis: &8[<##FF0000>&l❗&8]&c You do not have permission for this feature.
+	notyou: &8[<##FF0000>&l❗&8]&c That person has a higher authority than you.
+	notnow: &8[<##FF0000>&l❗&8]&c You may use this command in %remaining time%.
+
+# ================================================================================ #
+
+# IMPORTS
+import:
+	java.io.File
+	java.net.URL
+	java.awt.Color
+	java.util.Map
+	java.util.UUID
+	java.util.function.Predicate
+	java.lang.management.ManagementFactory
+	javax.imageio.ImageIO
+	net.md_5.bungee.api.ChatColor
+	org.bukkit.Bukkit
+
+	net.luckperms.api.node.NodeType
+	net.luckperms.api.LuckPermsProvider
+	net.luckperms.api.model.user.User
+	net.luckperms.api.node.types.PrefixNode
+	net.luckperms.api.node.types.SuffixNode
+	net.luckperms.api.node.types.InheritanceNode
+
+	me.lucko.spark.api.SparkProvider
+	me.lucko.spark.api.statistic.StatisticWindow$TicksPerSecond
+	me.lucko.spark.api.statistic.StatisticWindow$MillisPerTick
+	me.lucko.spark.api.statistic.StatisticWindow$CpuUsage
+
+	com.plotsquared.core.PlotAPI
+	com.plotsquared.core.player.PlotPlayer
+
+# ================================================================================ #
+
+# SPARK
+expression spark tps:
+	return type: number
+	get:
+		return round(SparkProvider.get().tps().poll(TicksPerSecond.SECONDS_5), 2)
+
+expression spark cpu:
+	return type: number
+	get:
+		return round(SparkProvider.get().cpuSystem().poll(CpuUsage.SECONDS_10) * 100, 2)
+
+expression spark mspt:
+	return type: number
+	get:
+		return round(SparkProvider.get().mspt().poll(MillisPerTick.SECONDS_10).median(), 2)
+
+# LUCKPERMS
+function LPUser(p: offlineplayer) :: object:
+	{_p}.getUniqueId() is set
+	return LuckPermsProvider.get().getUserManager().getUser({_p}.getUniqueId()) ? LuckPermsProvider.get().getUserManager().loadUser({_p}.getUniqueId()).get()
+
+expression:
+	patterns:
+		group %string%'[s] prefix
+		prefix of group %string%
+	return type: text
+	get:
+		return LuckPermsProvider.get().getGroupManager().getGroup(expr-1).getCachedData().getMetaData().getPrefix() ? ""
+		
+expression:
+	patterns:
+		group %string%'[s] suffix
+		prefix of group %string%
+	return type: text
+	get:
+		return LuckPermsProvider.get().getGroupManager().getGroup(expr-1).getCachedData().getMetaData().getSuffix() ? ""
+
+expression:
+	patterns:
+		%offlineplayer%'[s] prefix [with priority %integer%]
+		prefix of %offlineplayer% [with priority %integer%]
+	return type: text
+	get:
+		return toHex(LPUser(expr-1).getCachedData().getMetaData().getPrefix()) ? ""
+	set:
+		set {_user} to LPUser(expr-1)
+
+		{_user}.data().clear(NodeType.PREFIX.predicate())
+
+		{_user}.data().add(PrefixNode.builder("%change value%", 100).build())
+
+		LuckPermsProvider.get().getUserManager().saveUser({_user})
+	add:
+		LPUser(expr-1).data().add(PrefixNode.builder(change value, expr-2 ? 1).build())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+	remove:
+		LPUser(expr-1).data().remove(PrefixNode.builder(change value, expr-2 ? 1).build())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+	delete:
+		LPUser(expr-1).data().clear(NodeType.PREFIX.predicate())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+
+expression:
+	patterns:
+		%offlineplayer%'[s] suffix [with priority %integer%]
+		suffix of %offlineplayer% [with priority %integer%]
+	return type: text
+	get:
+		return toHex(LPUser(expr-1).getCachedData().getMetaData().getSuffix()) ? ""
+	set:
+		LPUser(expr-1).data().clear(NodeType.SUFFIX.predicate())
+		LPUser(expr-1).data().add(SuffixNode.builder(change value, expr-2 ? 1).build())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+	add:
+		LPUser(expr-1).data().add(SuffixNode.builder(change value, expr-2 ? 1).build())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+	remove:
+		LPUser(expr-1).data().remove(SuffixNode.builder(change value, expr-2 ? 1).build())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+	delete:
+		LPUser(expr-1).data().clear(NodeType.SUFFIX.predicate())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+
+expression:
+	patterns:
+		%offlineplayer%'[s] group
+		group of %offlineplayer%
+	return type: string
+	get:
+		return LPUser(expr-1).getPrimaryGroup() ? "default"
+	set:
+		LPUser(expr-1).data().clear(NodeType.INHERITANCE.predicate())
+		LPUser(expr-1).data().add(InheritanceNode.builder(change value).build())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+	add:
+		LPUser(expr-1).data().add(InheritanceNode.builder(change value).build())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+	remove:
+		LPUser(expr-1).data().remove(InheritanceNode.builder(change value).build())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+	delete:
+		LPUser(expr-1).data().clear(NodeType.INHERITANCE.predicate())
+		LuckPermsProvider.get().getUserManager().saveUser(LPUser(expr-1))
+
+# PLOTSQUARED
+
+expression:
+	patterns:
+		%offlineplayer%'[s] claimed plots
+		claimed plots of %offlineplayer%
+	return type: integer
+	get:
+		return PlotPlayer.from(expr-1).getPlotCount("plots")
+
+expression:
+	patterns:
+		%offlineplayer%'[s] max plots
+		max plots of %offlineplayer%
+	return type: integer
+	get:
+		PlotPlayer.from(expr-1).getAllowedPlots() > 200:
+			return 999
+		return PlotPlayer.from(expr-1).getAllowedPlots()
+
+# OTHERS
+
+expression:
+	patterns:
+		%offlineplayer%'[s] vanish status
+		vanish status of %offlineplayer%
+	return type: text
+	get:
+		expr-1 has metadata "vanished":
+			return " <#DEDEDE>[ᴠᴀɴɪsʜᴇᴅ]&r"
+		return ""
+
+expression:
+	patterns:
+		%offlineplayer%'[s] staff status
+		staff status of %offlineplayer%
+	return type: text
+	get:
+		expr-1 has permission "staff.tag":
+			return " &c🛠&r"
+		return ""
+
+expression:
+	patterns:
+		%offlineplayer%'[s] afk status
+		afk status of %offlineplayer%
+	return type: text
+	get:
+		expr-1 has metadata "afk":
+			return " &7[ᴀғᴋ]&r"
+		return ""
+
+expression:
+	patterns:
+		%offlineplayer%'[s] dc status
+		dc status of %offlineplayer%
+	return type: text
+	get:
+		{dc::id::%expr-1's uuid%} is set:
+			return " <#7076FF>•&r"
+		return ""
+
+on skript load:
+	set {-start} to now
+
+expression uptime:
+	return type: timespan
+	get:
+		return time since {-start}
+
+# ================================================================================ #
+
+function toHex(r: text) :: text:
+	set {_m::*} to regex split {_r} at "(?<=&#[0-9a-fA-F]{6})"
+	set {_x} to join {_m::*} by ">"
+	replace all "&#" in {_x} with "<#"
+	return formatted {_x}
+
+function timeFormat(t: timespan) :: text:
+	set {_x} to {_t}.getTicks() / 20
+	set {_y} to floor({_x} / 31104000)
+	set {_x} to {_x} - {_y} * 31104000
+	set {_mo} to floor({_x} / 2592000)
+	set {_x} to {_x} - {_mo} * 2592000
+	set {_d} to floor({_x} / 86400)
+	set {_x} to {_x} - {_d} * 86400
+	set {_h} to floor({_x} / 3600)
+	set {_x} to {_x} - {_h} * 3600
+	set {_m} to floor({_x} / 60)
+	set {_x} to {_x} - {_m} * 60
+	set {_s} to floor({_x})
+	set {_y} to "%{_y}%ʏ " if {_y} > 0 else ""
+	set {_mo} to "%{_mo}%ᴍᴏ " if {_mo} > 0 else ""
+	set {_d} to "%{_d}%ᴅ " if {_d} > 0 else ""
+	set {_h} to "%{_h}%ʜ " if {_h} > 0 else ""
+	set {_m} to "%{_m}%ᴍ " if {_m} > 0 else ""
+	set {_s} to "%{_s}%s" if {_s} > 0 else ""
+	return "%{_y}%%{_mo}%%{_d}%%{_h}%%{_m}%%{_s}%"
+
+function timeFormat2(t: timespan) :: text:
+	set {_x} to {_t}.getTicks() / 20
+	set {_y} to floor({_x} / 31104000)
+	set {_x} to {_x} - {_y} * 31104000
+	set {_mo} to floor({_x} / 2592000)
+	set {_x} to {_x} - {_mo} * 2592000
+	set {_d} to floor({_x} / 86400)
+	set {_x} to {_x} - {_d} * 86400
+	set {_h} to floor({_x} / 3600)
+	set {_x} to {_x} - {_h} * 3600
+	set {_m} to floor({_x} / 60)
+	set {_x} to {_x} - {_m} * 60
+	set {_s} to floor({_x})
+	{_y} > 0:
+		return "%{_y}%ʏ %{_mo}%ᴍᴏ"
+	else if {_mo} > 0:
+		return "%{_mo}%ᴍᴏ %{_d}%ᴅ"
+	else if {_d} > 0:
+		return "%{_d}%ᴅ %{_h}%ʜ"
+	else if {_h} > 0:
+		return "%{_h}%ʜ %{_m}%ᴍ"
+	else:
+		return "%{_m}%ᴍ %{_s}%s"
+		
+function numFormat(n: number) :: text:
+	loop split "No,30|Oc,27|Sp,24|Sx,21|Qi,18|Qd,15|T,12|B,9|M,6|K,3" at "|":
+		set {_s::*} to split loop-value at ","
+		{_n} >= 10 ^ {_s::2} parsed as number
+		return "%{_n} / 10 ^ {_s::2} parsed as number%%{_s::1}%"
+	return "%{_n} ? 0%"
+	
+function numFormat2(t: text) :: number:
+	loop split "No,30|Oc,27|Sp,24|Sx,21|Qi,18|Qd,15|T,12|B,9|M,6|K,3" at "|":
+		set {_s::*} to split loop-value at ","
+		if {_t} contains "%{_s::1}%":
+			replace all "%{_s::1}%" with "" in {_t}
+			return {_t} parsed as number * (10 ^ {_s::2} parsed as number)
+	return {_t} parsed as number
+
+function logo(w: text) :: text:
+	{_w} = "creative":
+		return "&a◆"
+	{_w} = "canvas":
+		return "&d◆"
+	{_w} = "plots":
+		return "&6◆"
+	{_w} = "parkour":
+		return "&c◆"
+	{_w} = "events":
+		return "&b◆"
+	{_w} = "tag":
+		return "&e◆"
+	{_w} = "donor":
+		return "&b◆"
+	{_w} = "staff":
+		return "<#008DFF>◆"
+	{_w} = "admin":
+		return "&d◆"
+	else:
+		return "&9◆"
+
+function playerHead(p: offlineplayer) :: strings:
+	"%{_p}%" contains ".":
+		set {_p} to "Noodles_VN"
+	else:
+		set {_image} to ImageIO.read(new URL("https://mineskin.eu/helm/%{_p}%/8"))
+		loop 8 times:
+			loop 8 times:
+				set {_line} to ((loop-value-1) - 1)
+				set {_skin::%{_line}%} to join {_skin::%{_line}%} and "%ChatColor.of(new Color({_image}.getRGB((loop-value-2) - 1, {_line})))%█"
+		return {_skin::*}
+
+function realPlayers(w: text = "none") :: integer:
+	{_w} = "none":
+		set {_players::*} to all players
+	else:		
+		set {_players::*} to all players in world {_w}
+
+	set {_x} to size of {_players::*}
+	set {_y} to size of {_players::*} where [input's metadata "vanished" is set]
+
+	return {_x} - {_y}
+
+function realStaff(w: text = "none") :: integer:
+	{_w} = "none":
+		set {_players::*} to all players where [input has permission "staff.tag"]
+	else:		
+		set {_players::*} to all players in world {_w} where [input has permission "staff.tag"]
+
+	set {_x} to size of {_players::*}
+	set {_y} to size of {_players::*} where [input's metadata "vanished" is set]
+
+	return {_x} - {_y}
+
+function smallcaps(s: string) :: string:
+	set {_a::*} to "aᴀ|bʙ|cᴄ|dᴅ|eᴇ|fꜰ|gɢ|hʜ|iɪ|jᴊ|kᴋ|lʟ|mᴍ|nɴ|oᴏ|pᴘ|qꞯ|rʀ|sѕ|tᴛ|uᴜ|wᴡ|xх|yʏ|zᴢ" split at "|"
+	loop {_a::*}:
+		delete {_a::%loop-index%}
+		set {_a::%first character of loop-value%} to last character of loop-value
+	set {_s::*} to {_s} split at ""
+	loop {_s::*}:
+		add 1 to {_n}
+		set {_s::%loop-index%} to {_a::%loop-value%} if {_a::%loop-value%} exists
+	delete {_s::%{_n}%}
+	return join {_s::*} with ""
+
+# ================================================================================ #
+
+function priority(s: sender) :: integer:
+	{_s} = console, command block or repeating command block or chain command block:
+		return 21
+	else if {_s}'s group = "owner":
+		return 17
+	else if {_s}'s group = "co-owner":
+		return 16
+	else if {_s}'s group = "developer":
+		return 15
+	else if {_s} is op:
+		return 15
+	else if {_s}'s group = "manager":
+		return 14
+	else if {_s}'s group = "sradmin":
+		return 13
+	else if {_s} has permission "*":
+		return 12
+	else if {_s}'s group = "admin":
+		return 12
+	else if {_s}'s group = "srmod":
+		return 11
+	else if {_s}'s group = "mod":
+		return 10
+	else if {_s}'s group = "jrmod":
+		return 10
+	else if {_s}'s group = "trainee":
+		return 10
+	else if {_s}'s group = "builder":
+		return 7
+	else if {_s}'s group = "media":
+		return 6
+	else if {_s}'s group = "creator":
+		return 5
+	else if {_s}'s group = "engineer":
+		return 4
+	else if {_s}'s group = "architect":
+		return 3
+	else if {_s}'s group = "designer":
+		return 2
+	else:
+		return 1
+
+function rankPlayer(p: player):
+	delete team of {_p}
+	{_p}'s group = "owner":
+		set {_t} to team named "a-%{_p}%"
+	else if {_p}'s group = "co-owner":
+		set {_t} to team named "b-%{_p}%"
+	else if {_p}'s group = "developer":
+		set {_t} to team named "c-%{_p}%"
+	else if {_p}'s group = "manager":
+		set {_t} to team named "d-%{_p}%"
+	else if {_p}'s group = "sradmin":
+		set {_t} to team named "e-%{_p}%"
+	else if {_p}'s group = "admin":
+		set {_t} to team named "f-%{_p}%"
+	else if {_p}'s group = "srmod":
+		set {_t} to team named "g-%{_p}%"
+	else if {_p}'s group = "mod":
+		set {_t} to team named "h-%{_p}%"
+	else if {_p}'s group = "jrmod":
+		set {_t} to team named "i-%{_p}%"
+	else if {_p}'s group = "trainee":
+		set {_t} to team named "j-%{_p}%"
+	else if {_p}'s group = "media":
+		set {_t} to team named "u-%{_p}%"
+	else if {_p}'s group = "creator":
+		set {_t} to team named "v-%{_p}%"
+	else if {_p}'s group = "engineer":
+		set {_t} to team named "w-%{_p}%"
+	else if {_p}'s group = "architect":
+		set {_t} to team named "x-%{_p}%"
+	else if {_p}'s group = "designer":
+		set {_t} to team named "y-%{_p}%"
+	else:
+		set {_t} to team named "z-%{_p}%"
+	set team prefix of {_t} to {_p}'s prefix
+	add {_p} to {_t}
+
+on load:
+	loop all players:
+		rankPlayer(loop-player)
+		wait 1 tick
+
+on command:
+	full command contains "lp"
+	priority(sender) > 11
+	loop all players:
+		rankPlayer(loop-player)
+		wait 1 tick	
+
+on join:
+	delete team of player
+	rankPlayer(player)
+
+on quit:
+	delete team of player
+
+# ================================================================================ #
+
+# SOUND EFFECTS
+
+function sfx(p: players, s: string):
+	{_s} = "success":
+		play sound "entity.player.levelup" at volume 0.5 at pitch 1.25 for {_p::*}
+	{_s} = "fail":
+		play sound "block.anvil.land" at volume 0.5 at pitch 1.25 for {_p::*}
+	{_s} = "info":
+		play sound "entity.experience_orb.pickup" at volume 0.5 at pitch 1.2 for {_p::*}
+	{_s} = "warn":
+		play sound "block.note_block.didgeridoo" at volume 0.5 at pitch 1.1 for {_p::*}
+	{_s} = "gui":
+		play sound "entity.bat.takeoff" at volume 0.5 at pitch 1.1 for {_p::*}
+
+function invsfx(p: player, i: int=1):
+	{s::invsfx::%{_p}'s uuid%} isn't set
+	{_i} = 1:
+		play sound "entity.bat.takeoff" at pitch 1.15 for {_p}
+	{_i} = 2:
+		play sound "block.anvil.land" at pitch 0.7 for {_p}
+	{_i} = 3:
+		play sound "entity.experience_orb.pickup" at pitch 0.7 to {_p}
+
+# ================================================================================ #
+
+function stafflog(t: text):
+	send "%minimessage from "<bold><gradient:#00ACFF:#B247FF>STAFFLOG"% &8→&f <#C26EFF>%{_t}%" to console and all players where [priority(input) >= 10]
+
+function adminlog(t: text):
+	send "%minimessage from "<bold><gradient:#FF0000:#FF2323>ADMINLOG"% &8→&f <#FF2323>%{_t}%" to console and all players where [priority(input) >= 12]
+	
+# ================================================================================ #

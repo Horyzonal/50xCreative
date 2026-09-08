@@ -1,0 +1,1058 @@
+#
+#More information about how to set up the plugin can be found in the wiki
+# https://github.com/Nononitas/Plugin-Hide-Pro/wiki
+#
+
+#Config version. Don't change!
+version: 15
+
+debug: false
+
+#Stay on the newest version to get better features!
+#Enable or disable automatic ingame update notification on join
+update-notify: true
+
+#Set this to TRUE if you are using the BUNGEECORD/VELOCITY version
+#!!!!!If true, every feature except the op protection will be DISABLED in this configuration. Use the configuration of the proxy plugin to configure the plugin!!!!!!
+proxy-mode: false
+
+#OP-protection: Player can only be op'ed if they are in the "allowed-operators" list
+#The list also supports UUIDs
+op-protection: false
+allowed-operators: []
+#If you try to OP someone who isn't in the list
+op-message: "&cThe Player isn't a listed operator!"
+#Players who are operators and are not in the list can't connect and will be deop'ed.
+unauthorized-operator-kick-message: '&cYou are not allowed to be an operator'
+
+#Message shown if you type /pl | Enter none to disable | Players with the permission plhide.bypass.pl-message will see the real plugins when executing /plugins
+/pl-message: 'Plugins (1): 50xCreative.xyz'
+
+#Changes the server brand in the upper left of the f3 debug screen
+f3-server-brand: ''
+replace-f3-server-brand: false
+
+#Automatically makes the base commands in lower case for version 1.18+
+#For example: "/WarP Resources" will be changed to "/warp Resources"
+auto_lowercase_base_commands: true
+
+#Fixes an exploit that crashes a Minecraft server through tab-completion, by producing a stackoverflow in Mojang's Brigadier API
+#This is not a 100% fix, as it doesn't change the NBT-reading, but merely tries to predict the exploit by interpreting the tab-completion.
+#Only relevant for versions from 1.13-1.20.4. In newer 1.20.4 builds the exploit is already fixed (Paper 1.20.4 Build 427 and higher)
+completion_exploit_fixer:
+  enabled: false
+  should_kick:
+    enabled: true
+    message: "Invalid Completion"
+
+#How many commands a player can send every 2 seconds
+command_spam:
+  amount: 40
+
+#Enable MiniMessage support for the blocked-command-message
+minimessage: false
+
+groups:
+  op:
+    commands: ["*"]
+    tabcomplete: ["*"]
+    priority: 20
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+    inherited-groups: []
+  owner:
+    priority: 15
+    inherited-groups: admin
+    commands: []
+    tabcomplete: []
+    group-mode: blacklist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+  developer:
+    priority: 14
+    inherited-groups: admin
+    commands: []
+    tabcomplete: []
+    group-mode: blacklist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+  manager:
+    priority: 13
+    inherited-groups: admin
+    commands: []
+    tabcomplete: []
+    group-mode: blacklist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+  sradmin:
+    priority: 12
+    inherited-groups: admin
+    commands: []
+    tabcomplete: []
+    group-mode: blacklist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+  admin:
+    priority: 11
+    inherited-groups: []
+    group-mode: blacklist
+    commands: []
+    tabcomplete: []
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+  srmod:
+    priority: 10
+    commands:
+      - fakewarn
+      - faketempban
+      - fakeban
+      - faketempmute
+      - fakemute
+      - fakekick
+      - fakejoin
+      - fakeleave
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+      - 
+    tabcomplete:
+      - fakewarn
+      - faketempban
+      - fakeban
+      - faketempmute
+      - fakemute
+      - fakekick
+      - fakejoin
+      - fakeleave
+    inherited-groups:
+      - mod
+      - jrmod
+      - trainee
+      - creator
+      - engineer
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+
+  mod:
+    priority: 9
+    commands:
+      - fakejoin
+      - fakeleave
+      - 
+      - freeze
+      - unfreeze
+      - 
+      - mutechat
+      - chatmute
+      - mc
+      - 
+      - vanish 
+      - v
+      - 
+      - banhammer
+      - bhammer
+    tabcomplete:
+      - fakejoin
+      - fakeleave
+      - 
+      - freeze
+      - unfreeze
+      - 
+      - mutechat
+      - chatmute
+      - mc
+      - 
+      - vanish 
+      - v
+      - 
+      - banhammer
+      - bhammer
+    inherited-groups:
+      - jrmod
+      - trainee
+      - creator
+      - engineer
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+
+  jrmod:
+    priority: 8
+    commands: []
+    tabcomplete: []
+    inherited-groups:
+    inherited-groups:
+      - engineer
+      - trainee
+      - creator
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+
+  trainee:
+    priority: 7
+    commands:
+      - 
+      - clearchat
+      - chatclear
+      - cc
+      - 
+      - mapreset
+      - mr
+      - 
+      - clearinv
+      - invclear
+      - clearinventory
+      - inventoryclear
+      - 
+      - openinv
+      - openinventory
+      - invopen
+      - inventoryopen
+      - punish
+      - 
+      - stopvotekick
+      -
+      - 
+      - kick
+      - staffhist
+      - staffhistory
+      - 
+      - announce
+      - 
+      - staff:
+      - staffchat
+      - schat
+      - sc
+      - vanish
+      - smite
+      - warn
+      - unwarn
+      - tempban
+      - ban
+      - ipban
+      - kick
+      - tempmute
+      - mute
+      - unmute
+      - muteip
+      - unmuteip
+      - unban
+      - pardon
+      - checkalts
+      - checkmute
+      - checkban
+      - checkwarn
+      - entityfix
+      - blockfix
+      - inv
+      - alts
+    tabcomplete:
+      - 
+      - clearchat
+      - chatclear
+      - cc
+      - 
+      - mapreset
+      - mr
+      - 
+      - clearinv
+      - invclear
+      - clearinventory
+      - inventoryclear
+      - punish
+      - 
+      - openinv
+      - openinventory
+      - invopen
+      - inventoryopen
+      - 
+      - stopvotekick
+      -
+      - 
+      - kick
+      - staffhist
+      - staffhistory
+      - 
+      - announce
+      - 
+      - staff:
+      - staffchat
+      - schat
+      - sc
+      - vanish
+      - smite
+      - warn
+      - unwarn
+      - tempban
+      - ban
+      - ipban
+      - kick
+      - tempmute
+      - mute
+      - unmute
+      - muteip
+      - unmuteip
+      - unban
+      - pardon
+      - checkalts
+      - checkmute
+      - checkban
+      - checkwarn
+      - entityfix
+      - blockfix
+      - inv
+      - alts
+    inherited-groups:
+      - creator
+      - engineer
+      - architect
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+
+  media:
+    priority: 6
+    commands: []
+    tabcomplete: []
+    inherited-groups:
+      - creator
+      - engineer
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+
+  creator:
+    priority: 5
+    commands: []
+    tabcomplete: []
+    inherited-groups:
+      - engineer
+      - architect 
+      - designer
+      - default
+    group-mode: whitelist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+
+  engineer:
+    priority: 4
+    commands:
+      - wand
+      - toggleeditwand
+      - sel
+      - desel
+      - pos1
+      - pos2
+      - hpos1
+      - hpos2
+      - chunk
+      - expand
+      - contract
+      - outset
+      - inset
+      - count
+      - distr
+      - set
+      - replace
+      - overlay
+      - walls
+      - outline
+      - center
+      - smooth
+      - deform
+      - regen
+      - hollow
+      - move
+      - stack
+      - naturalize
+      - line
+      - curve
+      - forest
+      - flora
+      - copy
+      - paste
+      - rotate
+      - flip
+      - schem
+      - schematic
+      - cut
+      - generate
+      - generatebiome
+      - hcyl
+      - cyl
+      - sphere
+      - hsphere
+      - pyramid
+      - hpyramid
+      - forestgen
+      - pumpkins
+      - toggleplace
+      - fill
+      - fillr
+      - drain
+      - fixwater
+      - fixlava
+      - removeabove
+      - removebelow
+      - replacenear
+      - replacenear
+      - removenear
+      - snow
+      - thaw
+      - ex
+      - butcher
+      - remove
+      - green
+      - chunkinfo
+      - calc
+      - listchunks
+      - sp
+      - tool
+      - none
+      - farwand
+      - tree
+      - deltree
+      - repl
+      - cycler
+      - flood
+      - brush
+      - size
+      - mat
+      - range
+      - mask
+      - gmask
+      - unstuck
+      - ascend
+      - descend
+      - thru
+      - jumpto
+      - up
+      - restore
+      - snapshot
+      - cs
+      - .s
+      - biomelist
+      - biomeinfo
+      - setbiome
+      - /wand
+      - /toggleeditwand
+      - /sel
+      - /desel
+      - /pos1
+      - /pos2
+      - /hpos1
+      - /hpos2
+      - /chunk
+      - /expand
+      - /contract
+      - /outset
+      - /inset
+      - /count
+      - /distr
+      - /set
+      - /replace
+      - /overlay
+      - /walls
+      - /outline
+      - /center
+      - /smooth
+      - /deform
+      - /regen
+      - /hollow
+      - /move
+      - /stack
+      - /naturalize
+      - /line
+      - /curve
+      - /forest
+      - /flora
+      - /copy
+      - /paste
+      - /rotate
+      - /flip
+      - /schem
+      - /schematic
+      - /cut
+      - /generate
+      - /generatebiome
+      - /hcyl
+      - /cyl
+      - /sphere
+      - /hsphere
+      - /pyramid
+      - /hpyramid
+      - /forestgen
+      - /pumpkins
+      - /toggleplace
+      - /fill
+      - /fillr
+      - /drain
+      - /fixwater
+      - /fixlava
+      - /removeabove
+      - /removebelow
+      - /replacenear
+      - /replacenear
+      - /removenear
+      - /snow
+      - /thaw
+      - /ex
+      - /butcher
+      - /remove
+      - /green
+      - /chunkinfo
+      - /calc
+      - /listchunks
+      - /
+      - /sp
+      - /tool
+      - /none
+      - /farwand
+      - /tree
+      - /deltree
+      - /repl
+      - /cycler
+      - /flood
+      - /brush
+      - /size
+      - /mat
+      - /range
+      - /mask
+      - /gmask
+      - /unstuck
+      - /ascend
+      - /descend
+      - /thru
+      - /jumpto
+      - /up
+      - /restore
+      - /snapshot
+      - /cs
+      - /.s
+      - /biomelist
+      - /biomeinfo
+      - /setbiome
+      - /undo
+      - /redo
+    tabcomplete:
+      - wand
+      - toggleeditwand
+      - sel
+      - desel
+      - pos1
+      - pos2
+      - hpos1
+      - hpos2
+      - chunk
+      - expand
+      - contract
+      - outset
+      - inset
+      - count
+      - distr
+      - set
+      - replace
+      - overlay
+      - walls
+      - outline
+      - center
+      - smooth
+      - deform
+      - regen
+      - hollow
+      - move
+      - stack
+      - naturalize
+      - line
+      - curve
+      - forest
+      - flora
+      - copy
+      - paste
+      - rotate
+      - flip
+      - schem
+      - schematic
+      - cut
+      - generate
+      - generatebiome
+      - hcyl
+      - cyl
+      - sphere
+      - hsphere
+      - pyramid
+      - hpyramid
+      - forestgen
+      - pumpkins
+      - toggleplace
+      - fill
+      - fillr
+      - drain
+      - fixwater
+      - fixlava
+      - removeabove
+      - removebelow
+      - replacenear
+      - replacenear
+      - removenear
+      - snow
+      - thaw
+      - ex
+      - butcher
+      - remove
+      - green
+      - chunkinfo
+      - calc
+      - listchunks
+      - sp
+      - tool
+      - none
+      - farwand
+      - tree
+      - deltree
+      - repl
+      - cycler
+      - flood
+      - brush
+      - size
+      - mat
+      - range
+      - mask
+      - gmask
+      - unstuck
+      - ascend
+      - descend
+      - thru
+      - jumpto
+      - up
+      - restore
+      - snapshot
+      - cs
+      - .s
+      - biomelist
+      - biomeinfo
+      - setbiome
+      - /wand
+      - /toggleeditwand
+      - /sel
+      - /desel
+      - /pos1
+      - /pos2
+      - /hpos1
+      - /hpos2
+      - /chunk
+      - /expand
+      - /contract
+      - /outset
+      - /inset
+      - /count
+      - /distr
+      - /set
+      - /replace
+      - /overlay
+      - /walls
+      - /outline
+      - /center
+      - /smooth
+      - /deform
+      - /regen
+      - /hollow
+      - /move
+      - /stack
+      - /naturalize
+      - /line
+      - /curve
+      - /forest
+      - /flora
+      - /copy
+      - /paste
+      - /rotate
+      - /flip
+      - /schem
+      - /schematic
+      - /cut
+      - /generate
+      - /generatebiome
+      - /hcyl
+      - /cyl
+      - /sphere
+      - /hsphere
+      - /pyramid
+      - /hpyramid
+      - /forestgen
+      - /pumpkins
+      - /toggleplace
+      - /fill
+      - /fillr
+      - /drain
+      - /fixwater
+      - /fixlava
+      - /removeabove
+      - /removebelow
+      - /replacenear
+      - /replacenear
+      - /removenear
+      - /snow
+      - /thaw
+      - /ex
+      - /butcher
+      - /remove
+      - /green
+      - /chunkinfo
+      - /calc
+      - /listchunks
+      - /
+      - /sp
+      - /tool
+      - /none
+      - /farwand
+      - /tree
+      - /deltree
+      - /repl
+      - /cycler
+      - /flood
+      - /brush
+      - /size
+      - /mat
+      - /range
+      - /mask
+      - /gmask
+      - /unstuck
+      - /ascend
+      - /descend
+      - /thru
+      - /jumpto
+      - /up
+      - /restore
+      - /snapshot
+      - /cs
+      - /.s
+      - /biomelist
+      - /biomeinfo
+      - /setbiome
+      - /undo
+      - /redo
+    inherited-groups:
+      - architect
+      - designer
+      - default
+    group-mode: whitelist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+
+  architect:
+    priority: 3
+    commands:
+      - chatcolorhex
+      - walkspeed
+      - wspeed
+      - flyspeed
+      - fspeed
+      - 
+      - 
+      - 
+      - 
+    tabcomplete:
+      - chatcolorhex
+      - walkspeed
+      - wspeed
+      - flyspeed
+      - fspeed
+      - 
+      - 
+      - 
+      - 
+    inherited-groups:
+      - designer
+      - default
+    group-mode: whitelist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+
+  designer:
+    priority: 2
+    commands:
+      - donorchat
+      - dchat
+      - effect
+      - skull
+      - head
+      - jailforce
+      - jailprank
+      - nick
+      - nickme
+      - nickname
+      - rename
+      - scale
+      - tp
+      - tphere
+    tabcomplete:
+      - donorchat
+      - dchat
+      - effect
+      - skull
+      - head
+      - jailforce
+      - jailprank
+      - nick
+      - nickme
+      - nickname
+      - rename
+      - scale
+      - tp
+      - tphere
+    inherited-groups:
+      - default
+    group-mode: whitelist
+    blocked-command-message: "Unknown command. Type \"/help\" for help."
+
+  default:
+    priority: 1
+    commands:
+      - shop
+      - vault
+      - yell
+      - yodel
+      - shout
+      - sync
+      - options
+      - stats
+      - rules
+      - vote
+      - vk
+      - vkick
+      - votekick
+      - 50x:
+      - gmc
+      - gms
+      - gma
+      - gmsp
+
+      - hat
+      - discord
+      - afk
+      - tpa
+      - tpaccept
+      - tpadeny
+      - tpahere
+      - spawn
+      - rules
+      - help
+      - report
+      - balance
+      - bal
+      - baltop
+      - balancetop
+      - rich
+      - money
+      - paytoggle
+      - pay
+      - nbts
+      - money
+      - jailforce
+      - nick
+      - sticko
+      - head
+      - whoistherichest
+      - purchase
+      - store
+      - gmc
+      - gms
+      - gma
+      - vk
+      - vkick
+      - votek
+      - votekick
+      - skulls
+      - co
+      - coreprotect
+      - report
+      - controlpanel
+      - panel
+      - friends
+      - friend
+      - poll
+      - chatcolor
+      - realname
+      - stats
+      - aclaim
+      - playtime
+      - plots
+      - plot
+      - p
+      - tell
+      - sit
+      - dclink
+      - link
+      - unlink
+      - dcunlink
+      - vr
+      - vault
+      - 
+      - 
+      - mh
+      - mhc
+      - minehut
+      - backup
+      - fav
+      - favorite
+      - find
+      - ignore
+      - m
+      - message
+      - msg
+      - r
+      - reply
+      - setting
+      - settings
+      - tell
+      - gsit:
+      - bellyflop
+      - crawl
+      - gbellyflop
+      - gcrawl
+      - glay
+      - gsit
+      - gsitreload
+      - gsitrl
+      - gspin
+      - lay
+      - sit
+      - spin
+      - "plhide"
+      -
+      -
+      -
+      -
+    tabcomplete:
+      - shop
+      - 
+      - vault
+      - v
+      - 
+      - yell
+      - yodel
+      - shout
+      - sync
+      - clear
+      - 
+      - options
+      - 
+      - stats
+      - 
+      - rules
+      - vote
+      - vk
+      - vkick
+      - votekick
+      - 
+      - 50x:
+      - gmc
+      - gms
+      - gma
+      - gmsp
+      - 
+      - hat
+      - discord
+      - afk
+      - tpa
+      - tpaccept
+      - tpadeny
+      - tpahere
+      - spawn
+      - rules
+      - help
+      - report
+      - balance
+      - bal
+      - baltop
+      - balancetop
+      - rich
+      - money
+      - paytoggle
+      - pay
+      - nbts
+      - money
+      - jailforce
+      - nick
+      - sticko
+      - head
+      - whoistherichest
+      - purchase
+      - store
+      - gmc
+      - gms
+      - gma
+      - vk
+      - vkick
+      - votek
+      - votekick
+      - skulls
+      - co
+      - coreprotect
+      - report
+      - controlpanel
+      - panel
+      - plots
+      - plot
+      - p
+      - friends
+      - friend
+      - poll
+      - chatcolor
+      - realname
+      - stats
+      - aclaim
+      - playtime
+      - tell
+      - sit
+      - dclink
+      - link
+      - unlink
+      - dcunlink
+      - vr
+      - vault
+      - 
+      - 
+      - mh
+      - mhc
+      - minehut
+      - backup
+      - fav
+      - favorite
+      - find
+      - ignore
+      - m
+      - message
+      - msg
+      - r
+      - reply
+      - setting
+      - settings
+      - tell
+      - gsit:
+      - bellyflop
+      - crawl
+      - gbellyflop
+      - gcrawl
+      - glay
+      - gsit
+      - gsitreload
+      - gsitrl
+      - gspin
+      - lay
+      - sit
+      - spin
+      - "plhide"
+    group-mode: whitelist
+    inherited-groups: []
+    blocked-command-message: "Unknown command. Type \"/help\" for help."

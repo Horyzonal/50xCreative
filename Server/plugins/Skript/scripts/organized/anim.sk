@@ -1,0 +1,6 @@
+on skript load:
+	set {-animation-offset} to now
+
+
+every tick:
+	set {-anim} to minimessage from "<bold><gradient:#0079FF:#52E3FF:%mod(ticks of time since {-animation-offset}, 100) / 100%><shadow:#000000AA>50xCreative"

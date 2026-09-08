@@ -1,0 +1,49 @@
+config-version: 6
+settings:
+  command:
+    open:
+      no-args-opens-self: false
+    searchcontainer:
+      max-radius: 10
+  disable-offline-access: false
+  disable-saving: false
+  locale: en_gb
+toggles:
+  silent-chest:
+    80b434c7-de64-4a14-98ab-7d34d3cc11ea: true
+    2c21098e-abe1-4e1a-a56b-c3a4d50ffdd0: true
+    65ab41f3-854b-4d6d-b2c8-ff9b407e887f: false
+    5466b696-68e6-4e24-810a-1f2ad338005f: false
+    adb45da7-8774-4fb5-a569-b02f60e38ed8: false
+    c285d803-6b6a-409e-a8c3-a0276e028eac: false
+    2edd67e2-8cd9-4b23-8b5d-f664df9b9f48: false
+    b90cb200-6fb0-42ef-8e84-fea9c5b1457f: true
+    7f46947c-a92d-4ec5-a602-9763537e7672: false
+    c6f106dd-39bf-4243-999e-05af9d54ec1a: false
+    26a9b6de-63d5-4ce1-8d76-3e96ca43583d: true
+    c699bef0-6ea1-4661-be95-24ed6e255564: true
+    15e295ed-814b-4ec6-9d0b-91ae5b764fba: false
+    6fde7365-ca36-46a8-8d7c-f88e777b282d: false
+    8261a4d9-3205-4a12-93db-46f80ebfc9da: false
+    141bf6ec-d114-43af-8ffa-08be0927d38f: true
+    0ef57eb4-29a0-427e-83d0-af14ee8ea1dc: false
+    806bd084-ad78-4c6c-ae78-6044ba545fed: false
+    0d559717-eb11-42f5-99f8-becbaf47dafe: true
+    e0c70b04-0739-42d4-9dde-bc72f937f8d5: false
+    f0801ea8-55aa-4411-bd65-8f83f6ba4f55: false
+    e5339ca8-fbfc-4bc6-8c49-6920b18febe1: false
+    dbb20d7f-2110-4e5f-8e31-d52e924813f2: false
+    6d5ec000-ef37-46fa-a921-68a0dc2fae24: false
+    05083138-eb56-44b3-8737-5daa3f29f6fc: false
+    4130f544-b5ff-4121-8c88-b9f31bb35d1a: false
+  any-chest:
+    c285d803-6b6a-409e-a8c3-a0276e028eac: true
+    2edd67e2-8cd9-4b23-8b5d-f664df9b9f48: true
+    b90cb200-6fb0-42ef-8e84-fea9c5b1457f: true
+    f0801ea8-55aa-4411-bd65-8f83f6ba4f55: false
+    15e295ed-814b-4ec6-9d0b-91ae5b764fba: false
+    6fde7365-ca36-46a8-8d7c-f88e777b282d: true
+    0d559717-eb11-42f5-99f8-becbaf47dafe: true
+    e0c70b04-0739-42d4-9dde-bc72f937f8d5: true
+    2c21098e-abe1-4e1a-a56b-c3a4d50ffdd0: true
+    65ab41f3-854b-4d6d-b2c8-ff9b407e887f: false

@@ -1,0 +1,867 @@
+version: 2 # DO NOT CHANGE
+holograms:
+  plots:
+    type: TEXT
+    location:
+      world: lobby
+      x: -12.5
+      y: 93.71121215820312
+      z: 2.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#FFB035:#FFF349>PLOTS</gradient></b>
+    - '&8• &fʀɪɢʜᴛ-ᴄʟɪᴄᴋ &8•'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  randomizer:
+    type: TEXT
+    location:
+      world: lobby
+      x: 1.5
+      y: 93.71121215820312
+      z: 2.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#6C39FF:#FF33B7>RANDOMIZER</gradient></b>
+    - '&8• &fʀɪɢʜᴛ-ᴄʟɪᴄᴋ &8•'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  x1:
+    type: TEXT
+    location:
+      world: lobby
+      x: -18.5
+      y: 93.74994659423828
+      z: 8.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><#FFFFFF>TAG
+    - '&8• &fʀɪɢʜᴛ-ᴄʟɪᴄᴋ &8•'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  x2:
+    type: TEXT
+    location:
+      world: lobby
+      x: -19.5
+      y: 93.74994659423828
+      z: 15.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#FFFFFF:#838383>UNKNOWN</gradient></b>
+    - '&8• &7ᴄᴏᴍɪɴɢ sᴏᴏɴ &8•'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  x3:
+    type: TEXT
+    location:
+      world: lobby
+      x: -18.5
+      y: 93.74994659423828
+      z: 22.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#FFFFFF:#838383>UNKNOWN</gradient></b>
+    - '&8• &7ᴄᴏᴍɪɴɢ sᴏᴏɴ &8•'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  x4:
+    type: TEXT
+    location:
+      world: lobby
+      x: 7.5
+      y: 93.74994659423828
+      z: 8.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#FFFFFF:#838383>UNKNOWN</gradient></b>
+    - '&8• &7ᴄᴏᴍɪɴɢ sᴏᴏɴ &8•'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  x5:
+    type: TEXT
+    location:
+      world: lobby
+      x: 8.5
+      y: 93.72699737548828
+      z: 15.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#FFFFFF:#838383>UNKNOWN</gradient></b>
+    - '&8• &7ᴄᴏᴍɪɴɢ sᴏᴏɴ &8•'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  x6:
+    type: TEXT
+    location:
+      world: lobby
+      x: 7.5
+      y: 93.74994659423828
+      z: 22.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#FFFFFF:#838383>UNKNOWN</gradient></b>
+    - '&8• &7ᴄᴏᴍɪɴɢ sᴏᴏɴ &8•'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  games:
+    type: TEXT
+    location:
+      world: lobby
+      x: -5.5
+      y: 97.5
+      z: -4.5
+      yaw: 0.0
+      pitch: 0.0
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 10.0
+    scale_y: 10.0
+    scale_z: 10.0
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#52FFEA:#279FFF>GAMES</gradient></b>
+    - <#DDDDDD>ᴄʜᴏᴏsᴇ ᴀ ɢᴀᴍᴇ
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+    billboard: fixed
+  welcome:
+    type: TEXT
+    location:
+      world: lobby
+      x: -5.5
+      y: 93.0
+      z: 53.5
+      yaw: -180.0
+      pitch: 0.0
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 2.0
+    scale_y: 2.0
+    scale_z: 2.0
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <gradient:#003BFF:#0079FF:#003BFF><st>┏---------------------------------┓
+    - '&7'
+    - '&fWelcome to <b><gradient:#1685FF:#16E3FF>✫ 50xCreative ✫</gradient></b>'
+    - '&7ᴛʜᴇ <gradient:#3FD8FF:#ABFCFF>ᴘʀᴇᴍɪᴜᴍ </gradient>&7ᴄʀᴇᴀᴛɪᴠᴇ ᴇxᴘᴇʀɪᴇɴᴄᴇ'
+    - '&6'
+    - <#DDDDDD>Use the <#16E3FF>selector <#DDDDDD>in your hotbar
+    - <#DDDDDD>Or click on the <#16E3FF>NPCs <#DDDDDD>ahead to play!
+    - '&f'
+    - '&9&lDISCORD &8➳ <gradient:#9578FF:#F69FFF>dcd.gg/50xCreative</gradient>'
+    - '&d&lWEBSITE &8➳ <gradient:#FF9FF1:#FF9FBA>www.50xCreative.xyz</gradient>'
+    - '&c&lYOUTUBE &8➳ <gradient:#FF9F9F:#FFBA9F>youtube.com/@50xCreative</gradient>'
+    - '&7'
+    - <#4499FF>Read the rules and have fun ^o^
+    - <gradient:#003BFF:#0079FF:#003BFF><st>┗---------------------------------┛
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: '#21000000'
+    billboard: vertical
+  vote_crate:
+    type: TEXT
+    location:
+      world: lobby
+      x: 54.5
+      y: 93.4749984741211
+      z: 61.5
+      yaw: 85.85778
+      pitch: 12.544999
+    visibility_distance: 100000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.0
+    scale_y: 1.0
+    scale_z: 1.0
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    text:
+    - <b><gradient:#5555FF:#FF55FF>VOTE CRATE</gradient></b>
+    - '&8• &fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ᴏᴘᴇɴ &8•'
+    - '&8• &fʟᴇꜰᴛ ᴄʟɪᴄᴋ ᴛᴏ ᴠɪᴇᴡ ᴄᴏɴᴛᴇɴᴛꜱ &8•'
+    text_shadow: false
+    see_through: true
+    text_alignment: center
+    update_text_interval: -1
+    block_brightness: 0
+    sky_brightness: 15
+    background: transparent
+  creative:
+    type: TEXT
+    location:
+      world: lobby
+      x: -5.5
+      y: 93.69999694824219
+      z: 1.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#74FF7D:#2DBBFF>CREATIVE</gradient></b>
+    - '&8• &fʀɪɢʜᴛ-ᴄʟɪᴄᴋ &8•'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  discord:
+    type: TEXT
+    location:
+      world: lobby
+      x: -20.5
+      y: 96.19999694824219
+      z: 46.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.0
+    scale_y: 1.0
+    scale_z: 1.0
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - '&9&lDISCORD'
+    - '&8(<#DDDDDD>ʀɪɢʜᴛ-ᴄʟɪᴄᴋ&8)'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  store:
+    type: TEXT
+    location:
+      world: lobby
+      x: 9.5
+      y: 96.19999694824219
+      z: 46.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.0
+    scale_y: 1.0
+    scale_z: 1.0
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - '&d&lSTORE'
+    - '&8(<#DDDDDD>ʀɪɢʜᴛ-ᴄʟɪᴄᴋ&8)'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  vote:
+    type: TEXT
+    location:
+      world: lobby
+      x: 9.5
+      y: 96.19999694824219
+      z: 76.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.0
+    scale_y: 1.0
+    scale_z: 1.0
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - '&a&lVOTE'
+    - '&8(<#DDDDDD>ʀɪɢʜᴛ-ᴄʟɪᴄᴋ&8)'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  website:
+    type: TEXT
+    location:
+      world: lobby
+      x: -20.5
+      y: 96.19999694824219
+      z: 76.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.0
+    scale_y: 1.0
+    scale_z: 1.0
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - '&b&lWEBSITE'
+    - '&8(<#DDDDDD>ʀɪɢʜᴛ-ᴄʟɪᴄᴋ&8)'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  gamesitem:
+    type: ITEM
+    location:
+      world: lobby
+      x: -5.5
+      y: 105.64258575439453
+      z: -4.5
+      yaw: -180.0
+      pitch: 0.0
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 5.0
+    scale_y: 5.0
+    scale_z: 5.0
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    billboard: fixed
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      DataVersion: 4556
+      id: minecraft:ender_eye
+      count: 64
+      schema_version: 1
+    block_brightness: 15
+    sky_brightness: 0
+  games2:
+    type: TEXT
+    location:
+      world: lobby
+      x: -5.5
+      y: 97.5
+      z: -4.5
+      yaw: -180.0
+      pitch: 0.0
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 10.0
+    scale_y: 10.0
+    scale_z: 10.0
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    billboard: fixed
+    text:
+    - <b><gradient:#52FFEA:#279FFF>GAMES</gradient></b>
+    - <#DDDDDD>ᴄʜᴏᴏsᴇ ᴀ ɢᴀᴍᴇ
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  afk:
+    type: TEXT
+    location:
+      world: lobby
+      x: -51.5
+      y: 92.0
+      z: 61.5
+      yaw: -90.0
+      pitch: 0.0
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 2.5
+    scale_y: 2.5
+    scale_z: 2.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#3765FF:#A53BFF>AFK ZONE</gradient></b>
+    - <#DDDDDD>ᴊᴜsᴛ ᴀ ᴘʟᴀᴄᴇ ᴛᴏ ᴀꜰᴋ
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  baltop:
+    type: TEXT
+    location:
+      world: lobby
+      x: -65.5
+      y: 94.5
+      z: 61.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - '&#5CFF9C&lTOP BALANCES'
+    - '&7'
+    - '&#5CFF9C1. §fTheJohnChatgame §7- &#5CFF9C💲313.97K'
+    - '&#5CFF9C2. §fbrizie §7- &#5CFF9C💲83.5K'
+    - '&#5CFF9C3. §fpotator123 §7- &#5CFF9C💲61.21K'
+    - '&#5CFF9C4. §fTangykai §7- &#5CFF9C💲43.05K'
+    - '&#5CFF9C5. §fSnowyAngel_ §7- &#5CFF9C💲42.27K'
+    - '&#5CFF9C6. §fKane1349 §7- &#5CFF9C💲41.14K'
+    - '&#5CFF9C7. §fintegr §7- &#5CFF9C💲39.47K'
+    - '&#5CFF9C8. §fEgono §7- &#5CFF9C💲38.82K'
+    - '&#5CFF9C9. §fLauritsmt123 §7- &#5CFF9C💲37.29K'
+    - '&#5CFF9C10. §fDecisiveOhio6 §7- &#5CFF9C💲37.11K'
+    - '&7'
+    - <#CCCCCC>(ʀᴇғʀᴇsʜᴇs ᴇᴠᴇʀʏ ᴛᴇɴ ᴍɪɴᴜᴛᴇs)
+    text_shadow: true
+    see_through: false
+    text_alignment: left
+    update_text_interval: -1
+    background: transparent
+    billboard: vertical
+  bp1:
+    type: TEXT
+    location:
+      world: lobby
+      x: -5.5
+      y: 93.5
+      z: 48.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#FCD05C:#F7FF72>Booster Pad</gradient></b>
+    - '&7Up up and away!'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  bp2:
+    type: TEXT
+    location:
+      world: lobby
+      x: 7.5
+      y: 93.5
+      z: 61.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#FCD05C:#F7FF72>Booster Pad</gradient></b>
+    - '&7Up up and away!'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  bp3:
+    type: TEXT
+    location:
+      world: lobby
+      x: -5.5
+      y: 93.5
+      z: 74.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#FCD05C:#F7FF72>Booster Pad</gradient></b>
+    - '&7Up up and away!'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  bp4:
+    type: TEXT
+    location:
+      world: lobby
+      x: -18.5
+      y: 93.5
+      z: 61.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - <b><gradient:#FCD05C:#F7FF72>Booster Pad</gradient></b>
+    - '&7Up up and away!'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent
+  playtimetop:
+    type: TEXT
+    location:
+      world: lobby
+      x: -64.5
+      y: 94.5
+      z: 68.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    billboard: vertical
+    text:
+    - '&#ff49dd&lTOP PLAYTIME'
+    - '&7'
+    - §x§f§f§4§9§d§d1. §fKundaliel §7- §x§f§f§4§9§d§d⏳5ᴍᴏ 4ᴅ
+    - §x§f§f§4§9§d§d2. §fCapsytral §7- §x§f§f§4§9§d§d⏳27ᴅ 22ʜ
+    - §x§f§f§4§9§d§d3. §fLeopardGamer §7- §x§f§f§4§9§d§d⏳26ᴅ 6ʜ
+    - §x§f§f§4§9§d§d4. §fLemonLimeSlice §7- §x§f§f§4§9§d§d⏳6ᴅ 2ʜ
+    - §x§f§f§4§9§d§d5. §fmc_modder §7- §x§f§f§4§9§d§d⏳6ᴅ 0ʜ
+    - §x§f§f§4§9§d§d6. §fTheJohnChatgame §7- §x§f§f§4§9§d§d⏳5ᴅ 20ʜ
+    - §x§f§f§4§9§d§d7. §fKane1349 §7- §x§f§f§4§9§d§d⏳5ᴅ 7ʜ
+    - §x§f§f§4§9§d§d8. §fSnowyAngel_ §7- §x§f§f§4§9§d§d⏳4ᴅ 22ʜ
+    - §x§f§f§4§9§d§d9. §fTheCogInYourGame §7- §x§f§f§4§9§d§d⏳4ᴅ 7ʜ
+    - §x§f§f§4§9§d§d10. §fcrustysout §7- §x§f§f§4§9§d§d⏳4ᴅ 1ʜ
+    - '&7'
+    - <#CCCCCC>(ʀᴇғʀᴇsʜᴇs ᴇᴠᴇʀʏ ᴛᴇɴ ᴍɪɴᴜᴛᴇs)
+    text_shadow: true
+    see_through: false
+    text_alignment: left
+    update_text_interval: -1
+    background: transparent
+  karmatop:
+    type: TEXT
+    location:
+      world: lobby
+      x: -64.5
+      y: 94.5
+      z: 54.5
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    billboard: vertical
+    text:
+    - '&#5CFF9C&lTOP BALANCES'
+    - '&7'
+    - '&#5CFF9C1. §fCapsytral §7- &#5CFF9C💵221.51K'
+    - '&#5CFF9C2. §fLeopardGamer §7- &#5CFF9C💵66.86K'
+    - '&#5CFF9C3. §fTangykai §7- &#5CFF9C💵49.35K'
+    - '&#5CFF9C4. §fLegulaTime §7- &#5CFF9C💵46.05K'
+    - '&#5CFF9C5. §fNotTrueUsername §7- &#5CFF9C💵45.96K'
+    - '&#5CFF9C6. §fSnowyAngel_ §7- &#5CFF9C💵43.33K'
+    - '&#5CFF9C7. §fbutterfly142 §7- &#5CFF9C💵41.6K'
+    - '&#5CFF9C8. §f_Aple__ §7- &#5CFF9C💵40.56K'
+    - '&#5CFF9C9. §fEndMaestro §7- &#5CFF9C💵39.68K'
+    - '&#5CFF9C10. §fS4ap13n §7- &#5CFF9C💵39.54K'
+    - '&7'
+    - <#CCCCCC>(ʀᴇғʀᴇsʜᴇs ᴇᴠᴇʀʏ ᴛᴇɴ ᴍɪɴᴜᴛᴇs)
+    text_shadow: true
+    see_through: false
+    text_alignment: left
+    update_text_interval: -1
+    background: transparent
+  RULEs:
+    type: TEXT
+    location:
+      world: plots
+      x: 2425.185546875
+      y: 108.176025390625
+      z: 1786.30810546875
+      yaw: 1.1039124
+      pitch: -6.9129686
+    visibility_distance: 2000
+    visibility: ALL
+    persistent: true
+    scale_x: 1.5
+    scale_y: 1.5
+    scale_z: 1.5
+    translation_x: 0.0
+    translation_y: 0.0
+    translation_z: 0.0
+    shadow_radius: 0.0
+    shadow_strength: 1.0
+    block_brightness: 15
+    sky_brightness: 0
+    text:
+    - '&c&lAPARTMENT RULES'
+    - '&c1. &fno jumping off'
+    - '&c2. &fno dying'
+    text_shadow: true
+    see_through: false
+    text_alignment: center
+    update_text_interval: -1
+    background: transparent

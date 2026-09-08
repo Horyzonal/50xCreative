@@ -1,0 +1,91 @@
+#==========================================================================#
+
+options:
+	err: &8(&4&l❗&8)&c
+	info: &8(<##FC00FF>&l❗&8)&f
+
+	usage: &8(&4&l❗&8) &cCorrect command usage &7»&f
+	notyou: &8(&4&l❗&8) &cConsole may not use this command.
+	noperm: &8(&4&l❗&8) &cYou do not have permission for this command.
+	notthis: &8(&4&l❗&8) &cYou may not use this feature of the command.
+	nothere: &8(&4&l❗&8) &cYou may not use this command in this region.
+	nothigh: &8(&4&l❗&8) &cThat person has a higher authority than you.
+	notnow: &8(&4&l❗&8) &cYou may use this command after %remaining time%.
+
+#==========================================================================#
+        
+on tab complete of "votereset" or "vr":
+	set tab completions for position 1 to "yes", "no"
+	priority(sender) > 9
+	add "start", "stop" to tab completions for position 1
+	set tab completions for position 2 to "-auto"
+
+on load:
+	clear {reset}, {resetting}, {resetyes::*}, {resetno::*}
+
+command votereset [<string>] [<string>]:
+	aliases: vr
+	trigger:
+		arg-1 = "stop":
+			priority(sender) < 10:
+				send "{@nothigh}"
+			else if {reset} is set:
+				clear {reset}, {resetting}, {resetyes::*}, {resetno::*}
+				send "%nl%&d&lMAP RESET VOTE%nl%&fThe current map reset voting has been &ccanceled &fby a staff member.%nl%" to all players in world "creative"
+				stafflog("%sender% &fhas cancelled the current map reset voting.")
+			else:
+				send "{@err} There is no pending map reset voting."		
+		else if arg-1 = "start":
+			priority(sender) < 10:
+				send "{@nothigh}"
+			else if {reset} is set:
+				send "{@err} There is already a pending map reset voting."
+			else:
+				clear {reset}, {resetting}, {resetyes::*}, {resetno::*}
+				set {reset} to true
+				stafflog("%sender% &fhas initiated a <#B247FF>creative map reset voting&f%" with auto reset" if arg 2 is "-auto" else ""%.")
+				send "%nl%&d&lMAP RESET VOTE%nl%%nl%<#FFAFFF>/vr yes &fto agree on resetting the map.%nl%<#FFAFFF>/vr no &fto disagree on resetting the map.%nl%%nl%&7Ends in 1 minute.%nl%" to all players in world "creative"
+				wait 30 seconds
+				{reset} is set
+				send "%nl%&d&lMAP RESET VOTE%nl%%nl%<#FFAFFF>/vr yes &fto agree on resetting the map.%nl%<#FFAFFF>/vr no &fto disagree on resetting the map.%nl%%nl%&dCurrent votes:%nl%&2%amount of {resetyes::*}% &aYes%nl%&4%amount of {resetno::*}% &cNo%nl%%nl%&7Ends in 30 seconds.%nl%" to all players in world "creative"
+				wait 30 seconds
+				{reset} is set
+				set {_a} to round((amount of {resetyes::*}) / (amount of {resetno::*} + amount of {resetyes::*}) * 100, 2)
+				send "%nl%&d&lMAP RESET VOTE%nl%%nl%&dCurrent votes:%nl%&2%amount of {resetyes::*}% &aYes%nl%&4%amount of {resetno::*}% &cNo%nl%%nl%<#FFAFFF>%{_a}%%% &fof people agreed to a map reset." to all players in world "creative"
+				clear {resetyes::*}, {resetno::*}
+				{_a} <= 50:
+					send nl to all players in world "creative"
+					clear {reset}
+				else:
+					arg-2 = "-auto"
+					set {resetting} to true
+					send "&cResetting map in 10 seconds.%nl%" to all players in world "creative"
+					wait 10 seconds
+					{reset} is set
+					mapreset(sender, world "creative") if arg-2 = "-auto"
+					clear {reset}, {resetting}
+		else if arg-1 = "yes" or "no":
+			{reset} is set:
+				{resetting} isn't set:
+					arg-1 = "yes":
+						{resetyes::*} doesn't contain player's uuid:
+							add player's uuid to {resetyes::*}
+							remove player's uuid from {resetno::*}
+							send "{@info} You have voted &ayes &ffor a map reset."
+						else:
+							send "{@err} You have already voted yes for a map reset."
+					else if arg-1 = "no":
+						{resetno::*} doesn't contain player's uuid:
+							add player's uuid to {resetno::*}
+							remove player's uuid from {resetyes::*}
+							send "{@info} You have voted &cno &ffor a map reset."
+						else:
+							send "{@err} You have already voted no for a map reset."
+					else:
+						send "{@usage} /votereset <yes | no>"
+				else:
+					send "{@err} There is no pending map reset voting."
+			else:
+				send "{@err} There is no pending map reset voting."
+		else:
+			send "{@usage} /votereset (yes | no | start | stop) [-auto]" if priority(player) > 9 else "{@usage} /votereset <yes | no>"

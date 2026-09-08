@@ -1,0 +1,19 @@
+{
+  "type": "imageframe:url_static",
+  "index": 9,
+  "name": "noear",
+  "url": "https://media.discordapp.net/attachments/1334763305906077767/1516124850249400491/ear-emoji.png?ex\u003d6a3180cc\u0026is\u003d6a302f4c\u0026hm\u003d3c60bd681460ad433a6fd7c1a14183f0135df4ffa4cf7a93087ccbdc0a33cb30\u0026\u003d\u0026format\u003dwebp\u0026quality\u003dlossless",
+  "width": 1,
+  "height": 1,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "hasAccess": {},
+  "creationTime": 1781542745335,
+  "mapdata": [
+    {
+      "mapid": 423,
+      "image": "0.png",
+      "markers": []
+    }
+  ]
+}

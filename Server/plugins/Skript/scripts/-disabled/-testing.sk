@@ -1,0 +1,76 @@
+#
+# /genquad        → prints a random quadratic with integer roots
+# /solve <a> <b> <c>  → solves any quadratic and refuses non-integer roots
+# Add-on needed: SkBee  (for math expression “sqrt()”)
+#
+
+command /genquad:
+    permission: op
+    trigger:
+        set {_quad::*} to generateHardcodedQuadratic()
+
+        set {_a} to {_quad::1}
+        set {_b} to {_quad::2}
+        set {_c} to {_quad::3}
+        set {_r1} to {_quad::4}
+        set {_r2} to {_quad::5}
+
+        send "&aYour equation:"
+        send "&l%{_a}%x^2 +% {_b}%x +% {_c}% = 0"
+        send "&7(It factors to (x - %{_r1}%)(x - %{_r2}%), so the roots are integers.)"
+
+
+function solvequadratic(a: number, b: number, c: number) :: integer:
+    set {_d} to {_b} * {_b} - 4 * {_a} * {_c}
+    if {_d} < 0:
+        return 0
+    set {_sqrt} to sqrt({_d})
+    set {_posA} to ((-1 * {_b}) + {_sqrt}) / (2 * {_a})
+    set {_posB} to ((-1 * {_b}) - {_sqrt}) / (2 * {_a})
+    if {_posA} <= {posB}:
+        return {_posB}
+    else:
+        return {_posA}
+
+function generateHardcodedQuadratic() :: objects:
+    # Pick integer roots in hardcoded range
+    set {_r1} to random integer between -20 and 20
+    set {_r2} to random integer between -20 and 20
+    # Avoid same roots (or trivial case)
+    while {_r1} is {_r2}:
+        set {_r2} to random integer between -9 and 10
+
+    # Leading coefficient between 1 and 5
+    set {_a} to random integer between 1 and 5
+
+    # Calculate coefficients
+    set {_b} to -1 * {_a} * ({_r1} + {_r2})
+    set {_c} to {_a} * {_r1} * {_r2}
+
+    # Return coefficients and roots
+    return {_a}, {_b}, {_c}, {_r1}, {_r2}
+
+command /solvequadraticeq <number> <number> <number>:
+    permission: op
+    trigger:
+        set {_roots::*} to solvequadratic(arg-1, arg-2, arg-3)
+        if {_roots::1} is "No real roots":
+            send "%{_roots::1}%"
+        else:
+            send "Roots are: %{_roots::1}% and %{_roots::2}%"
+
+command /quadtest:
+    permission: op
+    trigger:
+        set {_quad::*} to generateHardcodedQuadratic()
+        
+        set {_a} to {_quad::1}
+        set {_b} to {_quad::2}
+        set {_c} to {_quad::3}
+        set {_r1} to {_quad::4}
+        set {_r2} to {_quad::5}
+        set {_ans} to solvequadratic({_a}, {_b}, {_c})
+        set {_cgames::ans} to {_ans}
+        set {_equation} to "&l%{_a}%x^2 +% {_b}%x +% {_c}% = 0"
+        send {_cgames::ans}
+        send {_equation}

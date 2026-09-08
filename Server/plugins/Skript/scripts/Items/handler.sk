@@ -1,0 +1,238 @@
+on load:
+	set {Magic.Tools::1} to breeze rod named "&cDeath Crucifix"
+	set {Magic.Tools::2} to breeze rod named "&6Annihilation Crucifix"
+	set {Magic.Tools::3} to breeze rod named "&9Holy Crucifix"
+	clear {reset}, {resetting}, {resetyes::*}, {resetno::*}
+
+on right click:
+    set {_a} to (metadata "death;adapt" of entity)
+    player's name is "SGGopen":
+        stop
+
+    if {Magic.Tools::*} contains 1 of player's tool:
+        set {_e} to event-entity
+        {_e} isn't player
+        priority(player) < 10:
+            stop
+        if {_e}'s name is "Kundaliel" or "LeopardGamer":
+            create an explosion of force 0 at {_e}
+            set {_e} to player
+        player's name isn't "Kundaliel" or "LeopardGamer":
+            {_a} > 5:
+                create an explosion of force 0 at {_e}
+                set {_e} to player
+        if 1 of player's tool is {Magic.Tools::1}:
+            {_e}'s metadata "death" isn't set
+            {_e}'s health is set
+            cancel event
+            remove 1 of player's tool from player's tool
+            set {_e}'s metadata "death" to true
+            set {_e}'s health to {_e}'s max health
+            loop 190 times:
+                magicCircle({_e}'s location, crit particle, loop-counter, 4)
+                force draw 5 of enchanting particle at location 1 block above {_e}'s location
+                mod(loop-counter, 10) = 0:
+                    if {_e} isn't alive:
+                        exit loop
+                    add ({_e}'s max health / 20) to {_hurt}
+                    set {_e}'s health to {_e}'s max health - {_hurt}
+                    play hurt animation on {_e}
+                wait 1 tick
+            wait 10 ticks
+            delete {_e}'s metadata "death"
+            set {_e}'s health to -100
+            force draw 50 of poof particle at location 1 block above {_e}'s location
+        else if 1 of player's tool is {Magic.Tools::2}:
+            {_e}'s metadata "annihilate" isn't set
+            {_e}'s health is set
+            cancel event
+            remove 1 of player's tool from player's tool
+            set {_e}'s metadata "annihilate" to true
+            set {_o} to {_e}'s location
+            loop 360 times:
+                if {_e} isn't alive:
+                    exit loop
+                magicCircle({_o}, flame particle, loop-counter, 3)
+                teleport {_e} to {_o} ~ vector(0, loop-counter*-0.01, 0)
+                wait 1 tick
+            delete {_e}'s metadata "annihilate"
+        else if 1 of player's tool is {Magic.Tools::3}:
+            {_e}'s metadata "disolve" isn't set
+            {_e}'s health is set
+            cancel event
+            remove 1 of player's tool from player's tool
+            set {_e}'s metadata "disolve" to true
+            set {_o} to {_e}'s location
+            loop 360 times:
+                if {_e} isn't alive:
+                    exit loop
+                magicCircle({_o}, small gust particle, loop-counter, 6)
+                set {_v} to vector between ({_e}'s location) and ({_o} ~ vector(0, 1000, 0))
+                push {_e} {_v} with speed log(distance between ({_e}'s location) and ({_o} ~ vector(0, 1000, 0)), 100)
+                wait 1 tick
+            delete {_e}'s metadata "disolve"
+    
+    else if 1 of player's tool is a clock:
+        player doesn't have permission "timeclock.use":
+            stop
+        custom nbt of player's tool is set
+        string tag "time-clock" of custom nbt of player's tool is set
+        
+        if {timeclock.active::%player's uuid%} is true:
+            send "&cYou already have an active time clock!" to player
+            stop
+        
+        set {_radius} to float tag "radius" of custom nbt of player's tool ? 5
+        set {_revolutionTime} to float tag "revolutionTime" of custom nbt of player's tool ? 200
+        
+        executeTimeSlow(player, {_radius}, {_revolutionTime})
+
+    if player's offhand item is set:
+        custom nbt of player's offhand item is set
+        string tag "personal-teleporter" of custom nbt of player's offhand item is set
+        player doesn't have permission "teleporter.personal":
+            send "&cThe magic of this item rejects you..." to player
+            stop
+        if player is sneaking:
+            cancel event
+            set {_nbt} to createNBT(player, custom nbt of player's offhand item)
+            set {_amount} to amount of (compound list tag "locations" of custom nbt of player's offhand item)
+            if {_amount} is 0:
+                set compound list tag "locations" of custom nbt of player's offhand item to {_nbt}
+            else:
+                add createNBT(player, custom nbt of player's offhand item) to compound list tag "locations" of custom nbt of player's offhand item
+            send "&aAdded position #%{_amount} + 1%: &f%player's x%, %player's y%, %player's z% &7in &f%player's world%" to player
+            set {Saved-Teleporter::%player's uuid%} to player's offhand item
+            play sound "entity.experience_orb.pickup" to player
+        else:
+            event-block isn't air
+            cancel event
+            
+            set {_currentIndex} to int tag "currentIndex" of custom nbt of player's offhand item ? 1
+            set {_totalPositions} to size of compound list tag "locations" of custom nbt of player's offhand item
+            
+            if {_totalPositions} is 0:
+                send "&cNo teleporter positions saved! Shift + Right Click to add a position." to player
+                stop
+            
+            set {_positionIndex} to {_currentIndex}
+            set {_locations::*} to compound list tag "locations" of custom nbt of player's offhand item
+
+            set {_selectedLocation} to {_locations::%{_positionIndex}%}
+            if long list tag "location" of custom nbt of event-block is set:
+                play sound "block.beacon.deactivate" at event-block
+                stop
+            
+            add {_selectedLocation} to custom nbt of event-block
+            executeTeleporter(event-block)
+            clear custom nbt of event-block
+
+
+on quit:
+    removeClockDisplay(player)
+
+on death of player:
+    removeClockDisplay(victim)
+
+on left click:
+    player's name is "SGGopen":
+        stop
+    custom nbt of player's offhand item is set
+    string tag "personal-teleporter" of custom nbt of player's offhand item is set
+    player is sneaking
+    player doesn't have permission "teleporter.personal":
+        send "&cThe magic of this item rejects you..." to player
+        stop
+    
+    cancel event
+    
+    set {_currentIndex} to int tag "currentIndex" of custom nbt of player's offhand item ? 1
+    set {_locations::*} to compound list tag "locations" of custom nbt of player's offhand item
+    if {_locations::%{_currentIndex}%} isn't set:
+        send "&cLocation doesn't exist" to player
+        stop
+
+    delete {_locations::%{_currentIndex}%}
+
+    set compound list tag "locations" of custom nbt of player's offhand item to {_locations::*}
+
+    set {Saved-Teleporter::%player's uuid%} to player's offhand item
+    send "&cRemoved position #%{_currentIndex}%" to player
+    play sound "entity.item.break" to player
+
+on tool change:
+    player's name is "SGGopen":
+        stop
+    custom nbt of player's offhand item is set
+    string tag "personal-teleporter" of custom nbt of player's offhand item is set
+    player is sneaking
+
+    add (1 if (index of past event-slot) < (index of event-slot) else -1) to (int tag "currentIndex" of custom nbt of player's offhand item)
+    cancel event
+    
+    set {_currentIndex} to int tag "currentIndex" of custom nbt of player's offhand item ? 1
+    set {_locations::*} to compound list tag "locations" of custom nbt of player's offhand item
+    set {_totalPositions} to amount of {_locations::*}
+    set {_selectedLocation} to {_locations::%{_currentIndex}%}
+    set {_coords::*} to long list tag "location" of {_selectedLocation}
+    set {_x} to {_coords::1} / 10000
+    set {_y} to {_coords::2} / 10000
+    set {_z} to {_coords::3} / 10000
+    set {_world} to string tag "world" of {_selectedLocation}
+
+    send action bar "&7[&5%{_currentIndex}%&7/&5%{_totalPositions}%&7] &f%{_x}%, %{_y}%, %{_z}% &7in &f%{_world}%" to player
+    play sound "block.note_block.hat" with pitch 1.5 to player
+
+
+on redstone change:
+    if redstone power of block is 0:
+        stop
+    executeTeleporter(block)
+
+on place:
+    custom nbt of item is set
+    add custom nbt of item to custom nbt of block
+
+
+every tick:
+    loop all entities:
+        if loop-value is a player:
+            if string tag "affectedByTimeClock" of custom nbt of loop-value is set:
+                set {_casterUUID} to string tag "affectedByTimeClock" of custom nbt of loop-value
+                
+                if {timeclock.locked::%loop-value's uuid%} is true:
+                    if {timeclock.locked.location::%loop-value's uuid%} is set:
+                        teleport loop-value to {timeclock.locked.location::%loop-value's uuid%}
+                
+                if {timeclock.active::%{_casterUUID}%} is not set:
+                    setPlayerTickRate(loop-value, 20, false)
+                    unlockPlayerCamera(loop-value)
+                    removeClockDisplay(loop-value)
+                    delete string tag "affectedByTimeClock" of custom nbt of loop-value
+                else:
+                    set {_display} to {timeclock.display::%loop-value's uuid%}
+                    if {_display} is set:
+                        if {_display} is alive:
+                            if vehicle of {_display} is not loop-value:
+                                make {_display} ride loop-value
+                        else:
+                            delete {timeclock.display::%loop-value's uuid%}
+        else:
+            if double list tag "originalVelocity" of custom nbt of loop-value is set:
+                if string tag "affectedByTimeClock" of custom nbt of loop-value is set:
+                    set {_casterUUID} to string tag "affectedByTimeClock" of custom nbt of loop-value
+                    if {timeclock.active::%{_casterUUID}%} is not set:
+                        set {_v::*} to double list tag "originalVelocity" of custom nbt of loop-value
+                        set velocity of loop-value to vector {_v::1}, {_v::2}, {_v::3}
+                        delete custom nbt of loop-value
+                else:
+                    set {_v::*} to double list tag "originalVelocity" of custom nbt of loop-value
+                    set velocity of loop-value to vector {_v::1}, {_v::2}, {_v::3}
+                    delete custom nbt of loop-value
+
+on entity move:
+	if any:
+		event-entity's metadata "annihilate" is set
+		event-entity's metadata "death" is set
+	then:
+		cancel event

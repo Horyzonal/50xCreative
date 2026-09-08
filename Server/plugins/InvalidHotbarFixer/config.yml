@@ -1,0 +1,5 @@
+# InvalidHotbarFixer - Configuration
+# Enables/Disables debug mode.
+# If "true", more information going to be logged in console.
+
+debug: false

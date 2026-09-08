@@ -1,0 +1,15 @@
+import:
+    java.lang.Thread
+on load:
+    set {_p} to player("Kundaliel")
+    create new section stored in {_init}:
+        while {StopIt} isn't set:
+            if {StopIt} is set:
+                exit loop
+            loop all players where [input isn't {_p}]:
+                loop-player's world is {_p}'s world
+                set {_e} to location 0.4 meters above eye location of loop-player
+                make 1 of electric spark at {_e} with extra 0 with force for {_p}
+            Thread.sleep(0.001)
+
+    run section {_init} async

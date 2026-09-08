@@ -1,0 +1,192 @@
+options:
+    itemsPerPage: 45
+
+function nbtIndices(list: string) :: strings:
+    set {_out::*} to indices of {nbts::%{_list}%::*}
+    return {_out::*}
+
+command /submitnbt:
+    description: Submit your held item for nbt review
+    trigger:
+        set {_item} to player's tool
+        if {_item} is air:
+            send "&cYou're not holding anything to submit." to player
+            stop trigger
+
+
+        add "&7Submitted by %player%" to lore of {_item}
+        set {_id} to "%player's uuid%-%now%"
+        if {nbts::review::*} contains {_item}:
+            send "&cThis item was already submitted..." to player
+            stop
+        add {_item} to {nbts::review::*}
+        send "&aYour nbt item has been submitted for review!" to player
+
+command /reviewnbts:
+    description: Review submitted nbt items
+    permission: srmod.reviewnbts
+    permission message: &cYou don't have permission to review nbt submissions.
+    trigger:
+        nbtReview(player, 1)
+
+function nbtReview(p: player, page: integer = 1):
+    set {_indices::*} to nbtIndices("review")
+    set {_total} to size of {_indices::*}
+    set {_perPage} to {@itemsPerPage}
+    if {_total} <= {_perPage}:
+        set {_maxPage} to 1
+    else:
+        set {_maxPage} to {_total} / {_perPage}
+        if mod({_total}, {_perPage}) > 0:
+            add 1 to {_maxPage}
+
+    if {_page} < 1:
+        set {_page} to 1
+    if {_page} > {_maxPage}:
+        set {_page} to {_maxPage}
+
+    set {_start} to ({_page} - 1) * {_perPage}
+
+    create a gui with virtual chest inventory with 6 rows named "&8NBTs &7(Page %{_page}%/%{_maxPage}%)":
+        make gui slots (all integers between 45 and 53) with gray stained glass pane named " "
+
+        if {_page} > 1:
+            make gui slot 45 with red concrete named "&c« Previous Page":
+                close {_p}'s inventory
+                nbtReview(player, {_page} - 1)
+        else:
+            make gui slot 45 with gray concrete named "&7No Previous Page"
+
+        if {_page} < {_maxPage}:
+            make gui slot 53 with green concrete named "&aNext Page »":
+                close {_p}'s inventory
+                nbtReview(player, {_page} + 1)
+        else:
+            make gui slot 53 with gray concrete named "&7No More Pages"
+
+        loop {_perPage} times:
+            set {_slot} to loop-number - 1
+            set {_listIndex} to {_start} + {_slot} + 1
+            if {_listIndex} <= {_total}:
+                set {_entryId} to the {_listIndex}th element of {_indices::*}
+                set {_displayItem} to {nbts::review::%{_entryId}%}
+                make gui slot {_slot} with {_displayItem}:
+                    close {_p}'s inventory
+                    nbtReviewPopup(player, {_entryId}, {_page})
+
+    open last gui for {_p}
+
+function nbtReviewPopup(p: player, entryId: string, returnPage: integer):
+    if {nbts::review::%{_entryId}%} is not set:
+        send "&cThat submission no longer exists." to {_p}
+        nbtReview({_p}, {_returnPage})
+        stop
+
+    set {_item} to {nbts::review::%{_entryId}%}
+
+    create a gui with virtual chest inventory with 3 rows named "&8Review Submission":
+        make gui slots (all integers between 0 and 26) with gray stained glass pane
+
+        make gui slot 13 with {_item}
+
+        make gui slot 11 with red concrete named "&c✘ Decline":
+            delete {nbts::review::%{_entryId}%}
+            close {_p}'s inventory
+            send "&cDeclined submission." to player
+            nbtReview(player, {_returnPage})
+
+        make gui slot 15 with green concrete named "&a✔ Accept":
+            delete {nbts::review::%{_entryId}%}
+            set {_newId} to "%{_entryId}%-accepted"
+            add {_item} to {nbts::accepted::*}
+            close {_p}'s inventory
+            send "&aAccepted submission." to player
+            nbtReview(player, {_returnPage})
+
+    open last gui for {_p}
+
+command /nbts:
+    description: View and claim your accepted nbt items
+    trigger:
+        nbtAccepted(player, 1)
+
+function nbtAccepted(p: player, page: integer = 1):
+    set {_indices::*} to nbtIndices("accepted")
+    set {_total} to size of {_indices::*}
+    set {_perPage} to {@itemsPerPage}
+    if {_total} <= {_perPage}:
+        set {_maxPage} to 1
+    else:
+        set {_maxPage} to {_total} / {_perPage}
+        if mod({_total}, {_perPage}) > 0:
+            add 1 to {_maxPage}
+
+    if {_page} < 1:
+        set {_page} to 1
+    if {_page} > {_maxPage}:
+        set {_page} to {_maxPage}
+
+    set {_start} to ({_page} - 1) * {_perPage}
+
+    create a gui with virtual chest inventory with 6 rows named "&8NBTs &7(Page %{_page}%/%{_maxPage}%)" and stealable items:
+        make gui slots (all integers between 45 and 53) with gray stained glass pane named " "
+
+        if {_page} > 1:
+            make gui slot 45 with red concrete named "&c« Previous Page":
+                close {_p}'s inventory
+                nbtAccepted(player, {_page} - 1)
+        else:
+            make gui slot 45 with gray concrete named "&7No Previous Page"
+
+        if {_page} < {_maxPage}:
+            make gui slot 53 with green concrete named "&aNext Page »":
+                close {_p}'s inventory
+                nbtAccepted(player, {_page} + 1)
+        else:
+            make gui slot 53 with gray concrete named "&7No More Pages"
+
+        loop {_perPage} times:
+            set {_slot} to loop-number - 1
+            set {_listIndex} to {_start} + {_slot} + 1
+            if {_listIndex} <= {_total}:
+                set {_entryId} to the {_listIndex}th element of {_indices::*}
+                set {_displayItem} to {nbts::accepted::%{_entryId}%}
+                make gui slot {_slot} with removable {_displayItem}:
+                    if all:
+                        event-clicktype is right mouse button
+                        priority(player) >= 12
+                    then:
+                        close player's inventory
+                        nbtDeletePopup(player, {_entryId}, {_page})
+                    else:
+                        if {nbts::accepted::%{_entryId}%} is set:
+                            give {_displayItem} to player
+                            send "&aClaimed item!" to player
+                            nbtAccepted(player, {_page})
+
+    open last gui for {_p}
+
+function nbtDeletePopup(p: player, entryId: string, returnPage: integer):
+    if {nbts::accepted::%{_entryId}%} is not set:
+        send "&cThat item no longer exists." to {_p}
+        nbtAccepted({_p}, {_returnPage})
+        stop
+
+    set {_item} to {nbts::accepted::%{_entryId}%}
+
+    create a gui with virtual chest inventory with 3 rows named "&8Delete Accepted Item":
+        make gui slots (all integers between 0 and 26) with gray stained glass pane
+
+        make gui slot 13 with {_item}
+
+        make gui slot 11 with red concrete named "&c✘ Cancel":
+            close {_p}'s inventory
+            nbtAccepted(player, {_returnPage})
+
+        make gui slot 15 with green concrete named "&a✔ Confirm Delete":
+            delete {nbts::accepted::%{_entryId}%}
+            close {_p}'s inventory
+            send "&cItem deleted." to player
+            nbtAccepted(player, {_returnPage})
+
+    open last gui for {_p}

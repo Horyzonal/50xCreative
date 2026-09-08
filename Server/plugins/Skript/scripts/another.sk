@@ -1,0 +1,209 @@
+on shoot:
+    shooter's name is "Cusmic_"
+    if {Time::Cusmic} is set:
+        if difference between {Time::Cusmic} and now < 1 minute:
+            cancel event
+            stop
+    set {Time::Cusmic} to now
+
+
+on book edit:
+    player's name is "Kundaliel"
+    event-item stack's name is "&fDeath Note"
+    loop event-texts:
+        kill player(loop-value)
+
+import:
+    io.papermc.paper.event.player.PrePlayerAttackEntityEvent
+    java.util.UUID
+###
+on PrePlayerAttackEntityEvent:
+    event.getAttacked().getUniqueId().equals(UUID.fromString("6fde7365-ca36-46a8-8d7c-f88e777b282d")) is true
+    event.setCancelled(true)
+###
+
+import:
+    org.bukkit.event.block.NotePlayEvent
+    org.bukkit.Instrument
+
+on NotePlayEvent:
+    set {_instrument} to event.getInstrument()
+    set {_name} to {_instrument}.name()
+    if {_name} is "CUSTOM_HEAD":
+        event.setCancelled(true)
+
+on death:
+    victim's name is "d0ctor7"
+    cancel event
+    
+    
+command dsay <text>:
+    executable by: console
+    trigger:
+        set {_m} to arg
+        replace all "_" with "\_" in {_m}
+        replace all "*" with "\*" in {_m}
+        replace all "`" with "\`" in {_m}
+        make new embed and store it in {_embed}:
+            set author of embed to "Console"
+            set author icon of embed to "https://github.com/Kundaliel/Files-For-Sharing/blob/c2d4f0cbb7bbdbf47e93164ca6ad8042996e3dda/code_icon_green.png?raw=true"
+            set description of embed to unformatted {_m}
+        post {_embed} to text channel with id "1417472418217197679" with bot bot "50xCreative"
+
+
+
+        set {_format} to text component from "&8[&f&lꜱᴇʀᴠᴇʀ&8]&f Console <#6E6E6E>» <#E0E0E0>%toHex(arg)%"
+
+        set {_x::1} to "<#0079FF>&m                                         "
+        set {_x::2} to "<#16AFFF>&lConsole"
+        set {_x::3} to "<#DDDDDD>Their current statistics."
+        set {_x::4} to ""
+        set {_x::5} to "<#16E3FF>| <#00FF73>💲 &fᴍᴏɴᴇʏ &7→ <#00FF73>Infinity"
+        set {_x::6} to "<#16E3FF>| <#FFE300>⚛ &fᴋᴀʀᴍᴀ &7→ <#FFE300>Infinity"
+        set {_x::7} to "<#16E3FF>| <#FF49DD>⏳ &fᴛɪᴍᴇ &7→ <#FF49DD>Infinity"
+        set {_x::8} to "<#16E3FF>| <#DA2FFF>👤 &fᴊᴏɪɴᴇᴅ &7→ <#DA2FFF>undefined ᴀɢᴏ"
+        set {_x::9} to ""
+        set {_x::10} to "&7(Click to message Console)"
+        set {_x::11} to "<#0079FF>&m                                         "
+        add hover event showing (text component from (join {_x::*} with nl)) to {_format}
+        add click event to suggest command "You can't message the Console..." to {_format}
+
+        set {_format} to merge components (minimessage from "<sprite:blocks:block/command_block> ") and {_format}
+        send component {_format} to console and all players
+
+import:
+    com.plotsquared.bukkit.util.BukkitUtil
+    com.plotsquared.core.util.SchematicHandler
+    java.util.function.BiConsumer
+    org.bukkit.Bukkit
+    java.io.File
+
+function plotDownloadCallback(proxy: object, tag: object, err: object):
+    set {_id} to {plotdl::pending}
+    set {_p} to {plotdl::player::%{_id}%}
+    set {_username} to {plotdl::username::%{_id}%}
+    set {_plotId} to {plotdl::plotid::%{_id}%}
+    set {_executor} to {plotdl::executor::%{_id}%}
+    delete {plotdl::executor::%{_id}%}
+    delete {plotdl::player::%{_id}%}
+    delete {plotdl::username::%{_id}%}
+    delete {plotdl::plotid::%{_id}%}
+    delete {plotdl::pending}
+
+    if {_err} is set:
+        send "&cFailed to get schematic data!" to {_p}
+        stop
+
+    set {_injector} to Bukkit.getPluginManager().getPlugin("PlotSquared").injector()
+    set {_handler} to {_injector}.getInstance(SchematicHandler.class)
+
+    set {_filename} to "%{_username}%-%{_plotId}%"
+    set {_path} to "plugins/PlotSquared/%{_filename}%"
+    set {_schemPath} to "plugins/PlotSquared/%{_filename}%.schem"
+
+    set {_saveResult} to {_handler}.save({_tag}, {_filename})
+
+    wait 60 ticks
+
+    set {_fileObj} to new File({_path})
+
+    if {_fileObj}.exists() is false:
+        send "&cFailed to save schematic file!" to {_p}
+        stop
+
+    set {_schemFile} to new File({_schemPath})
+    {_fileObj}.renameTo({_schemFile})
+
+    create a new message and store it in {_msg}:
+        set the content of the message to "**%{_username}%** | Plot `%{_plotId}%` | Executed by: **%{_executor}%**"
+        add {_schemPath} to the attachments of the message
+
+    post {_msg} to channel with id "1502826749451571270" and store it in {_sent}
+
+    loop attachments of {_sent}:
+        set {_url} to url of loop-value
+        exit loop
+        
+    send component minimessage from " <#9651FF>→ <white>ᴅᴏᴡɴʟᴏᴀᴅ </white><click:open_url:%{_url}%><green><underlined>ʏᴏᴜʀ ᴘʟᴏᴛ</underlined></green> <#9651FF>←" to {_p}
+    {_schemFile}.delete()
+
+command /plotdownload:
+    aliases: pd, downloadplot dp
+    trigger:
+        set {_plotPlayer} to BukkitUtil.adapt(player)
+        set {_plot} to {_plotPlayer}.getCurrentPlot()
+
+        set {_regions} to {_plot}.getRegions()
+        set {_region} to {_regions}.iterator().next()
+        set {_width} to {_region}.getWidth()
+        set {_length} to {_region}.getLength()
+        set {_plotCount} to {_plot}.getConnectedPlots().size()
+
+        if {_plotCount} > 32:
+            send "&cYour merged plot is too large to download! &7(Max 32 merged plots)" to player
+            send "&cYour merged plot count&7: %{_plotCount}% plots" to player
+            stop
+
+        if {_plot} is not set:
+            send "&cYou must be standing in your plot!" to player
+            stop
+
+        if {_plot}.isOwner({_plotPlayer}.getUUID()) is false:
+            priority(sender) < 12
+            send "&cYou don't own this plot!" to player
+            stop
+
+        set {_owners} to {_plot}.getOwners()
+        set {_owner} to {_owners}.iterator().next()
+        set {_offlinePlayer} to Bukkit.getOfflinePlayer({_owner})
+        set {_username} to {_offlinePlayer}.getName()
+        set {_plotId} to "%{_plot}.getId()%".replace(",", ";")
+        set {_id} to "%uuid of player%"
+
+        set {plotdl::pending} to {_id}
+        set {plotdl::player::%{_id}%} to player
+        set {plotdl::username::%{_id}%} to {_username}
+        set {plotdl::plotid::%{_id}%} to {_plotId}
+        set {plotdl::executor::%{_id}%} to sender
+
+        send "&7Generating schematic, please wait..." to player
+
+        set {_injector} to Bukkit.getPluginManager().getPlugin("PlotSquared").injector()
+        set {_handler} to {_injector}.getInstance(SchematicHandler.class)
+
+        set {_functions::accept} to function reference "plotDownloadCallback"
+        set {_biConsumer} to new proxy instance of BiConsumer using {_functions::*}
+
+        set {_future} to {_handler}.getCompoundTag({_plot})
+        {_future}.whenComplete({_biConsumer})
+
+
+command apply-pack-to-all <string>:
+    permission: op
+    trigger:
+        loop all players:
+            loop-value.setResourcePack(arg)
+
+command apply-pack-to-player <player> <string>:
+    permission: op
+    trigger:
+        arg 1.setResourcePack(arg 2)
+
+
+on command:
+    if command is ("//calc", "//calculate", "//eval", "//evaluate", or "//solve"):
+        player isn't an operator
+        cancel event
+        send "&cThis command is blocked due to potential crash method." to player
+
+on damage with priority lowest:
+    attacker's tool is stick named "&fStick That Does 10 Damage" with lore "&7Over 1 second..."
+    set damage to 0
+    metadata "is;dying" of victim isn't true
+    set metadata "is;dying" of victim to true
+    loop 100 times:
+        remove 0.1 from victim's health
+        play hurt animation on victim
+        if mod(loop-counter, 5) is 0:
+            wait 1 tick
+    set metadata "is;dying" of victim to false

@@ -1,0 +1,59 @@
+{
+  "type": "imageframe:url_static",
+  "index": 2,
+  "name": "laura",
+  "url": "https://cdn.discordapp.com/attachments/1311367214795849861/1515106748145467543/A_Laura_is_talking.png?ex\u003d6a2dcc9e\u0026is\u003d6a2c7b1e\u0026hm\u003d295dfe2b2a6a2005e120688f3515eb7210365947fd3fa93cdae2cfc48d89176c\u0026",
+  "width": 3,
+  "height": 3,
+  "ditheringType": "nearest-color",
+  "creator": "26dc0ca0-7aaa-467a-b008-044c30c2177e",
+  "hasAccess": {},
+  "creationTime": 1781300005947,
+  "mapdata": [
+    {
+      "mapid": 305,
+      "image": "0.png",
+      "markers": []
+    },
+    {
+      "mapid": 306,
+      "image": "1.png",
+      "markers": []
+    },
+    {
+      "mapid": 307,
+      "image": "2.png",
+      "markers": []
+    },
+    {
+      "mapid": 308,
+      "image": "3.png",
+      "markers": []
+    },
+    {
+      "mapid": 309,
+      "image": "4.png",
+      "markers": []
+    },
+    {
+      "mapid": 310,
+      "image": "5.png",
+      "markers": []
+    },
+    {
+      "mapid": 311,
+      "image": "6.png",
+      "markers": []
+    },
+    {
+      "mapid": 312,
+      "image": "7.png",
+      "markers": []
+    },
+    {
+      "mapid": 313,
+      "image": "8.png",
+      "markers": []
+    }
+  ]
+}
