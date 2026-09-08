@@ -1,0 +1,58 @@
+[
+  {
+    "uuid": "f9f758b1-df75-443c-85ab-734d16a02168",
+    "name": "_FTN_",
+    "created": "2025-09-04 17:58:29 +0000",
+    "source": "siqns",
+    "expires": "forever",
+    "reason": "a"
+  },
+  {
+    "uuid": "8b6d5697-7f04-4364-a668-4c4e81b2213c",
+    "name": "DevilishRak",
+    "created": "2025-03-05 12:32:17 +0000",
+    "source": "Server",
+    "expires": "forever",
+    "reason": "Banned by an operator."
+  },
+  {
+    "uuid": "44d78dc7-cc31-4b15-9ffa-55df992fc661",
+    "name": "Dominateaur",
+    "created": "2025-02-22 18:20:30 +0000",
+    "source": "Egono",
+    "expires": "forever",
+    "reason": "Banned by an operator."
+  },
+  {
+    "uuid": "06f7cd12-4f00-4342-85f6-956b1ca48d38",
+    "name": "Tubbo_",
+    "created": "2025-12-25 10:07:56 +0000",
+    "source": "Server",
+    "expires": "forever",
+    "reason": "Banned by an operator."
+  },
+  {
+    "uuid": "64c7aa6e-4bc1-43f3-b034-eb7736c43f1e",
+    "name": "SwissHacks",
+    "created": "2025-02-22 18:20:35 +0000",
+    "source": "Egono",
+    "expires": "forever",
+    "reason": "Banned by an operator."
+  },
+  {
+    "uuid": "c2c7b10f-87d6-4cf1-8a86-973a2268b9ba",
+    "name": "Goofa23",
+    "created": "2025-09-04 18:15:45 +0000",
+    "source": "Skript ban effect",
+    "expires": "forever",
+    "reason": "test"
+  },
+  {
+    "uuid": "b0d52f45-13cf-4906-92d9-01cb79ef3c25",
+    "name": "Henreeco",
+    "created": "2025-09-06 08:44:58 +0000",
+    "source": "The_Bear__",
+    "expires": "2027-09-07 08:44:58 +0000",
+    "reason": "underage"
+  }
+]
