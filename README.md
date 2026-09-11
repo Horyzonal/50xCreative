@@ -10,9 +10,12 @@ Server files have been repacked by me.
 
 7zip (.7z) files are added compressed archives of files I deem cumbersome. They are also compressed to fit for github uploads.
 
-The original files are ~ 9.1 GiB (+27.5 GiB Plots world file)
+- The original files are ~ 9.1 GiB (+27.5 GiB Plots world file)
+- And have been compressed to ~ 1.8 GiB (+ 18.8 GiB Plots world file)
 
-And have been compressed to ~ 1.8 GiB (+ 18.8 GiB Plots world file)
+2026 plot files can be downloaded from [Archive.org](https://archive.org/details/plots.7z)
+
+Non-repacked versions can be downloaded from [github](https://github.com/Horyzonal/50xCreative/releases/download/lf/Original.Server.files.7z) or [Archive.org](https://archive.org/details/50x.7z)
 
 See Server/repacke du.txt | Server/repacked du d1.txt
 
